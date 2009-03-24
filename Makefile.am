@@ -1,10 +1,12 @@
-EXTRA_DIST=genmarshal pygnt
+EXTRA_DIST=genmarshal
 
 SUBDIRS = . wms
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = gnt.pc
 
 lib_LTLIBRARIES = libgnt.la
+
+noinst_HEADERS = gntinternal.h
 
 BUILT_SOURCES = gntmarshal.h
 
