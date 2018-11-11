@@ -31,9 +31,7 @@
 
 #include <glib.h>
 
-#ifdef HAVE_CONFIG_H
-#  include <gntconfig.h>
-#endif
+#include <gntconfig.h>
 #ifdef _WIN32
 #  undef KEY_EVENT
 #endif

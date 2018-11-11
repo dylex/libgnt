@@ -1,108 +1,133 @@
 # UPDATING VERSION NUMBERS FOR RELEASES
 #
+# The version number is:
+#   <major>.<minor>.<micro><suffix>
+#
 # If any code has changed in libgnt:
-#   gnt_micro_version += 1
+#   micro += 1
 #
 # If any functions have been added to libgnt:
-#   gnt_micro_version = 0
-#   gnt_minor_version += 1
-#   gnt_lt_current += 1
+#   micro = 0
+#   minor += 1
 #
 # If backwards compatibility has been broken in libgnt:
-#   gnt_micro_version = 0
-#   gnt_minor_version = 0
-#   gnt_major_version += 1;
-#   gnt_lt_current += 1
+#   micro = 0
+#   minor = 0
+#   major += 1
+#   gnt_soversion += 1
 #
-# gnt_version_suffix should be similar to one of the following:
-#   For beta releases:          'beta2'
-#   For code under development: 'devel'
+# suffix should be similar to one of the following:
+#   For beta releases:          '-beta2'
+#   For code under development: '-devel'
 #   For production releases:    ''
 #
 
 # the last version for Finch 2 was 2.8.10,
 # the first version for Finch 3 was 2.9.0
-gnt_lt_current = 9
-gnt_major_version = 2
-gnt_minor_version = 9
-gnt_micro_version = 0
-gnt_version_suffix = 'devel'
-gnt_version = '@0@.@1@.@2@'.format(gnt_major_version,
-                                   gnt_minor_version,
-                                   gnt_micro_version)
-gnt_display_version = '@0@@1@'.format(gnt_version,
-                                      gnt_version_suffix)
 
-GNT_LIB_VERSION = '@0@.@1@.@2@'.format(gnt_lt_current - gnt_minor_version,
-                                       gnt_minor_version,
-                                       gnt_micro_version)
+project('libgnt', 'c',
+    version : '2.9.0-devel',
+    meson_version : '>=0.37.0')
+gnt_soversion = 1
 
-# Always true when built as part of pidgin repo.
-PURPLE_AVAILABLE = true
+parts = meson.project_version().split('-')
+if parts.length() > 1
+  gnt_extra_version = parts[1]
+else
+  gnt_extra_version = ''
+endif
+
+parts = parts[0].split('.')
+gnt_major_version = parts[0]
+gnt_minor_version = parts[1]
+gnt_micro_version = parts[2]
 
 gnt_config = configuration_data()
+gnt_config.set('GNT_MAJOR_VERSION', gnt_major_version)
+gnt_config.set('GNT_MINOR_VERSION', gnt_minor_version)
+gnt_config.set('GNT_MICRO_VERSION', gnt_micro_version)
+gnt_config.set_quoted('GNT_EXTRA_VERSION', gnt_extra_version)
+gnt_config.set_quoted('GNT_VERSION', meson.project_version())
+
+# FIXME Not available when independent.
+PURPLE_AVAILABLE = false
+
+compiler = meson.get_compiler('c')
+pkgconfig = import('pkgconfig')
+
+# #######################################################################
+# # Check for GLib 2.40
+# #######################################################################
+glib = dependency('glib-2.0', version : '>= 2.40.0')
+gobject = dependency('gobject-2.0')
+gnome = import('gnome')
 
 #######################################################################
-# Check for ncurses and other things used by the console UI
+# Check for LibXML2
 #######################################################################
-ncurses_available = false
-if get_option('consoleui')
-	ncurses_available = true
-	ncurses_inc = []
-	ncurses_libs = [
-		compiler.find_library('ncursesw', required : false),
-		compiler.find_library('panelw', required : false)
-	]
-	if not ncurses_libs[0].found() or not ncurses_libs[1].found()
+libxml = dependency('libxml-2.0', version : '>= 2.6.0')
+
+#######################################################################
+# Check for ncurses and other things used by it
+#######################################################################
+ncurses_available = true
+ncurses_inc = []
+ncurses_libs = [
+	compiler.find_library('ncursesw', required : false),
+	compiler.find_library('panelw', required : false)
+]
+if not ncurses_libs[0].found() or not ncurses_libs[1].found()
+	ncurses_available = false
+endif
+
+if host_machine.system() == 'windows'
+	# FIXME: $host ?
+	ncurses_sys_prefix = '/usr/$host/sys-root/mingw'
+else
+	ncurses_sys_prefix = '/usr'
+endif
+
+ncurses_sys_dirs = [ncurses_sys_prefix + '/include/ncursesw',
+                    ncurses_sys_prefix + '/include']
+
+if ncurses_available
+	# Some distros put the headers in ncursesw/, some don't
+	found_ncurses_h = false
+	foreach location : ncurses_sys_dirs
+		f = location + '/ncurses.h'
+		if not found_ncurses_h
+			if compiler.has_header_symbol(f, 'get_wch',
+			    prefix : '#define _XOPEN_SOURCE_EXTENDED')
+				if location != '.'
+					ncurses_inc += [include_directories(location)]
+				endif
+				found_ncurses_h = true
+			endif
+		endif
+	endforeach
+
+	if not found_ncurses_h
+		ncurses_inc = []
+		ncurses_libs = []
 		ncurses_available = false
 	endif
-
-	if IS_WIN32
-		# FIXME: $host ?
-		ncurses_sys_prefix = '/usr/$host/sys-root/mingw'
-	else
-		ncurses_sys_prefix = '/usr'
-	endif
-
-	ncurses_sys_dirs = [ncurses_sys_prefix + '/include/ncursesw',
-	                    ncurses_sys_prefix + '/include']
-
-	if ncurses_available
-		# Some distros put the headers in ncursesw/, some don't
-		found_ncurses_h = false
-		foreach location : ncurses_sys_dirs
-			f = location + '/ncurses.h'
-			if not found_ncurses_h
-				if compiler.has_header_symbol(f, 'get_wch',
-				       prefix : '#define _XOPEN_SOURCE_EXTENDED')
-					if location != '.'
-						ncurses_inc += [include_directories(location)]
-					endif
-					found_ncurses_h = true
-				endif
-			endif
-		endforeach
-
-		if not found_ncurses_h
-			ncurses_inc = []
-			ncurses_libs = []
-			ncurses_available = false
-		endif
-	else
-		# ncursesw was not found. Look for plain old ncurses
-		ncurses_libs = [
-			compiler.find_library('ncurses', required : false),
-			compiler.find_library('panel', required : false)
-		]
-		ncurses_available = ncurses_libs[0].found() and ncurses_libs[1].found()
-		gnt_config.set('NO_WIDECHAR', true)
-	endif
-
-	ncurses = declare_dependency(
-	    include_directories : ncurses_inc,
-	    dependencies : ncurses_libs
-	)
+else
+	# ncursesw was not found. Look for plain old ncurses
+	ncurses_libs = [
+		compiler.find_library('ncurses', required : false),
+		compiler.find_library('panel', required : false)
+	]
+	ncurses_available = ncurses_libs[0].found() and ncurses_libs[1].found()
+	gnt_config.set('NO_WIDECHAR', true)
 endif
+if not ncurses_available
+	error('ncurses could not be found!')
+endif
+
+ncurses = declare_dependency(
+    include_directories : ncurses_inc,
+    dependencies : ncurses_libs
+)
 
 libgnt_SOURCES = [
 	'gntwidget.c',
@@ -162,10 +187,8 @@ libgnt_headers = [
 	'gnt.h'
 ]
 
-if ncurses_available
-
 # Check for Python headers
-python_dep = dependency('python3')
+python_dep = dependency('python3', required : false)
 gnt_config.set('USE_PYTHON', python_dep.found())
 
 configure_file(output : 'gntconfig.h',
@@ -175,32 +198,35 @@ gmodule = dependency('gmodule-2.0')
 
 install_headers(libgnt_headers, subdir : 'gnt')
 
-if IS_WIN32
+if host_machine.system() == 'windows'
 	libgnt_SOURCES += windows.compile_resources('libgnt_winres.rc')
 endif
 
 libgnt_inc = include_directories('.')
 libgnt = library('gnt',
                  libgnt_SOURCES,
-                 include_directories : [toplevel_inc],
                  install : true,
-                 version : GNT_LIB_VERSION,
+                 version : '@0@.@1@.@2@'.format(gnt_soversion,
+                                                gnt_minor_version,
+                                                gnt_micro_version),
                  dependencies : [ncurses, libxml, glib, gobject, gmodule, python_dep])
 libgnt_dep = declare_dependency(
-    include_directories : [toplevel_inc, libgnt_inc],
+    include_directories : libgnt_inc,
     link_with : libgnt,
     dependencies : [ncurses, glib])
 
 pkgconfig.generate(
     name : 'LibGNT',
     description : 'Glib Ncurses Toolkit is a collection of curses-widgets.',
-    version : purple_display_version,
+    version : meson.project_version(),
     filebase : 'gnt',
     subdirs : 'gnt',
     libraries : [libgnt],
-    requires : ['glib-2.0'])
+    requires : ['glib-2.0'],
+    variables : ['plugindir = ${libdir}/gnt'],
+    )
 
-if enable_introspection
+if get_option('introspection')
 	libgnt_gir = gnome.generate_gir(libgnt,
 	    sources : libgnt_headers,
 	    includes : 'GObject-2.0',
@@ -213,5 +239,3 @@ endif
 
 subdir('wms')
 subdir('test')
-
-endif  # ncurses_available
