@@ -193,6 +193,10 @@ gnt_config.set('USE_PYTHON', python_dep.found())
 
 configure_file(output : 'gntconfig.h',
     configuration : gnt_config)
+configure_file(input : 'gntversion.h.in', output : 'gntversion.h',
+    configuration : gnt_config,
+    install : true,
+    install_dir : join_paths(get_option('includedir'), 'gnt'))
 
 gmodule = dependency('gmodule-2.0')
 
