@@ -25,7 +25,7 @@
 #define _XOPEN_SOURCE_EXTENDED
 #endif
 
-#include "config.h"
+#include "gntconfig.h"
 
 #include <gmodule.h>
 
