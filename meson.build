@@ -134,6 +134,14 @@ if not ncurses_available
 	ncurses_widechar = false
 endif
 
+if not ncurses_available and host_machine.system() == 'windows'
+	# Try pdcurses too.
+	ncurses_header = 'curses.h'
+	ncurses_libs = compiler.find_library('pdcurses', required : false)
+	ncurses_available = compiler.has_header(ncurses_header) and ncurses_libs.found()
+	ncurses = declare_dependency(dependencies : ncurses_libs)
+endif
+
 if not ncurses_available
 	error('ncurses could not be found!')
 endif
@@ -219,7 +227,12 @@ gmodule = dependency('gmodule-2.0')
 install_headers(libgnt_headers, subdir : 'gnt')
 
 if host_machine.system() == 'windows'
-	libgnt_SOURCES += windows.compile_resources('libgnt_winres.rc')
+	windows = import('windows')
+	libgnt_winres = configure_file(
+	    input : 'libgnt_winres.rc.in',
+	    output : 'libgnt_winres.rc',
+	    configuration : gnt_config)
+	libgnt_SOURCES += windows.compile_resources(libgnt_winres)
 endif
 
 libgnt_inc = include_directories('.')
@@ -246,7 +259,7 @@ pkgconfig.generate(
     variables : ['plugindir = ${libdir}/gnt'],
     )
 
-if get_option('introspection')
+if get_option('introspection') and host_machine.system() != 'windows'
 	libgnt_gir = gnome.generate_gir(libgnt,
 	    sources : libgnt_headers,
 	    includes : 'GObject-2.0',

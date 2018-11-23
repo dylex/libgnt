@@ -15,12 +15,12 @@ VS_VERSION_INFO VERSIONINFO
       BEGIN
         VALUE "CompanyName", "The Pidgin developer community"
         VALUE "FileDescription", "Glib ncurses toolkit"
-        VALUE "FileVersion", "@GNT_VERSION@"
+        VALUE "FileVersion", @GNT_VERSION@
         VALUE "InternalName", "libgnt"
         VALUE "LegalCopyright", "Copyright (C) 1998-2014 The Pidgin developer community (See the COPYRIGHT file in the source distribution)."
-        VALUE "OriginalFilename", "libgnt-@GNT_API_VERSION@.dll"
+        VALUE "OriginalFilename", "libgnt-@GNT_MAJOR_VERSION@.dll"
         VALUE "ProductName", "libgnt"
-        VALUE "ProductVersion", "@GNT_VERSION@"
+        VALUE "ProductVersion", @GNT_VERSION@
       END
     END
     BLOCK "VarFileInfo"
