@@ -591,7 +591,7 @@ void gnt_init()
 
 	setup_io();
 
-#ifdef NO_WIDECHAR
+#if !NCURSES_WIDECHAR
 	ascii_only = TRUE;
 	(void)locale;
 #else

@@ -31,15 +31,10 @@
 
 #include <glib.h>
 
-#include <gntconfig.h>
 #ifdef _WIN32
 #  undef KEY_EVENT
 #endif
-#ifdef NO_WIDECHAR
-#  define NCURSES_WIDECHAR 0
-#else
-#  define NCURSES_WIDECHAR 1
-#endif
+#define NCURSES_WIDECHAR @NCURSES_WIDECHAR@
 #include <ncurses.h>
 
 #include "gntwidget.h"

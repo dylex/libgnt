@@ -111,6 +111,7 @@ if ncurses_available
 		ncurses_libs = []
 		ncurses_available = false
 	endif
+	gnt_config.set('NCURSES_WIDECHAR', 1)
 else
 	# ncursesw was not found. Look for plain old ncurses
 	ncurses_libs = [
@@ -118,7 +119,7 @@ else
 		compiler.find_library('panel', required : false)
 	]
 	ncurses_available = ncurses_libs[0].found() and ncurses_libs[1].found()
-	gnt_config.set('NO_WIDECHAR', true)
+	gnt_config.set('NCURSES_WIDECHAR', 0)
 endif
 if not ncurses_available
 	error('ncurses could not be found!')
@@ -184,7 +185,7 @@ libgnt_headers = [
 	'gntwindow.h',
 	'gntwm.h',
 	'gntws.h',
-	'gnt.h'
+#	'gnt.h'
 ]
 
 # Check for Python headers
@@ -194,6 +195,11 @@ gnt_config.set('USE_PYTHON', python_dep.found())
 configure_file(output : 'gntconfig.h',
     configuration : gnt_config)
 configure_file(input : 'gntversion.h.in', output : 'gntversion.h',
+    configuration : gnt_config,
+    install : true,
+    install_dir : join_paths(get_option('includedir'), 'gnt'))
+# This is temporary until we can hide GObject internals:
+configure_file(input : 'gnt.h.in', output : 'gnt.h',
     configuration : gnt_config,
     install : true,
     install_dir : join_paths(get_option('includedir'), 'gnt'))

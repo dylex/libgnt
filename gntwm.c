@@ -89,7 +89,7 @@ static void shift_window(GntWM *wm, GntWidget *widget, int dir);
 static gboolean workspace_next(GntBindable *wm, GList *n);
 static gboolean workspace_prev(GntBindable *wm, GList *n);
 
-#ifndef NO_WIDECHAR
+#if NCURSES_WIDECHAR
 static int widestringwidth(wchar_t *wide);
 #endif
 
@@ -157,7 +157,7 @@ gnt_wm_copy_win(GntWidget *widget, GntNode *node)
 static void
 work_around_for_ncurses_bug(void)
 {
-#ifndef NO_WIDECHAR
+#if NCURSES_WIDECHAR
 	PANEL *panel = NULL;
 	while ((panel = panel_below(panel)) != NULL) {
 		int sx, ex, sy, ey, w, y;
@@ -732,7 +732,7 @@ dump_file_save(GntFileSel *fs, const char *path, const char *f, gpointer n)
 	for (y = 0; y < getmaxy(stdscr); y++) {
 		for (x = 0; x < getmaxx(stdscr); x++) {
 			char ch[2] = {0, 0}, *print;
-#ifdef NO_WIDECHAR
+#if !NCURSES_WIDECHAR
 			now = mvwinch(curscr, y, x);
 			ch[0] = now & A_CHARTEXT;
 			now ^= ch[0];
@@ -806,7 +806,7 @@ dump_file_save(GntFileSel *fs, const char *path, const char *f, gpointer n)
 						bg.r, bg.g, bg.b, fg.r, fg.g, fg.b);
 			}
 			print = ch;
-#ifndef NO_WIDECHAR
+#if NCURSES_WIDECHAR
 			if (wch.chars[0] > 255) {
 				snprintf(unicode, sizeof(unicode), "&#x%x;", (unsigned int)wch.chars[0]);
 				print = unicode;
@@ -982,7 +982,7 @@ list_actions(GntBindable *bindable, GList *null)
 	return TRUE;
 }
 
-#ifndef NO_WIDECHAR
+#if NCURSES_WIDECHAR
 static int
 widestringwidth(wchar_t *wide)
 {
@@ -1004,7 +1004,7 @@ reverse_char(WINDOW *d, int y, int x, gboolean set)
 {
 #define DECIDE(ch) (set ? ((ch) | A_REVERSE) : ((ch) & ~A_REVERSE))
 
-#ifdef NO_WIDECHAR
+#if !NCURSES_WIDECHAR
 	chtype ch;
 	ch = mvwinch(d, y, x);
 	mvwaddch(d, y, x, DECIDE(ch));

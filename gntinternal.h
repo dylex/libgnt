@@ -21,6 +21,7 @@
  */
 
 #include "gnt.h"
+#include "gntconfig.h"
 
 #undef G_LOG_DOMAIN
 #define G_LOG_DOMAIN "Gnt"
