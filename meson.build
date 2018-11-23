@@ -71,64 +71,74 @@ libxml = dependency('libxml-2.0', version : '>= 2.6.0')
 # Check for ncurses and other things used by it
 #######################################################################
 ncurses_available = true
-ncurses_inc = []
-ncurses_libs = [
-	compiler.find_library('ncursesw', required : false),
-	compiler.find_library('panelw', required : false)
+ncurses_widechar = true
+ncurses_header = 'ncurses.h'
+# Some distros put the headers in ncursesw/, some don't. These are ordered to
+# pick the last available as most-specific version.
+ncursesw_header_paths = ['', 'ncursesw/']
+
+ncurses = [
+	dependency('ncursesw', required : false),
+	dependency('panelw', required : false),
 ]
-if not ncurses_libs[0].found() or not ncurses_libs[1].found()
-	ncurses_available = false
-endif
-
-if host_machine.system() == 'windows'
-	# FIXME: $host ?
-	ncurses_sys_prefix = '/usr/$host/sys-root/mingw'
-else
-	ncurses_sys_prefix = '/usr'
-endif
-
-ncurses_sys_dirs = [ncurses_sys_prefix + '/include/ncursesw',
-                    ncurses_sys_prefix + '/include']
-
-if ncurses_available
-	# Some distros put the headers in ncursesw/, some don't
-	found_ncurses_h = false
-	foreach location : ncurses_sys_dirs
-		f = location + '/ncurses.h'
-		if not found_ncurses_h
-			if compiler.has_header_symbol(f, 'get_wch',
-			    prefix : '#define _XOPEN_SOURCE_EXTENDED')
-				if location != '.'
-					ncurses_inc += [include_directories(location)]
-				endif
-				found_ncurses_h = true
-			endif
+if ncurses[0].found() and ncurses[1].found()
+	foreach location : ncursesw_header_paths
+		f = location + 'ncurses.h'
+		if compiler.has_header_symbol(f, 'get_wch',
+		    prefix : '#define _XOPEN_SOURCE_EXTENDED')
+			ncurses_header = f
 		endif
 	endforeach
-
-	if not found_ncurses_h
-		ncurses_inc = []
-		ncurses_libs = []
-		ncurses_available = false
-	endif
-	gnt_config.set('NCURSES_WIDECHAR', 1)
 else
-	# ncursesw was not found. Look for plain old ncurses
+	ncurses_available = false
+	ncurses_inc = []
 	ncurses_libs = [
-		compiler.find_library('ncurses', required : false),
-		compiler.find_library('panel', required : false)
+		compiler.find_library('ncursesw', required : false),
+		compiler.find_library('panelw', required : false)
 	]
-	ncurses_available = ncurses_libs[0].found() and ncurses_libs[1].found()
-	gnt_config.set('NCURSES_WIDECHAR', 0)
+	if ncurses_libs[0].found() and ncurses_libs[1].found()
+		foreach location : ncursesw_header_paths
+			f = location + 'ncurses.h'
+			if compiler.has_header_symbol(f, 'get_wch',
+			    prefix : '#define _XOPEN_SOURCE_EXTENDED')
+				ncurses_available = true
+				ncurses_header = f
+			endif
+		endforeach
+
+		if ncurses_available
+			ncurses = declare_dependency(
+			    include_directories : ncurses_inc,
+			    dependencies : ncurses_libs
+			)
+		endif
+	endif
 endif
+
+if not ncurses_available
+	# ncursesw was not found. Look for plain old ncurses
+	ncurses = [
+		dependency('ncurses', required : false),
+		dependency('panel', required : false),
+	]
+	if ncurses[0].found() and ncurses_libs[1].found()
+		ncurses_available = true
+	else
+		ncurses_libs = [
+			compiler.find_library('ncurses', required : false),
+			compiler.find_library('panel', required : false),
+		]
+		ncurses_available = ncurses_libs[0].found() and ncurses_libs[1].found()
+		ncurses = declare_dependency(dependencies : ncurses_libs)
+	endif
+	ncurses_widechar = false
+endif
+
 if not ncurses_available
 	error('ncurses could not be found!')
 endif
-
-ncurses = declare_dependency(
-    include_directories : ncurses_inc,
-    dependencies : ncurses_libs
-)
+gnt_config.set('NCURSES_HEADER', ncurses_header)
+gnt_config.set10('NCURSES_WIDECHAR', ncurses_widechar)
 
 libgnt_SOURCES = [
 	'gntwidget.c',

@@ -35,7 +35,7 @@
 #  undef KEY_EVENT
 #endif
 #define NCURSES_WIDECHAR @NCURSES_WIDECHAR@
-#include <ncurses.h>
+#include <@NCURSES_HEADER@>
 
 #include "gntwidget.h"
 #include "gntclipboard.h"
