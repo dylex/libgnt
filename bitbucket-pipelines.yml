@@ -8,4 +8,4 @@ pipelines:
           - meson build-pipelines
           - ninja -C build-pipelines
           - ninja -C build-pipelines test
-
+          - ninja -C build-pipelines libgnt-doc

@@ -272,3 +272,4 @@ endif
 
 subdir('wms')
 subdir('test')
+subdir('doc')
