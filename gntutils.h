@@ -162,7 +162,7 @@ gboolean gnt_util_parse_xhtml_to_textview(const char *string, GntTextView *tv);
  *
  * Make some keypress activate a button when some key is pressed with 'wid' in focus.
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.1.0
  */
 void gnt_util_set_trigger_widget(GntWidget *widget, const char *key, GntWidget *button);
 

@@ -74,7 +74,7 @@ gboolean gnt_ascii_only(void);
  * Present a window. If the event was triggered because of user interaction,
  * the window is moved to the foreground. Otherwise, the Urgent hint is set.
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.1.0
  */
 void gnt_window_present(GntWidget *window);
 

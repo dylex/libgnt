@@ -82,7 +82,7 @@ G_BEGIN_DECLS
  *
  * Returns: The GType for GntSlider
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.1.0
  */
 GType gnt_slider_get_gtype(void);
 
@@ -99,7 +99,7 @@ GType gnt_slider_get_gtype(void);
  *
  * Returns:  The newly created slider
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.1.0
  */
 GntWidget * gnt_slider_new(gboolean orient, int max, int min);
 
@@ -123,7 +123,7 @@ gboolean gnt_slider_get_vertical(GntSlider *slider);
  *
  * Set the range of the slider.
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.1.0
  */
 void gnt_slider_set_range(GntSlider *slider, int max, int min);
 
@@ -146,7 +146,7 @@ void gnt_slider_get_range(GntSlider *slider, int *max, int *min);
  *
  * Sets the amount of change at each step.
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.1.0
  */
 void gnt_slider_set_step(GntSlider *slider, int step);
 
@@ -218,7 +218,7 @@ int gnt_slider_get_large_step(GntSlider *slider);
  *
  * Returns:   The value of the slider after the change
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.1.0
  */
 int gnt_slider_advance_step(GntSlider *slider, int steps);
 
@@ -229,7 +229,7 @@ int gnt_slider_advance_step(GntSlider *slider, int steps);
  *
  * Set the current value for the slider.
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.1.0
  */
 void gnt_slider_set_value(GntSlider *slider, int value);
 
@@ -239,7 +239,7 @@ void gnt_slider_set_value(GntSlider *slider, int value);
  *
  * Get the current value for the slider.
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.1.0
  */
 int gnt_slider_get_value(GntSlider *slider);
 
@@ -250,7 +250,7 @@ int gnt_slider_get_value(GntSlider *slider);
  *
  * Update a label with the value of the slider whenever the value changes.
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.1.0
  */
 void gnt_slider_reflect_label(GntSlider *slider, GntLabel *label);
 

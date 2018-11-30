@@ -254,7 +254,7 @@ void gnt_text_view_attach_editor_widget(GntTextView *view, GntWidget *widget);
  *
  * Set a GntTextViewFlag for the textview widget.
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.1.0
  */
 void gnt_text_view_set_flag(GntTextView *view, GntTextViewFlag flag);
 

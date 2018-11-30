@@ -70,7 +70,7 @@ const char *gnt_style_get(GntStyle style);
  *
  * Returns:  The value of the setting as a string, or %NULL
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.1.0
  */
 char *gnt_style_get_from_name(const char *group, const char *key);
 
@@ -113,7 +113,7 @@ int gnt_style_get_color(char *group, char *key);
  *
  * Returns:    The boolean value
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.1.0
  */
 gboolean gnt_style_parse_bool(const char *value);
 
