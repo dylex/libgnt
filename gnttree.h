@@ -261,7 +261,7 @@ GList * gnt_tree_get_row_text_list(GntTree *tree, gpointer key);
  *
  * Returns: (transfer none): The key of the row.
  *
- * Since: 2.8.0 (gnt), 2.7.2 (pidgin)
+ * Since: 2.8.0
  */
 gpointer gnt_tree_row_get_key(GntTree *tree, GntTreeRow *row);
 
@@ -274,7 +274,7 @@ gpointer gnt_tree_row_get_key(GntTree *tree, GntTreeRow *row);
  *
  * Returns: The next row.
  *
- * Since: 2.8.0 (gnt), 2.7.2 (pidgin)
+ * Since: 2.8.0
  */
 GntTreeRow * gnt_tree_row_get_next(GntTree *tree, GntTreeRow *row);
 
@@ -287,7 +287,7 @@ GntTreeRow * gnt_tree_row_get_next(GntTree *tree, GntTreeRow *row);
  *
  * Returns: The previous row.
  *
- * Since: 2.8.0 (gnt), 2.7.2 (pidgin)
+ * Since: 2.8.0
  */
 GntTreeRow * gnt_tree_row_get_prev(GntTree *tree, GntTreeRow *row);
 
@@ -300,7 +300,7 @@ GntTreeRow * gnt_tree_row_get_prev(GntTree *tree, GntTreeRow *row);
  *
  * Returns: The child row.
  *
- * Since: 2.8.0 (gnt), 2.7.2 (pidgin)
+ * Since: 2.8.0
  */
 GntTreeRow * gnt_tree_row_get_child(GntTree *tree, GntTreeRow *row);
 
@@ -313,7 +313,7 @@ GntTreeRow * gnt_tree_row_get_child(GntTree *tree, GntTreeRow *row);
  *
  * Returns: The parent row.
  *
- * Since: 2.8.0 (gnt), 2.7.2 (pidgin)
+ * Since: 2.8.0
  */
 GntTreeRow * gnt_tree_row_get_parent(GntTree *tree, GntTreeRow *row);
 
@@ -503,7 +503,7 @@ void gnt_tree_set_col_width(GntTree *tree, int col, int width);
  *
  * See gnt_tree_set_column_titles(), gnt_tree_set_show_title().
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.0.0
  */
 void gnt_tree_set_column_title(GntTree *tree, int index, const char *title);
 
@@ -615,7 +615,7 @@ void gnt_tree_set_column_visible(GntTree *tree, int col, gboolean vis);
  *
  * See gnt_tree_set_col_width(), gnt_tree_set_column_width_ratio().
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.0.0
  */
 void gnt_tree_set_column_resizable(GntTree *tree, int col, gboolean res);
 
@@ -638,7 +638,7 @@ void gnt_tree_set_column_is_binary(GntTree *tree, int col, gboolean bin);
  *
  * Set whether text in a column should be right-aligned.
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.0.0
  */
 void gnt_tree_set_column_is_right_aligned(GntTree *tree, int col, gboolean right);
 
@@ -654,7 +654,7 @@ void gnt_tree_set_column_is_right_aligned(GntTree *tree, int col, gboolean right
  *
  * See gnt_tree_set_col_width(), gnt_tree_set_column_resizable().
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.0.0
  */
 void gnt_tree_set_column_width_ratio(GntTree *tree, int cols[]);
 
@@ -665,7 +665,7 @@ void gnt_tree_set_column_width_ratio(GntTree *tree, int cols[]);
  *
  * Set the column to use for typeahead searching.
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.0.0
  */
 void gnt_tree_set_search_column(GntTree *tree, int col);
 
@@ -677,7 +677,7 @@ void gnt_tree_set_search_column(GntTree *tree, int col);
  *
  * Returns:  %TRUE if the user is searching, %FALSE otherwise.
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.0.0
  */
 gboolean gnt_tree_is_searching(GntTree *tree);
 
@@ -692,7 +692,7 @@ gboolean gnt_tree_is_searching(GntTree *tree);
  *
  * Set a custom search function.
  *
- * Since: 2.0.0 (gnt), 2.1.0 (pidgin)
+ * Since: 2.0.0
  */
 void gnt_tree_set_search_function(GntTree *tree,
 		gboolean (*func)(GntTree *tree, gpointer key, const char *search, const char *current));
