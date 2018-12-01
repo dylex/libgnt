@@ -20,7 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include "internal.h"
+#include "gntinternal.h"
 
 #include <string.h>
 #include <sys/types.h>
@@ -32,8 +32,6 @@
 #include "gntwm.h"
 #include "gntwindow.h"
 #include "gntlabel.h"
-
-#include "buddylist.h"
 
 #define TYPE_S				(s_get_type())
 
@@ -188,14 +186,12 @@ s_mouse_clicked(GntWM *wm, GntMouseEvent event, int cx, int cy, GntWidget *widge
 }
 
 static gboolean
-toggle_buddylist(GntBindable *bindable, GList *null)
+raise_buddylist(GntBindable *bindable, GList *null)
 {
 	GntWM *wm = GNT_WM(bindable);
 	GntWidget *blist = find_widget(wm, "buddylist");
 	if (blist)
-		gnt_widget_destroy(blist);
-	else
-		purple_blist_show();
+		gnt_wm_raise_window(wm, blist);
 	return TRUE;
 }
 
@@ -211,8 +207,8 @@ s_class_init(SClass *klass)
 	pclass->window_update = s_window_update;
 	pclass->mouse_clicked = s_mouse_clicked;
 
-	gnt_bindable_class_register_action(GNT_BINDABLE_CLASS(klass), "toggle-buddylist",
-				toggle_buddylist, "\033" "b", NULL);
+	gnt_bindable_class_register_action(GNT_BINDABLE_CLASS(klass),
+			"raise-buddylist", raise_buddylist, "\033" "b", NULL);
 	gnt_style_read_actions(G_OBJECT_CLASS_TYPE(klass), GNT_BINDABLE_CLASS(klass));
 	GNTDEBUG;
 }
