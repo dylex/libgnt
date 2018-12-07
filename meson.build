@@ -49,9 +49,6 @@ gnt_config.set('GNT_MICRO_VERSION', gnt_micro_version)
 gnt_config.set_quoted('GNT_EXTRA_VERSION', gnt_extra_version)
 gnt_config.set_quoted('GNT_VERSION', meson.project_version())
 
-# FIXME Not available when independent.
-PURPLE_AVAILABLE = false
-
 compiler = meson.get_compiler('c')
 pkgconfig = import('pkgconfig')
 
