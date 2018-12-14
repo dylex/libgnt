@@ -267,7 +267,8 @@ if get_option('introspection') and host_machine.system() != 'windows'
 	    symbol_prefix : 'gnt',
 	    identifier_prefix : 'Gnt',
 	    nsversion : '@0@.@1@'.format(gnt_major_version, gnt_minor_version),
-	    install : true)
+	    install : true,
+	    extra_args : ['--quiet'])
 endif
 
 subdir('wms')
