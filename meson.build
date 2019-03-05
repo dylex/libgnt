@@ -214,7 +214,7 @@ configure_file(input : 'gntversion.h.in', output : 'gntversion.h',
     install : true,
     install_dir : join_paths(get_option('includedir'), 'gnt'))
 # This is temporary until we can hide GObject internals:
-configure_file(input : 'gnt.h.in', output : 'gnt.h',
+gnt_h = configure_file(input : 'gnt.h.in', output : 'gnt.h',
     configuration : gnt_config,
     install : true,
     install_dir : join_paths(get_option('includedir'), 'gnt'))
@@ -258,7 +258,7 @@ pkgconfig.generate(
 
 if get_option('introspection') and host_machine.system() != 'windows'
 	libgnt_gir = gnome.generate_gir(libgnt,
-	    sources : libgnt_headers,
+	    sources : libgnt_headers + [gnt_h],
 	    includes : 'GObject-2.0',
 	    namespace : 'Gnt',
 	    symbol_prefix : 'gnt',
