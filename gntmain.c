@@ -607,6 +607,7 @@ void gnt_init()
 	typeahead(-1);
 	noecho();
 	curs_set(0);
+	keypad(stdscr, 1);
 
 	gnt_init_keys();
 	gnt_init_styles();
