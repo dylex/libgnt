@@ -31,7 +31,11 @@ enum
 };
 static guint signals[SIGS] = { 0 };
 
-static GObjectClass *parent_class = NULL;
+G_DEFINE_TYPE(GntMenuItem, gnt_menuitem, G_TYPE_OBJECT)
+
+/******************************************************************************
+ * GObject Implementation
+ *****************************************************************************/
 
 static void
 gnt_menuitem_destroy(GObject *obj)
@@ -42,14 +46,13 @@ gnt_menuitem_destroy(GObject *obj)
 	if (item->submenu)
 		gnt_widget_destroy(GNT_WIDGET(item->submenu));
 	g_free(item->priv.id);
-	parent_class->dispose(obj);
+	G_OBJECT_CLASS(gnt_menuitem_parent_class)->dispose(obj);
 }
 
 static void
 gnt_menuitem_class_init(GntMenuItemClass *klass)
 {
 	GObjectClass *obj_class = G_OBJECT_CLASS(klass);
-	parent_class = g_type_class_peek_parent(klass);
 
 	obj_class->dispose = gnt_menuitem_destroy;
 
@@ -62,44 +65,14 @@ gnt_menuitem_class_init(GntMenuItemClass *klass)
 }
 
 static void
-gnt_menuitem_init(GTypeInstance *instance, gpointer klass)
+gnt_menuitem_init(GntMenuItem *item)
 {
-	GntMenuItem *item = GNT_MENU_ITEM(instance);
-
 	item->visible = TRUE;
 }
 
 /******************************************************************************
  * GntMenuItem API
  *****************************************************************************/
-GType
-gnt_menuitem_get_type(void)
-{
-	static GType type = 0;
-
-	if(type == 0)
-	{
-		static const GTypeInfo info = {
-			sizeof(GntMenuItemClass),
-			NULL,					/* base_init		*/
-			NULL,					/* base_finalize	*/
-			(GClassInitFunc)gnt_menuitem_class_init,
-			NULL,					/* class_finalize	*/
-			NULL,					/* class_data		*/
-			sizeof(GntMenuItem),
-			0,						/* n_preallocs		*/
-			gnt_menuitem_init,			/* instance_init	*/
-			NULL					/* value_table		*/
-		};
-
-		type = g_type_register_static(G_TYPE_OBJECT,
-									  "GntMenuItem",
-									  &info, 0);
-	}
-
-	return type;
-}
-
 GntMenuItem *gnt_menuitem_new(const char *text)
 {
 	GObject *item = g_object_new(GNT_TYPE_MENU_ITEM, NULL);
