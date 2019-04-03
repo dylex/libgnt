@@ -29,6 +29,12 @@ enum {
 
 static guint signals[SIGS] = { 0 };
 
+G_DEFINE_TYPE(GntClipboard, gnt_clipboard, G_TYPE_OBJECT)
+
+/******************************************************************************
+ * GObject Implementation
+ *****************************************************************************/
+
 static void
 gnt_clipboard_class_init(GntClipboardClass *klass)
 {
@@ -40,6 +46,12 @@ gnt_clipboard_class_init(GntClipboardClass *klass)
 					 NULL, NULL, NULL,
 					 G_TYPE_NONE, 1, G_TYPE_POINTER);
 
+}
+
+static void
+gnt_clipboard_init(GntClipboard *clipboard)
+{
+	clipboard->string = g_strdup("");
 }
 
 /******************************************************************************
@@ -58,36 +70,4 @@ gchar *
 gnt_clipboard_get_string(GntClipboard *clipboard)
 {
 	return g_strdup(clipboard->string);
-}
-
-static void gnt_clipboard_init(GTypeInstance *instance, gpointer class) {
-	GntClipboard *clipboard = GNT_CLIPBOARD(instance);
-	clipboard->string = g_strdup("");
-}
-
-GType
-gnt_clipboard_get_type(void)
-{
-	static GType type = 0;
-
-	if (type == 0) {
-		static const GTypeInfo info = {
-			sizeof(GntClipboardClass),
-			NULL,					/* base_init		*/
-			NULL,					/* base_finalize	*/
-			(GClassInitFunc)gnt_clipboard_class_init,
-			NULL,
-			NULL,					/* class_data		*/
-			sizeof(GntClipboard),
-			0,						/* n_preallocs		*/
-			gnt_clipboard_init,		/* instance_init	*/
-			NULL					/* value_table		*/
-		};
-
-		type = g_type_register_static(G_TYPE_OBJECT,
-									  "GntClipboard",
-									  &info, 0);
-	}
-
-	return type;
 }
