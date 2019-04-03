@@ -37,8 +37,6 @@
 #include "gntwindow.h"
 #include "gntlabel.h"
 
-static GObjectClass *parent_class = NULL;
-
 static struct
 {
 	char * okeys;         /* Old keystrokes */
@@ -47,6 +45,18 @@ static struct
 	char * name;          /* The name of the action */
 	GList * params;       /* The list of paramaters */
 } rebind_info;
+
+typedef struct
+{
+	GHashTable *hash;
+	GntTree *tree;
+} BindingView;
+
+G_DEFINE_TYPE(GntBindable, gnt_bindable, G_TYPE_OBJECT)
+
+/******************************************************************************
+ * Helpers
+ *****************************************************************************/
 
 static void
 gnt_bindable_free_rebind_info(void)
@@ -106,6 +116,7 @@ gnt_bindable_rebinding_grab_key(GntBindable *bindable, const char *text, gpointe
 	}
 	return FALSE;
 }
+
 static void
 gnt_bindable_rebinding_activate(GntBindable *data, gpointer bindable)
 {
@@ -172,12 +183,6 @@ gnt_bindable_rebinding_activate(GntBindable *data, gpointer bindable)
 	gnt_widget_show(win);
 }
 
-typedef struct
-{
-	GHashTable *hash;
-	GntTree *tree;
-} BindingView;
-
 static void
 add_binding(gpointer key, gpointer value, gpointer data)
 {
@@ -198,20 +203,6 @@ add_action(gpointer key, gpointer value, gpointer data)
 {
 	BindingView *bv = data;
 	g_hash_table_insert(bv->hash, value, key);
-}
-
-static void
-gnt_bindable_class_init(GntBindableClass *klass)
-{
-	parent_class = g_type_class_peek_parent(klass);
-
-	klass->actions = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
-				(GDestroyNotify)gnt_bindable_action_free);
-	klass->bindings = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
-				(GDestroyNotify)gnt_bindable_action_param_free);
-
-	gnt_style_read_actions(G_OBJECT_CLASS_TYPE(klass), GNT_BINDABLE_CLASS(klass));
-	GNTDEBUG;
 }
 
 static gpointer
@@ -254,34 +245,28 @@ duplicate_hashes(GntBindableClass *klass)
 }
 
 /******************************************************************************
+ * GObject Implementation
+ *****************************************************************************/
+
+static void
+gnt_bindable_init(G_GNUC_UNUSED GntBindable *bindable)
+{
+}
+
+static void
+gnt_bindable_class_init(GntBindableClass *klass)
+{
+	klass->actions = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
+				(GDestroyNotify)gnt_bindable_action_free);
+	klass->bindings = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
+				(GDestroyNotify)gnt_bindable_action_param_free);
+
+	gnt_style_read_actions(G_OBJECT_CLASS_TYPE(klass), GNT_BINDABLE_CLASS(klass));
+}
+
+/******************************************************************************
  * GntBindable API
  *****************************************************************************/
-GType
-gnt_bindable_get_type(void)
-{
-	static GType type = 0;
-
-	if (type == 0) {
-		static const GTypeInfo info = {
-			sizeof(GntBindableClass),
-			(GBaseInitFunc)duplicate_hashes,	/* base_init		*/
-			NULL,					/* base_finalize	*/
-			(GClassInitFunc)gnt_bindable_class_init,
-			NULL,
-			NULL,					/* class_data		*/
-			sizeof(GntBindable),
-			0,						/* n_preallocs		*/
-			NULL,					/* instance_init	*/
-			NULL					/* value_table		*/
-		};
-
-		type = g_type_register_static(G_TYPE_OBJECT,
-									  "GntBindable",
-									  &info, G_TYPE_FLAG_ABSTRACT);
-	}
-
-	return type;
-}
 
 /*
  * Key Remaps

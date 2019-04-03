@@ -33,22 +33,11 @@
 #include <glib.h>
 #include <glib-object.h>
 
-#define GNT_TYPE_BINDABLE				(gnt_bindable_get_type())
-#define GNT_BINDABLE(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_BINDABLE, GntBindable))
-#define GNT_BINDABLE_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_BINDABLE, GntBindableClass))
-#define GNT_IS_BINDABLE(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_BINDABLE))
-#define GNT_IS_BINDABLE_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_BINDABLE))
-#define GNT_BINDABLE_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_BINDABLE, GntBindableClass))
+#define GNT_TYPE_BINDABLE gnt_bindable_get_type()
 
 #define	GNTDEBUG
 
-typedef struct _GntBindable			GntBindable;
-typedef struct _GntBindableClass		GntBindableClass;
-
-struct _GntBindable
-{
-	GObject inherit;
-};
+typedef struct _GntBindable GntBindable;
 
 struct _GntBindableClass
 {
@@ -68,7 +57,7 @@ struct _GntBindableClass
 
 G_BEGIN_DECLS
 
-GType gnt_bindable_get_type(void);
+G_DECLARE_DERIVABLE_TYPE(GntBindable, gnt_bindable, GNT, BINDABLE, GObject)
 
 /******************/
 /*   Key Remaps   */
