@@ -22,13 +22,19 @@
 
 #include "gnt-skel.h"
 
+struct _GntSkel
+{
+	GntWidget parent;
+};
+
 enum
 {
 	SIGS = 1,
 };
 
-static GntWidgetClass *parent_class = NULL;
 static guint signals[SIGS] = { 0 };
+
+G_DEFINE_TYPE(GntSkel, gnt_skel, GNT_TYPE_WIDGET)
 
 static void
 gnt_skel_draw(GntWidget *widget)
@@ -64,18 +70,21 @@ static void
 gnt_skel_class_init(GntSkelClass *klass)
 {
 	GObjectClass *obj_class = G_OBJECT_CLASS(klass);
+	GntWidgetClass *widget_class = GNT_WIDGET_CLASS(klass);
 
-	parent_class = GNT_WIDGET_CLASS(klass);
-	parent_class->destroy = gnt_skel_destroy;
-	parent_class->draw = gnt_skel_draw;
-	parent_class->map = gnt_skel_map;
-	parent_class->size_request = gnt_skel_size_request;
-	parent_class->key_pressed = gnt_skel_key_pressed;
+	widget_class->destroy = gnt_skel_destroy;
+	widget_class->draw = gnt_skel_draw;
+	widget_class->map = gnt_skel_map;
+	widget_class->size_request = gnt_skel_size_request;
+	widget_class->key_pressed = gnt_skel_key_pressed;
 
-	parent_class->actions = gnt_hash_table_duplicate(parent_class->actions, g_str_hash,
-				g_str_equal, NULL, (GDestroyNotify)gnt_widget_action_free);
-	parent_class->bindings = gnt_hash_table_duplicate(parent_class->bindings, g_str_hash,
-				g_str_equal, NULL, (GDestroyNotify)gnt_widget_action_param_free);
+	widget_class->actions = gnt_hash_table_duplicate(widget_class->actions,
+			g_str_hash, g_str_equal, NULL,
+			(GDestroyNotify)gnt_widget_action_free);
+	widget_class->bindings =
+		gnt_hash_table_duplicate(widget_class->bindings, g_str_hash,
+				g_str_equal, NULL,
+				(GDestroyNotify)gnt_widget_action_param_free);
 
 	gnt_widget_actions_read(G_OBJECT_CLASS_TYPE(klass), klass);
 
@@ -83,41 +92,13 @@ gnt_skel_class_init(GntSkelClass *klass)
 }
 
 static void
-gnt_skel_init(GTypeInstance *instance, gpointer class)
+gnt_skel_init(G_GNUC_UNUSED GntSkel *self)
 {
-	GNTDEBUG;
 }
 
 /******************************************************************************
  * GntSkel API
  *****************************************************************************/
-GType
-gnt_skel_get_type(void)
-{
-	static GType type = 0;
-
-	if(type == 0)
-	{
-		static const GTypeInfo info = {
-			sizeof(GntSkelClass),
-			NULL,					/* base_init		*/
-			NULL,					/* base_finalize	*/
-			(GClassInitFunc)gnt_skel_class_init,
-			NULL,					/* class_finalize	*/
-			NULL,					/* class_data		*/
-			sizeof(GntSkel),
-			0,						/* n_preallocs		*/
-			gnt_skel_init,			/* instance_init	*/
-		};
-
-		type = g_type_register_static(GNT_TYPE_WIDGET,
-									  "GntSkel",
-									  &info, 0);
-	}
-
-	return type;
-}
-
 GntWidget *gnt_skel_new()
 {
 	GntWidget *widget = g_object_new(GNT_TYPE_SKEL, NULL);

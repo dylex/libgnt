@@ -34,36 +34,11 @@
 #include "gntcolors.h"
 #include "gntkeys.h"
 
-#define GNT_TYPE_SKEL				(gnt_skel_get_type())
-#define GNT_SKEL(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_SKEL, GntSkel))
-#define GNT_SKEL_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_SKEL, GntSkelClass))
-#define GNT_IS_SKEL(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_SKEL))
-#define GNT_IS_SKEL_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_SKEL))
-#define GNT_SKEL_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_SKEL, GntSkelClass))
-
-typedef struct _GntSkel			GntSkel;
-typedef struct _GntSkelPriv		GntSkelPriv;
-typedef struct _GntSkelClass		GntSkelClass;
-
-struct _GntSkel
-{
-	GntWidget parent;
-};
-
-struct _GntSkelClass
-{
-	GntWidgetClass parent;
-
-	/*< private >*/
-	void (*gnt_reserved1)(void);
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
-};
+#define GNT_TYPE_SKEL gnt_skel_get_type()
 
 G_BEGIN_DECLS
 
-GType gnt_skel_get_type(void);
+G_DECLARE_FINAL_TYPE(GntSkel, gnt_skel, GNT, SKEL, GntWidget)
 
 GntWidget * gnt_skel_new();
 
