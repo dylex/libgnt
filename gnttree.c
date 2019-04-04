@@ -1508,16 +1508,10 @@ void gnt_tree_remove(GntTree *tree, gpointer key)
 	}
 }
 
-static gboolean
-return_true(gpointer key, gpointer data, gpointer null)
-{
-	return TRUE;
-}
-
 void gnt_tree_remove_all(GntTree *tree)
 {
 	tree->root = NULL;
-	g_hash_table_foreach_remove(tree->hash, (GHRFunc)return_true, tree);
+	g_hash_table_remove_all(tree->hash);
 	g_list_free(tree->list);
 	tree->list = NULL;
 	tree->current = tree->top = tree->bottom = NULL;
@@ -1813,7 +1807,6 @@ void gnt_tree_adjust_columns(GntTree *tree)
 
 void gnt_tree_set_hash_fns(GntTree *tree, gpointer hash, gpointer eq, gpointer kd)
 {
-	g_hash_table_foreach_remove(tree->hash, return_true, NULL);
 	g_hash_table_destroy(tree->hash);
 	tree->hash = g_hash_table_new_full(hash, eq, kd, free_tree_row);
 }
