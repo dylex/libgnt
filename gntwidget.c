@@ -652,3 +652,210 @@ gboolean gnt_widget_has_shadow(GntWidget *widget)
 			gnt_style_get_bool(GNT_STYLE_SHADOW, FALSE));
 }
 
+gboolean
+gnt_widget_in_destruction(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_DESTROYING);
+}
+
+void
+gnt_widget_set_drawing(GntWidget *widget, gboolean drawing)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (drawing) {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_DRAWING);
+	} else {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_DRAWING);
+	}
+}
+
+gboolean
+gnt_widget_get_drawing(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_DRAWING);
+}
+
+void
+gnt_widget_set_mapped(GntWidget *widget, gboolean mapped)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (mapped) {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_MAPPED);
+	} else {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_MAPPED);
+	}
+}
+
+gboolean
+gnt_widget_get_mapped(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED);
+}
+
+void
+gnt_widget_set_has_border(GntWidget *widget, gboolean has_border)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (has_border) {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_NO_BORDER);
+	} else {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_BORDER);
+	}
+}
+
+gboolean
+gnt_widget_get_has_border(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return !GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER);
+}
+
+void
+gnt_widget_set_has_shadow(GntWidget *widget, gboolean has_shadow)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (has_shadow) {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_NO_SHADOW);
+	} else {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_SHADOW);
+	}
+}
+
+gboolean
+gnt_widget_get_has_shadow(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return !GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_SHADOW);
+}
+
+void
+gnt_widget_set_has_focus(GntWidget *widget, gboolean has_focus)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (has_focus) {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_HAS_FOCUS);
+	} else {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_HAS_FOCUS);
+	}
+}
+
+gboolean
+gnt_widget_get_has_focus(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_HAS_FOCUS);
+}
+
+void
+gnt_widget_set_is_urgent(GntWidget *widget, gboolean urgent)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (urgent) {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_URGENT);
+	} else {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_URGENT);
+	}
+}
+
+gboolean
+gnt_widget_get_is_urgent(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_URGENT);
+}
+
+void
+gnt_widget_set_grow_x(GntWidget *widget, gboolean grow_x)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (grow_x) {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_GROW_X);
+	} else {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_GROW_X);
+	}
+}
+
+gboolean
+gnt_widget_get_grow_x(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_GROW_X);
+}
+
+void
+gnt_widget_set_grow_y(GntWidget *widget, gboolean grow_y)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (grow_y) {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_GROW_Y);
+	} else {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_GROW_Y);
+	}
+}
+
+gboolean
+gnt_widget_get_grow_y(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_GROW_Y);
+}
+
+void
+gnt_widget_set_transient(GntWidget *widget, gboolean transient)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (transient) {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_TRANSIENT);
+	} else {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_TRANSIENT);
+	}
+}
+
+gboolean
+gnt_widget_get_transient(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_TRANSIENT);
+}
+
+void
+gnt_widget_set_disable_actions(GntWidget *widget, gboolean disable_actions)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (disable_actions) {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_DISABLE_ACTIONS);
+	} else {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_DISABLE_ACTIONS);
+	}
+}
+
+gboolean
+gnt_widget_get_disable_actions(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_DISABLE_ACTIONS);
+}

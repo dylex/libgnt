@@ -313,6 +313,266 @@ void gnt_widget_set_visible(GntWidget *widget, gboolean set);
  */
 gboolean gnt_widget_has_shadow(GntWidget *widget);
 
+/**
+ * gnt_widget_in_destruction
+ * @widget: The widget
+ *
+ * Returns whether the widget is currently being destroyed.
+ *
+ * This information can sometimes be used to avoid doing unnecessary work.
+ *
+ * Returns:  %TRUE if the widget is being destroyed.
+ *
+ * Since: 2.9.0
+ */
+gboolean gnt_widget_in_destruction(GntWidget *widget);
+
+/**
+ * gnt_widget_set_drawing
+ * @widget:  The widget
+ * @drawing: Whether or not the widget is being drawn
+ *
+ * Marks the widget as being drawn (or not).
+ *
+ * Since: 2.9.0
+ */
+void gnt_widget_set_drawing(GntWidget *widget, gboolean drawing);
+
+/**
+ * gnt_widget_get_drawing
+ * @widget: The widget
+ *
+ * Returns whether the widget is currently being drawn.
+ *
+ * This information can sometimes be used to avoid doing unnecessary work.
+ *
+ * Returns:  %TRUE if the widget is being drawn.
+ *
+ * Since: 2.9.0
+ */
+gboolean gnt_widget_get_drawing(GntWidget *widget);
+
+/**
+ * gnt_widget_set_mapped
+ * @widget: The widget
+ * @mapped: Whether or not the widget is mapped
+ *
+ * Marks the widget as being mapped (or not).
+ *
+ * This should generally only be called from the widget's "map" or "unmap"
+ * implementation.
+ *
+ * Since: 2.9.0
+ */
+void gnt_widget_set_mapped(GntWidget *widget, gboolean mapped);
+
+/**
+ * gnt_widget_get_mapped
+ * @widget: The widget
+ *
+ * Whether widget is mapped or not.
+ *
+ * Returns: Whether the widget is mapped or not.
+ *
+ * Since: 2.9.0
+ */
+gboolean gnt_widget_get_mapped(GntWidget *widget);
+
+/**
+ * gnt_widget_set_has_border
+ * @widget:     The widget
+ * @has_border: Whether or not the widget has a border
+ *
+ * Sets the has-border property on widget to has_border.
+ *
+ * Since: 2.9.0
+ */
+void gnt_widget_set_has_border(GntWidget *widget, gboolean has_border);
+
+/**
+ * gnt_widget_get_has_border
+ * @widget: The widget
+ *
+ * Returns the has-border property on widget.
+ *
+ * Returns: Whether the widget has a border or not.
+ *
+ * Since: 2.9.0
+ */
+gboolean gnt_widget_get_has_border(GntWidget *widget);
+
+/**
+ * gnt_widget_set_has_shadow
+ * @widget:     The widget
+ * @has_shadow: Whether or not the widget has a shadow
+ *
+ * Sets the has-shadow property on widget to has_shadow. Note, setting this
+ * property does not necessarily mean the widget will have a shadow, depending
+ * on its styling.
+ *
+ * Since: 2.9.0
+ */
+void gnt_widget_set_has_shadow(GntWidget *widget, gboolean has_shadow);
+
+/**
+ * gnt_widget_get_has_shadow
+ * @widget: The widget
+ *
+ * Returns the has-shadow property on widget. Note, this is a property of the
+ * widget, but does not necessarily mean the widget will have a shadow as that
+ * depends on its styling. Use @gnt_widget_set_has_shadow to determine
+ * whether the widget will actually have a shadow.
+ *
+ * Returns: Whether the widget has a shadow set or not.
+ *
+ * Since: 2.9.0
+ */
+gboolean gnt_widget_get_has_shadow(GntWidget *widget);
+
+/**
+ * gnt_widget_set_has_focus
+ * @widget:    The widget
+ * @has_focus: Whether or not the widget has focus
+ *
+ * Sets the has-focus flag on a widget. Note, setting this flag does not
+ * necessarily mean the widget will have focus.
+ *
+ * This is mostly for internal use; you probably want to use
+ * @gnt_widget_set_focus instead.
+ *
+ * Since: 2.9.0
+ */
+void gnt_widget_set_has_focus(GntWidget *widget, gboolean has_focus);
+
+/**
+ * gnt_widget_get_has_focus:
+ * @widget:  The widget
+ *
+ * Check whether a widget has the focus flag.
+ *
+ * This is mostly for internal use; you probably want to use
+ * @gnt_widget_has_focus instead.
+ *
+ * Returns:  %TRUE if the widget's focus flag is set, %FALSE otherwise.
+ */
+gboolean gnt_widget_get_has_focus(GntWidget *widget);
+
+/**
+ * gnt_widget_set_is_urgent:
+ * @widget: The widget to set the URGENT hint for
+ * @urgent: Whether the URGENT hint should be set or not
+ *
+ * Set the URGENT hint for a widget.
+ *
+ * Since: 2.9.0
+ */
+void gnt_widget_set_is_urgent(GntWidget *widget, gboolean urgent);
+
+/**
+ * gnt_widget_get_urgent
+ * @widget: The widget
+ *
+ * Returns whether the widget has the URGENT hint set.
+ *
+ * Returns: Whether the URGENT hint is set or not.
+ *
+ * Since: 2.9.0
+ */
+gboolean gnt_widget_get_is_urgent(GntWidget *widget);
+
+/**
+ * gnt_widget_set_grow_x:
+ * @widget: The widget
+ * @grow_x: Whether the widget should grow or not
+ *
+ * Whether widget should grow in the x direction.
+ *
+ * Since: 2.9.0
+ */
+void gnt_widget_set_grow_x(GntWidget *widget, gboolean grow_x);
+
+/**
+ * gnt_widget_get_grow_x
+ * @widget: The widget
+ *
+ * Returns whether the widget should grow in the x direction.
+ *
+ * Returns: Whether widget should grow in the x direction.
+ *
+ * Since: 2.9.0
+ */
+gboolean gnt_widget_get_grow_x(GntWidget *widget);
+
+/**
+ * gnt_widget_set_grow_y:
+ * @widget: The widget
+ * @grow_y: Whether the widget should grow or not
+ *
+ * Whether widget should grow in the y direction.
+ *
+ * Since: 2.9.0
+ */
+void gnt_widget_set_grow_y(GntWidget *widget, gboolean grow_y);
+
+/**
+ * gnt_widget_get_grow_y
+ * @widget: The widget
+ *
+ * Returns whether the widget should grow in the y direction.
+ *
+ * Returns: Whether widget should grow in the y direction.
+ *
+ * Since: 2.9.0
+ */
+gboolean gnt_widget_get_grow_y(GntWidget *widget);
+
+/**
+ * gnt_widget_set_transient:
+ * @widget:    The widget
+ * @transient: Whether the widget is transient or not
+ *
+ * Whether the widget should be transient.
+ *
+ * Since: 2.9.0
+ */
+void gnt_widget_set_transient(GntWidget *widget, gboolean transient);
+
+/**
+ * gnt_widget_get_transient
+ * @widget: The widget
+ *
+ * Returns whether the widget is transient.
+ *
+ * Returns: Whether the widget should be transient.
+ *
+ * Since: 2.9.0
+ */
+gboolean gnt_widget_get_transient(GntWidget *widget);
+
+/**
+ * gnt_widget_set_disable_actions:
+ * @widget:          The widget
+ * @disable_actions: Whether the widget actions should be disabled or not
+ *
+ * Whether widget actions should be disabled.
+ *
+ * Since: 2.9.0
+ */
+void gnt_widget_set_disable_actions(GntWidget *widget,
+                                    gboolean disable_actions);
+
+/**
+ * gnt_widget_get_disable_actions
+ * @widget: The widget
+ *
+ * Returns whether the widget actions are disabled.
+ *
+ * Returns: Whether the widget actions are disabled.
+ *
+ * Since: 2.9.0
+ */
+gboolean gnt_widget_get_disable_actions(GntWidget *widget);
+
 G_END_DECLS
 
 #endif /* GNT_WIDGET_H */
