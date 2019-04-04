@@ -61,10 +61,10 @@ struct _GntEntrySearch
 
 static guint signals[SIGS] = { 0 };
 
-static GntWidgetClass *parent_class = NULL;
-
 static gboolean gnt_entry_key_pressed(GntWidget *widget, const char *text);
 static void gnt_entry_set_text_internal(GntEntry *entry, const char *text);
+
+G_DEFINE_TYPE(GntEntry, gnt_entry, GNT_TYPE_WIDGET)
 
 static gboolean
 update_kill_ring(GntEntry *entry, GntEntryAction action, const char *text, int len)
@@ -934,16 +934,16 @@ static void
 gnt_entry_class_init(GntEntryClass *klass)
 {
 	GntBindableClass *bindable = GNT_BINDABLE_CLASS(klass);
+	GntWidgetClass *widget_class = GNT_WIDGET_CLASS(klass);
 	char s[3] = {'\033', erasechar(), 0};
 
-	parent_class = GNT_WIDGET_CLASS(klass);
-	parent_class->clicked = gnt_entry_clicked;
-	parent_class->destroy = gnt_entry_destroy;
-	parent_class->draw = gnt_entry_draw;
-	parent_class->map = gnt_entry_map;
-	parent_class->size_request = gnt_entry_size_request;
-	parent_class->key_pressed = gnt_entry_key_pressed;
-	parent_class->lost_focus = gnt_entry_lost_focus;
+	widget_class->clicked = gnt_entry_clicked;
+	widget_class->destroy = gnt_entry_destroy;
+	widget_class->draw = gnt_entry_draw;
+	widget_class->map = gnt_entry_map;
+	widget_class->size_request = gnt_entry_size_request;
+	widget_class->key_pressed = gnt_entry_key_pressed;
+	widget_class->lost_focus = gnt_entry_lost_focus;
 
 	signals[SIG_TEXT_CHANGED] =
 		g_signal_new("text_changed",
@@ -1030,10 +1030,9 @@ new_killring(void)
 }
 
 static void
-gnt_entry_init(GTypeInstance *instance, gpointer class)
+gnt_entry_init(GntEntry *entry)
 {
-	GntWidget *widget = GNT_WIDGET(instance);
-	GntEntry *entry = GNT_ENTRY(instance);
+	GntWidget *widget = GNT_WIDGET(entry);
 
 	entry->flag = GNT_ENTRY_FLAG_ALL;
 	entry->max = 0;
@@ -1060,34 +1059,6 @@ gnt_entry_init(GTypeInstance *instance, gpointer class)
 /******************************************************************************
  * GntEntry API
  *****************************************************************************/
-GType
-gnt_entry_get_type(void)
-{
-	static GType type = 0;
-
-	if(type == 0)
-	{
-		static const GTypeInfo info = {
-			sizeof(GntEntryClass),
-			NULL,					/* base_init		*/
-			NULL,					/* base_finalize	*/
-			(GClassInitFunc)gnt_entry_class_init,
-			NULL,					/* class_finalize	*/
-			NULL,					/* class_data		*/
-			sizeof(GntEntry),
-			0,						/* n_preallocs		*/
-			gnt_entry_init,			/* instance_init	*/
-			NULL					/* value_table		*/
-		};
-
-		type = g_type_register_static(GNT_TYPE_WIDGET,
-									  "GntEntry",
-									  &info, 0);
-	}
-
-	return type;
-}
-
 GntWidget *gnt_entry_new(const char *text)
 {
 	GntWidget *widget = g_object_new(GNT_TYPE_ENTRY, NULL);

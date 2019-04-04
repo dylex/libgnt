@@ -59,13 +59,13 @@ typedef struct
 	int end;
 } GntTextTag;
 
-static GntWidgetClass *parent_class = NULL;
-
 static gchar *select_start;
 static gchar *select_end;
 static gboolean double_click;
 
 static void reset_text_view(GntTextView *view);
+
+G_DEFINE_TYPE(GntTextView, gnt_text_view, GNT_TYPE_WIDGET)
 
 static gboolean
 text_view_contains(GntTextView *view, const char *str)
@@ -443,23 +443,21 @@ gnt_text_view_size_changed(GntWidget *widget, int w, int h)
 static void
 gnt_text_view_class_init(GntTextViewClass *klass)
 {
-	parent_class = GNT_WIDGET_CLASS(klass);
-	parent_class->destroy = gnt_text_view_destroy;
-	parent_class->draw = gnt_text_view_draw;
-	parent_class->map = gnt_text_view_map;
-	parent_class->size_request = gnt_text_view_size_request;
-	parent_class->key_pressed = gnt_text_view_key_pressed;
-	parent_class->clicked = gnt_text_view_clicked;
-	parent_class->size_changed = gnt_text_view_size_changed;
+	GntWidgetClass *widget_class = GNT_WIDGET_CLASS(klass);
 
-	GNTDEBUG;
+	widget_class->destroy = gnt_text_view_destroy;
+	widget_class->draw = gnt_text_view_draw;
+	widget_class->map = gnt_text_view_map;
+	widget_class->size_request = gnt_text_view_size_request;
+	widget_class->key_pressed = gnt_text_view_key_pressed;
+	widget_class->clicked = gnt_text_view_clicked;
+	widget_class->size_changed = gnt_text_view_size_changed;
 }
 
 static void
-gnt_text_view_init(GTypeInstance *instance, gpointer class)
+gnt_text_view_init(GntTextView *view)
 {
-	GntWidget *widget = GNT_WIDGET(instance);
-	GntTextView *view = GNT_TEXT_VIEW(widget);
+	GntWidget *widget = GNT_WIDGET(view);
 	GntTextLine *line = g_new0(GntTextLine, 1);
 
 	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW |
@@ -475,34 +473,6 @@ gnt_text_view_init(GTypeInstance *instance, gpointer class)
 /******************************************************************************
  * GntTextView API
  *****************************************************************************/
-GType
-gnt_text_view_get_type(void)
-{
-	static GType type = 0;
-
-	if(type == 0)
-	{
-		static const GTypeInfo info = {
-			sizeof(GntTextViewClass),
-			NULL,					/* base_init		*/
-			NULL,					/* base_finalize	*/
-			(GClassInitFunc)gnt_text_view_class_init,
-			NULL,					/* class_finalize	*/
-			NULL,					/* class_data		*/
-			sizeof(GntTextView),
-			0,						/* n_preallocs		*/
-			gnt_text_view_init,			/* instance_init	*/
-			NULL					/* value_table		*/
-		};
-
-		type = g_type_register_static(GNT_TYPE_WIDGET,
-									  "GntTextView",
-									  &info, 0);
-	}
-
-	return type;
-}
-
 GntWidget *gnt_text_view_new()
 {
 	GntWidget *widget = g_object_new(GNT_TYPE_TEXT_VIEW, NULL);

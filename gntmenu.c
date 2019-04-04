@@ -40,8 +40,6 @@ enum
 	NUM_COLUMNS
 };
 
-static GntTreeClass *parent_class = NULL;
-
 static void (*org_draw)(GntWidget *wid);
 static void (*org_destroy)(GntWidget *wid);
 static void (*org_map)(GntWidget *wid);
@@ -50,6 +48,8 @@ static gboolean (*org_key_pressed)(GntWidget *w, const char *t);
 static gboolean (*org_clicked)(GntWidget *w, GntMouseEvent event, int x, int y);
 
 static void menuitem_activate(GntMenu *menu, GntMenuItem *item);
+
+G_DEFINE_TYPE(GntMenu, gnt_menu, GNT_TYPE_TREE)
 
 static void
 menu_hide_all(GntMenu *menu)
@@ -434,34 +434,33 @@ gnt_menu_clicked(GntWidget *widget, GntMouseEvent event, int x, int y)
 static void
 gnt_menu_class_init(GntMenuClass *klass)
 {
-	GntWidgetClass *wid_class = GNT_WIDGET_CLASS(klass);
-	parent_class = GNT_TREE_CLASS(klass);
+	GntWidgetClass *widget_class = GNT_WIDGET_CLASS(klass);
+	GntTreeClass *tree_class = GNT_TREE_CLASS(klass);
 
-	org_destroy = wid_class->destroy;
-	org_map = wid_class->map;
-	org_draw = wid_class->draw;
-	org_key_pressed = wid_class->key_pressed;
-	org_size_request = wid_class->size_request;
-	org_clicked = wid_class->clicked;
+	org_destroy = widget_class->destroy;
+	org_map = widget_class->map;
+	org_draw = widget_class->draw;
+	org_key_pressed = widget_class->key_pressed;
+	org_size_request = widget_class->size_request;
+	org_clicked = widget_class->clicked;
 
-	wid_class->destroy = gnt_menu_destroy;
-	wid_class->draw = gnt_menu_draw;
-	wid_class->map = gnt_menu_map;
-	wid_class->size_request = gnt_menu_size_request;
-	wid_class->key_pressed = gnt_menu_key_pressed;
-	wid_class->activate = gnt_menu_activate;
-	wid_class->hide = gnt_menu_hide;
-	wid_class->clicked = gnt_menu_clicked;
+	widget_class->destroy = gnt_menu_destroy;
+	widget_class->draw = gnt_menu_draw;
+	widget_class->map = gnt_menu_map;
+	widget_class->size_request = gnt_menu_size_request;
+	widget_class->key_pressed = gnt_menu_key_pressed;
+	widget_class->activate = gnt_menu_activate;
+	widget_class->hide = gnt_menu_hide;
+	widget_class->clicked = gnt_menu_clicked;
 
-	parent_class->toggled = gnt_menu_toggled;
-
-	GNTDEBUG;
+	tree_class->toggled = gnt_menu_toggled;
 }
 
 static void
-gnt_menu_init(GTypeInstance *instance, gpointer class)
+gnt_menu_init(GntMenu *menu)
 {
-	GntWidget *widget = GNT_WIDGET(instance);
+	GntWidget *widget = GNT_WIDGET(menu);
+
 	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_SHADOW | GNT_WIDGET_NO_BORDER |
 			GNT_WIDGET_CAN_TAKE_FOCUS | GNT_WIDGET_TRANSIENT | GNT_WIDGET_DISABLE_ACTIONS);
 	GNTDEBUG;
@@ -470,34 +469,6 @@ gnt_menu_init(GTypeInstance *instance, gpointer class)
 /******************************************************************************
  * GntMenu API
  *****************************************************************************/
-GType
-gnt_menu_get_type(void)
-{
-	static GType type = 0;
-
-	if(type == 0)
-	{
-		static const GTypeInfo info = {
-			sizeof(GntMenuClass),
-			NULL,					/* base_init		*/
-			NULL,					/* base_finalize	*/
-			(GClassInitFunc)gnt_menu_class_init,
-			NULL,					/* class_finalize	*/
-			NULL,					/* class_data		*/
-			sizeof(GntMenu),
-			0,						/* n_preallocs		*/
-			gnt_menu_init,			/* instance_init	*/
-			NULL					/* value_table		*/
-		};
-
-		type = g_type_register_static(GNT_TYPE_TREE,
-									  "GntMenu",
-									  &info, 0);
-	}
-
-	return type;
-}
-
 GntWidget *gnt_menu_new(GntMenuType type)
 {
 	GntWidget *widget = g_object_new(GNT_TYPE_MENU, NULL);

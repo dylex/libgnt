@@ -29,8 +29,9 @@ enum
 	SIGS,
 };
 
-static GntButtonClass *parent_class = NULL;
 static guint signals[SIGS] = { 0 };
+
+G_DEFINE_TYPE(GntCheckBox, gnt_check_box, GNT_TYPE_BUTTON)
 
 static void
 gnt_check_box_draw(GntWidget *widget)
@@ -90,15 +91,11 @@ gnt_check_box_clicked(GntWidget *widget, GntMouseEvent event, int x, int y)
 static void
 gnt_check_box_class_init(GntCheckBoxClass *klass)
 {
-	GntWidgetClass *wclass = GNT_WIDGET_CLASS(klass);
+	GntWidgetClass *widget_class = GNT_WIDGET_CLASS(klass);
 
-	parent_class = GNT_BUTTON_CLASS(klass);
-	/*parent_class->destroy = gnt_check_box_destroy;*/
-	wclass->draw = gnt_check_box_draw;
-	/*parent_class->map = gnt_check_box_map;*/
-	/*parent_class->size_request = gnt_check_box_size_request;*/
-	wclass->key_pressed = gnt_check_box_key_pressed;
-	wclass->clicked = gnt_check_box_clicked;
+	widget_class->draw = gnt_check_box_draw;
+	widget_class->key_pressed = gnt_check_box_key_pressed;
+	widget_class->clicked = gnt_check_box_clicked;
 
 	signals[SIG_TOGGLED] =
 		g_signal_new("toggled",
@@ -111,9 +108,9 @@ gnt_check_box_class_init(GntCheckBoxClass *klass)
 }
 
 static void
-gnt_check_box_init(GTypeInstance *instance, gpointer class)
+gnt_check_box_init(GntCheckBox *box)
 {
-	GntWidget *widget = GNT_WIDGET(instance);
+	GntWidget *widget = GNT_WIDGET(box);
 	widget->priv.minh = 1;
 	widget->priv.minw = 4;
 	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW);
@@ -123,34 +120,6 @@ gnt_check_box_init(GTypeInstance *instance, gpointer class)
 /******************************************************************************
  * GntCheckBox API
  *****************************************************************************/
-GType
-gnt_check_box_get_type(void)
-{
-	static GType type = 0;
-
-	if(type == 0)
-	{
-		static const GTypeInfo info = {
-			sizeof(GntCheckBoxClass),
-			NULL,					/* base_init		*/
-			NULL,					/* base_finalize	*/
-			(GClassInitFunc)gnt_check_box_class_init,
-			NULL,					/* class_finalize	*/
-			NULL,					/* class_data		*/
-			sizeof(GntCheckBox),
-			0,						/* n_preallocs		*/
-			gnt_check_box_init,			/* instance_init	*/
-			NULL					/* value_table		*/
-		};
-
-		type = g_type_register_static(GNT_TYPE_BUTTON,
-									  "GntCheckBox",
-									  &info, 0);
-	}
-
-	return type;
-}
-
 GntWidget *gnt_check_box_new(const char *text)
 {
 	GntWidget *widget = g_object_new(GNT_TYPE_CHECK_BOX, NULL);

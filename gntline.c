@@ -34,7 +34,7 @@ enum
 	SIGS = 1,
 };
 
-static GntWidgetClass *parent_class = NULL;
+G_DEFINE_TYPE(GntLine, gnt_line, GNT_TYPE_WIDGET)
 
 static void
 gnt_line_draw(GntWidget *widget)
@@ -107,15 +107,16 @@ gnt_line_get_property(GObject *obj, guint prop_id, GValue *value,
 static void
 gnt_line_class_init(GntLineClass *klass)
 {
-	GObjectClass *gclass = G_OBJECT_CLASS(klass);
-	parent_class = GNT_WIDGET_CLASS(klass);
-	parent_class->draw = gnt_line_draw;
-	parent_class->map = gnt_line_map;
-	parent_class->size_request = gnt_line_size_request;
+	GObjectClass *obj_class = G_OBJECT_CLASS(klass);
+	GntWidgetClass *widget_class = GNT_WIDGET_CLASS(klass);
 
-	gclass->set_property = gnt_line_set_property;
-	gclass->get_property = gnt_line_get_property;
-	g_object_class_install_property(gclass,
+	widget_class->draw = gnt_line_draw;
+	widget_class->map = gnt_line_map;
+	widget_class->size_request = gnt_line_size_request;
+
+	obj_class->set_property = gnt_line_set_property;
+	obj_class->get_property = gnt_line_get_property;
+	g_object_class_install_property(obj_class,
 			PROP_VERTICAL,
 			g_param_spec_boolean("vertical", "Vertical",
 				"Whether it's a vertical line or a horizontal one.",
@@ -126,9 +127,9 @@ gnt_line_class_init(GntLineClass *klass)
 }
 
 static void
-gnt_line_init(GTypeInstance *instance, gpointer class)
+gnt_line_init(GntLine *line)
 {
-	GntWidget *widget = GNT_WIDGET(instance);
+	GntWidget *widget = GNT_WIDGET(line);
 	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_SHADOW | GNT_WIDGET_NO_BORDER);
 	widget->priv.minw = 1;
 	widget->priv.minh = 1;
@@ -138,37 +139,8 @@ gnt_line_init(GTypeInstance *instance, gpointer class)
 /******************************************************************************
  * GntLine API
  *****************************************************************************/
-GType
-gnt_line_get_type(void)
-{
-	static GType type = 0;
-
-	if(type == 0)
-	{
-		static const GTypeInfo info = {
-			sizeof(GntLineClass),
-			NULL,					/* base_init		*/
-			NULL,					/* base_finalize	*/
-			(GClassInitFunc)gnt_line_class_init,
-			NULL,					/* class_finalize	*/
-			NULL,					/* class_data		*/
-			sizeof(GntLine),
-			0,						/* n_preallocs		*/
-			gnt_line_init,			/* instance_init	*/
-			NULL					/* value_table		*/
-		};
-
-		type = g_type_register_static(GNT_TYPE_WIDGET,
-									  "GntLine",
-									  &info, 0);
-	}
-
-	return type;
-}
-
 GntWidget *gnt_line_new(gboolean vertical)
 {
 	GntWidget *widget = g_object_new(GNT_TYPE_LINE, "vertical", vertical, NULL);
 	return widget;
 }
-

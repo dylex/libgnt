@@ -41,9 +41,9 @@ enum
 
 static guint signals[SIGS] = { 0 };
 
-static GntBoxClass *parent_class = NULL;
-
 static void (*org_destroy)(GntWidget *widget);
+
+G_DEFINE_TYPE(GntWindow, gnt_window, GNT_TYPE_BOX)
 
 static gboolean
 show_menu(GntBindable *bind, GList *null)
@@ -83,11 +83,10 @@ static void
 gnt_window_class_init(GntWindowClass *klass)
 {
 	GntBindableClass *bindable = GNT_BINDABLE_CLASS(klass);
-	GntWidgetClass *wid_class = GNT_WIDGET_CLASS(klass);
-	parent_class = GNT_BOX_CLASS(klass);
+	GntWidgetClass *widget_class = GNT_WIDGET_CLASS(klass);
 
-	org_destroy = wid_class->destroy;
-	wid_class->destroy = gnt_window_destroy;
+	org_destroy = widget_class->destroy;
+	widget_class->destroy = gnt_window_destroy;
 
 	signals[SIG_WORKSPACE_HIDE] =
 		g_signal_new("workspace-hidden",
@@ -114,12 +113,13 @@ gnt_window_class_init(GntWindowClass *klass)
 }
 
 static void
-gnt_window_init(GTypeInstance *instance, gpointer class)
+gnt_window_init(GntWindow *win)
 {
-	GntWidget *widget = GNT_WIDGET(instance);
-	GntWindow *win = GNT_WINDOW(widget);
+	GntWidget *widget = GNT_WIDGET(win);
+
 	GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW);
 	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_CAN_TAKE_FOCUS);
+
 	win->priv = g_new0(GntWindowPriv, 1);
 	win->priv->accels = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
 	GNTDEBUG;
@@ -128,34 +128,6 @@ gnt_window_init(GTypeInstance *instance, gpointer class)
 /******************************************************************************
  * GntWindow API
  *****************************************************************************/
-GType
-gnt_window_get_type(void)
-{
-	static GType type = 0;
-
-	if(type == 0)
-	{
-		static const GTypeInfo info = {
-			sizeof(GntWindowClass),
-			NULL,					/* base_init		*/
-			NULL,					/* base_finalize	*/
-			(GClassInitFunc)gnt_window_class_init,
-			NULL,					/* class_finalize	*/
-			NULL,					/* class_data		*/
-			sizeof(GntWindow),
-			0,						/* n_preallocs		*/
-			gnt_window_init,			/* instance_init	*/
-			NULL					/* value_table		*/
-		};
-
-		type = g_type_register_static(GNT_TYPE_BOX,
-									  "GntWindow",
-									  &info, 0);
-	}
-
-	return type;
-}
-
 GntWidget *gnt_window_new()
 {
 	GntWidget *widget = g_object_new(GNT_TYPE_WINDOW, NULL);

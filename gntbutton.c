@@ -33,8 +33,9 @@ enum
 	SIGS = 1,
 };
 
-static GntWidgetClass *parent_class = NULL;
 static gboolean small_button = FALSE;
+
+G_DEFINE_TYPE(GntButton, gnt_button, GNT_TYPE_WIDGET)
 
 static void
 gnt_button_draw(GntWidget *widget)
@@ -103,17 +104,18 @@ button_activate(GntBindable *bind, GList *null)
 }
 
 static void
-gnt_button_class_init(GntWidgetClass *klass)
+gnt_button_class_init(GntButtonClass *klass)
 {
 	char *style;
 	GntBindableClass *bindable = GNT_BINDABLE_CLASS(klass);
+	GntWidgetClass *widget_class = GNT_WIDGET_CLASS(klass);
 
-	parent_class = GNT_WIDGET_CLASS(klass);
-	parent_class->draw = gnt_button_draw;
-	parent_class->map = gnt_button_map;
-	parent_class->size_request = gnt_button_size_request;
-	parent_class->clicked = gnt_button_clicked;
-	parent_class->destroy = gnt_button_destroy;
+	widget_class = GNT_WIDGET_CLASS(klass);
+	widget_class->draw = gnt_button_draw;
+	widget_class->map = gnt_button_map;
+	widget_class->size_request = gnt_button_size_request;
+	widget_class->clicked = gnt_button_clicked;
+	widget_class->destroy = gnt_button_destroy;
 
 	style = gnt_style_get_from_name(NULL, "small-button");
 	small_button = gnt_style_parse_bool(style);
@@ -125,10 +127,10 @@ gnt_button_class_init(GntWidgetClass *klass)
 }
 
 static void
-gnt_button_init(GTypeInstance *instance, gpointer class)
+gnt_button_init(GntButton *button)
 {
-	GntWidget *widget = GNT_WIDGET(instance);
-	GntButton *button = GNT_BUTTON(instance);
+	GntWidget *widget = GNT_WIDGET(button);
+
 	button->priv = g_new0(GntButtonPriv, 1);
 
 	widget->priv.minw = 4;
@@ -142,32 +144,6 @@ gnt_button_init(GTypeInstance *instance, gpointer class)
 /******************************************************************************
  * GntButton API
  *****************************************************************************/
-GType
-gnt_button_get_type(void) {
-	static GType type = 0;
-
-	if(type == 0) {
-		static const GTypeInfo info = {
-			sizeof(GntButtonClass),
-			NULL,					/* base_init		*/
-			NULL,					/* base_finalize	*/
-			(GClassInitFunc)gnt_button_class_init,
-			NULL,					/* class_finalize	*/
-			NULL,					/* class_data		*/
-			sizeof(GntButton),
-			0,						/* n_preallocs		*/
-			gnt_button_init,			/* instance_init	*/
-			NULL					/* value_table		*/
-		};
-
-		type = g_type_register_static(GNT_TYPE_WIDGET,
-									  "GntButton",
-									  &info, 0);
-	}
-
-	return type;
-}
-
 GntWidget *gnt_button_new(const char *text)
 {
 	GntWidget *widget = g_object_new(GNT_TYPE_BUTTON, NULL);

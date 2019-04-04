@@ -34,7 +34,7 @@ enum
 
 static guint signals[SIGS] = { 0 };
 
-static GntWidgetClass *parent_class = NULL;
+G_DEFINE_TYPE(GntSlider, gnt_slider, GNT_TYPE_WIDGET)
 
 /* returns TRUE if the value was changed */
 static gboolean
@@ -190,10 +190,11 @@ static void
 gnt_slider_class_init(GntSliderClass *klass)
 {
 	GntBindableClass *bindable = GNT_BINDABLE_CLASS(klass);
-	parent_class = GNT_WIDGET_CLASS(klass);
-	parent_class->draw = gnt_slider_draw;
-	parent_class->map = gnt_slider_map;
-	parent_class->size_request = gnt_slider_size_request;
+	GntWidgetClass *widget_class = GNT_WIDGET_CLASS(klass);
+
+	widget_class->draw = gnt_slider_draw;
+	widget_class->map = gnt_slider_map;
+	widget_class->size_request = gnt_slider_size_request;
 
 	klass->changed = NULL;
 
@@ -222,9 +223,9 @@ gnt_slider_class_init(GntSliderClass *klass)
 }
 
 static void
-gnt_slider_init(GTypeInstance *instance, gpointer class)
+gnt_slider_init(GntSlider *slider)
 {
-	GntWidget *widget = GNT_WIDGET(instance);
+	GntWidget *widget = GNT_WIDGET(slider);
 	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_SHADOW | GNT_WIDGET_NO_BORDER | GNT_WIDGET_CAN_TAKE_FOCUS);
 	widget->priv.minw = 1;
 	widget->priv.minh = 1;
@@ -234,34 +235,6 @@ gnt_slider_init(GTypeInstance *instance, gpointer class)
 /******************************************************************************
  * GntSlider API
  *****************************************************************************/
-GType
-gnt_slider_get_type(void)
-{
-	static GType type = 0;
-
-	if(type == 0)
-	{
-		static const GTypeInfo info = {
-			sizeof(GntSliderClass),
-			NULL,                   /* base_init        */
-			NULL,                   /* base_finalize    */
-			(GClassInitFunc)gnt_slider_class_init,
-			NULL,                   /* class_finalize   */
-			NULL,                   /* class_data       */
-			sizeof(GntSlider),
-			0,                      /* n_preallocs      */
-			gnt_slider_init,        /* instance_init    */
-			NULL                    /* value_table      */
-		};
-
-		type = g_type_register_static(GNT_TYPE_WIDGET,
-		                              "GntSlider",
-		                              &info, 0);
-	}
-
-	return type;
-}
-
 GntWidget *gnt_slider_new(gboolean vertical, int max, int min)
 {
 	GntWidget *widget = g_object_new(GNT_TYPE_SLIDER, NULL);

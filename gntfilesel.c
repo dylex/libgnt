@@ -44,12 +44,13 @@ enum
 	SIGS
 };
 
-static GntWindowClass *parent_class = NULL;
 static guint signals[SIGS] = { 0 };
 static void (*orig_map)(GntWidget *widget);
 static void (*orig_size_request)(GntWidget *widget);
 
 static void select_activated_cb(GntWidget *button, GntFileSel *sel);
+
+G_DEFINE_TYPE(GntFileSel, gnt_file_sel, GNT_TYPE_WINDOW)
 
 static void
 gnt_file_sel_destroy(GntWidget *widget)
@@ -453,13 +454,13 @@ static void
 gnt_file_sel_class_init(GntFileSelClass *klass)
 {
 	GntBindableClass *bindable = GNT_BINDABLE_CLASS(klass);
-	GntWidgetClass *kl = GNT_WIDGET_CLASS(klass);
-	parent_class = GNT_WINDOW_CLASS(klass);
-	kl->destroy = gnt_file_sel_destroy;
-	orig_map = kl->map;
-	kl->map = gnt_file_sel_map;
-	orig_size_request = kl->size_request;
-	kl->size_request = gnt_file_sel_size_request;
+	GntWidgetClass *widget_class = GNT_WIDGET_CLASS(klass);
+
+	widget_class->destroy = gnt_file_sel_destroy;
+	orig_map = widget_class->map;
+	widget_class->map = gnt_file_sel_map;
+	orig_size_request = widget_class->size_request;
+	widget_class->size_request = gnt_file_sel_size_request;
 
 	signals[SIG_FILE_SELECTED] =
 		g_signal_new("file_selected",
@@ -478,10 +479,8 @@ gnt_file_sel_class_init(GntFileSelClass *klass)
 }
 
 static void
-gnt_file_sel_init(GTypeInstance *instance, gpointer class)
+gnt_file_sel_init(GntFileSel *sel)
 {
-	GntFileSel *sel = GNT_FILE_SEL(instance);
-
 	sel->dirs = gnt_tree_new();
 	gnt_tree_set_compare_func(GNT_TREE(sel->dirs), (GCompareFunc)g_utf8_collate);
 	gnt_tree_set_hash_fns(GNT_TREE(sel->dirs), g_str_hash, g_str_equal, g_free);
@@ -514,34 +513,6 @@ gnt_file_sel_init(GTypeInstance *instance, gpointer class)
 /******************************************************************************
  * GntFileSel API
  *****************************************************************************/
-GType
-gnt_file_sel_get_type(void)
-{
-	static GType type = 0;
-
-	if(type == 0)
-	{
-		static const GTypeInfo info = {
-			sizeof(GntFileSelClass),
-			NULL,					/* base_init		*/
-			NULL,					/* base_finalize	*/
-			(GClassInitFunc)gnt_file_sel_class_init,
-			NULL,					/* class_finalize	*/
-			NULL,					/* class_data		*/
-			sizeof(GntFileSel),
-			0,						/* n_preallocs		*/
-			gnt_file_sel_init,			/* instance_init	*/
-			NULL
-		};
-
-		type = g_type_register_static(GNT_TYPE_WINDOW,
-									  "GntFileSel",
-									  &info, 0);
-	}
-
-	return type;
-}
-
 static void
 select_activated_cb(GntWidget *button, GntFileSel *sel)
 {

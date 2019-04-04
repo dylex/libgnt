@@ -35,9 +35,10 @@ enum
 	SIGS,
 };
 
-static GntWidgetClass *parent_class = NULL;
 static guint signals[SIGS] = { 0 };
 static void (*widget_lost_focus)(GntWidget *widget);
+
+G_DEFINE_TYPE(GntComboBox, gnt_combo_box, GNT_TYPE_WIDGET)
 
 static void
 set_selection(GntComboBox *box, gpointer key)
@@ -263,19 +264,18 @@ static void
 gnt_combo_box_class_init(GntComboBoxClass *klass)
 {
 	GntBindableClass *bindable = GNT_BINDABLE_CLASS(klass);
+	GntWidgetClass *widget_class = GNT_WIDGET_CLASS(klass);
 
-	parent_class = GNT_WIDGET_CLASS(klass);
+	widget_class->destroy = gnt_combo_box_destroy;
+	widget_class->draw = gnt_combo_box_draw;
+	widget_class->map = gnt_combo_box_map;
+	widget_class->size_request = gnt_combo_box_size_request;
+	widget_class->key_pressed = gnt_combo_box_key_pressed;
+	widget_class->clicked = gnt_combo_box_clicked;
+	widget_class->size_changed = gnt_combo_box_size_changed;
 
-	parent_class->destroy = gnt_combo_box_destroy;
-	parent_class->draw = gnt_combo_box_draw;
-	parent_class->map = gnt_combo_box_map;
-	parent_class->size_request = gnt_combo_box_size_request;
-	parent_class->key_pressed = gnt_combo_box_key_pressed;
-	parent_class->clicked = gnt_combo_box_clicked;
-	parent_class->size_changed = gnt_combo_box_size_changed;
-
-	widget_lost_focus = parent_class->lost_focus;
-	parent_class->lost_focus = gnt_combo_box_lost_focus;
+	widget_lost_focus = widget_class->lost_focus;
+	widget_class->lost_focus = gnt_combo_box_lost_focus;
 
 	signals[SIG_SELECTION_CHANGED] =
 		g_signal_new("selection-changed",
@@ -295,13 +295,12 @@ gnt_combo_box_class_init(GntComboBoxClass *klass)
 }
 
 static void
-gnt_combo_box_init(GTypeInstance *instance, gpointer class)
+gnt_combo_box_init(GntComboBox *combo)
 {
+	GntWidget *widget = GNT_WIDGET(combo);
 	GntWidget *box;
-	GntWidget *widget = GNT_WIDGET(instance);
-	GntComboBox *combo = GNT_COMBO_BOX(instance);
 
-	GNT_WIDGET_SET_FLAGS(GNT_WIDGET(instance),
+	GNT_WIDGET_SET_FLAGS(widget,
 			GNT_WIDGET_GROW_X | GNT_WIDGET_CAN_TAKE_FOCUS | GNT_WIDGET_NO_SHADOW);
 	combo->dropdown = gnt_tree_new();
 
@@ -318,34 +317,6 @@ gnt_combo_box_init(GTypeInstance *instance, gpointer class)
 /******************************************************************************
  * GntComboBox API
  *****************************************************************************/
-GType
-gnt_combo_box_get_type(void)
-{
-	static GType type = 0;
-
-	if(type == 0)
-	{
-		static const GTypeInfo info = {
-			sizeof(GntComboBoxClass),
-			NULL,					/* base_init		*/
-			NULL,					/* base_finalize	*/
-			(GClassInitFunc)gnt_combo_box_class_init,
-			NULL,					/* class_finalize	*/
-			NULL,					/* class_data		*/
-			sizeof(GntComboBox),
-			0,						/* n_preallocs		*/
-			gnt_combo_box_init,			/* instance_init	*/
-			NULL					/* value_table		*/
-		};
-
-		type = g_type_register_static(GNT_TYPE_WIDGET,
-									  "GntComboBox",
-									  &info, 0);
-	}
-
-	return type;
-}
-
 GntWidget *gnt_combo_box_new()
 {
 	GntWidget *widget = g_object_new(GNT_TYPE_COMBO_BOX, NULL);

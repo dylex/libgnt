@@ -38,7 +38,7 @@ enum
 	SIGS = 1,
 };
 
-static GntWidgetClass *parent_class = NULL;
+G_DEFINE_TYPE(GntLabel, gnt_label, GNT_TYPE_WIDGET)
 
 static void
 gnt_label_destroy(GntWidget *widget)
@@ -107,18 +107,18 @@ gnt_label_get_property(GObject *obj, guint prop_id, GValue *value,
 static void
 gnt_label_class_init(GntLabelClass *klass)
 {
-	GObjectClass *gclass = G_OBJECT_CLASS(klass);
+	GObjectClass *obj_class = G_OBJECT_CLASS(klass);
+	GntWidgetClass *widget_class = GNT_WIDGET_CLASS(klass);
 
-	parent_class = GNT_WIDGET_CLASS(klass);
-	parent_class->destroy = gnt_label_destroy;
-	parent_class->draw = gnt_label_draw;
-	parent_class->map = NULL;
-	parent_class->size_request = gnt_label_size_request;
+	widget_class->destroy = gnt_label_destroy;
+	widget_class->draw = gnt_label_draw;
+	widget_class->map = NULL;
+	widget_class->size_request = gnt_label_size_request;
 
-	gclass->set_property = gnt_label_set_property;
-	gclass->get_property = gnt_label_get_property;
+	obj_class->set_property = gnt_label_set_property;
+	obj_class->get_property = gnt_label_get_property;
 
-	g_object_class_install_property(gclass,
+	g_object_class_install_property(obj_class,
 			PROP_TEXT,
 			g_param_spec_string("text", "Text",
 				"The text for the label.",
@@ -127,7 +127,7 @@ gnt_label_class_init(GntLabelClass *klass)
 			)
 		);
 
-	g_object_class_install_property(gclass,
+	g_object_class_install_property(obj_class,
 			PROP_TEXT_FLAG,
 			g_param_spec_int("text-flag", "Text flag",
 				"Text attribute to use when displaying the text in the label.",
@@ -142,9 +142,9 @@ gnt_label_class_init(GntLabelClass *klass)
 }
 
 static void
-gnt_label_init(GTypeInstance *instance, gpointer class)
+gnt_label_init(GntLabel *label)
 {
-	GntWidget *widget = GNT_WIDGET(instance);
+	GntWidget *widget = GNT_WIDGET(label);
 	gnt_widget_set_take_focus(widget, FALSE);
 	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW);
 	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_GROW_X);
@@ -156,34 +156,6 @@ gnt_label_init(GTypeInstance *instance, gpointer class)
 /******************************************************************************
  * GntLabel API
  *****************************************************************************/
-GType
-gnt_label_get_type(void)
-{
-	static GType type = 0;
-
-	if(type == 0)
-	{
-		static const GTypeInfo info = {
-			sizeof(GntLabelClass),
-			NULL,					/* base_init		*/
-			NULL,					/* base_finalize	*/
-			(GClassInitFunc)gnt_label_class_init,
-			NULL,					/* class_finalize	*/
-			NULL,					/* class_data		*/
-			sizeof(GntLabel),
-			0,						/* n_preallocs		*/
-			gnt_label_init,			/* instance_init	*/
-			NULL					/* value_table		*/
-		};
-
-		type = g_type_register_static(GNT_TYPE_WIDGET,
-									  "GntLabel",
-									  &info, 0);
-	}
-
-	return type;
-}
-
 GntWidget *gnt_label_new(const char *text)
 {
 	return gnt_label_new_with_format(text, 0);

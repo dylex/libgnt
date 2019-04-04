@@ -42,9 +42,9 @@ enum
 	SIGS = 1,
 };
 
-static GntWidgetClass *parent_class = NULL;
-
 static GntWidget * find_focusable_widget(GntBox *box);
+
+G_DEFINE_TYPE(GntBox, gnt_box, GNT_TYPE_WIDGET)
 
 static void
 add_to_focus(gpointer value, gpointer data)
@@ -570,24 +570,25 @@ static void
 gnt_box_class_init(GntBoxClass *klass)
 {
 	GntBindableClass *bindable = GNT_BINDABLE_CLASS(klass);
-	GObjectClass *gclass = G_OBJECT_CLASS(klass);
-	parent_class = GNT_WIDGET_CLASS(klass);
-	parent_class->destroy = gnt_box_destroy;
-	parent_class->draw = gnt_box_draw;
-	parent_class->expose = gnt_box_expose;
-	parent_class->map = gnt_box_map;
-	parent_class->size_request = gnt_box_size_request;
-	parent_class->set_position = gnt_box_set_position;
-	parent_class->key_pressed = gnt_box_key_pressed;
-	parent_class->clicked = gnt_box_clicked;
-	parent_class->lost_focus = gnt_box_lost_focus;
-	parent_class->gained_focus = gnt_box_gained_focus;
-	parent_class->confirm_size = gnt_box_confirm_size;
-	parent_class->size_changed = gnt_box_size_changed;
+	GObjectClass *obj_class = G_OBJECT_CLASS(klass);
+	GntWidgetClass *widget_class = GNT_WIDGET_CLASS(klass);
 
-	gclass->set_property = gnt_box_set_property;
-	gclass->get_property = gnt_box_get_property;
-	g_object_class_install_property(gclass,
+	widget_class->destroy = gnt_box_destroy;
+	widget_class->draw = gnt_box_draw;
+	widget_class->expose = gnt_box_expose;
+	widget_class->map = gnt_box_map;
+	widget_class->size_request = gnt_box_size_request;
+	widget_class->set_position = gnt_box_set_position;
+	widget_class->key_pressed = gnt_box_key_pressed;
+	widget_class->clicked = gnt_box_clicked;
+	widget_class->lost_focus = gnt_box_lost_focus;
+	widget_class->gained_focus = gnt_box_gained_focus;
+	widget_class->confirm_size = gnt_box_confirm_size;
+	widget_class->size_changed = gnt_box_size_changed;
+
+	obj_class->set_property = gnt_box_set_property;
+	obj_class->get_property = gnt_box_get_property;
+	g_object_class_install_property(obj_class,
 			PROP_VERTICAL,
 			g_param_spec_boolean("vertical", "Vertical",
 				"Whether the child widgets in the box should be stacked vertically.",
@@ -595,7 +596,7 @@ gnt_box_class_init(GntBoxClass *klass)
 				G_PARAM_READWRITE|G_PARAM_CONSTRUCT|G_PARAM_STATIC_STRINGS
 			)
 		);
-	g_object_class_install_property(gclass,
+	g_object_class_install_property(obj_class,
 			PROP_HOMO,
 			g_param_spec_boolean("homogeneous", "Homogeneous",
 				"Whether the child widgets in the box should have the same size.",
@@ -615,10 +616,9 @@ gnt_box_class_init(GntBoxClass *klass)
 }
 
 static void
-gnt_box_init(GTypeInstance *instance, gpointer class)
+gnt_box_init(GntBox *box)
 {
-	GntWidget *widget = GNT_WIDGET(instance);
-	GntBox *box = GNT_BOX(widget);
+	GntWidget *widget = GNT_WIDGET(box);
 	/* Initially make both the height and width resizable.
 	 * Update the flags as necessary when widgets are added to it. */
 	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_GROW_X | GNT_WIDGET_GROW_Y);
@@ -632,34 +632,6 @@ gnt_box_init(GTypeInstance *instance, gpointer class)
 /******************************************************************************
  * GntBox API
  *****************************************************************************/
-GType
-gnt_box_get_type(void)
-{
-	static GType type = 0;
-
-	if(type == 0)
-	{
-		static const GTypeInfo info = {
-			sizeof(GntBoxClass),
-			NULL,					/* base_init		*/
-			NULL,					/* base_finalize	*/
-			(GClassInitFunc)gnt_box_class_init,
-			NULL,					/* class_finalize	*/
-			NULL,					/* class_data		*/
-			sizeof(GntBox),
-			0,						/* n_preallocs		*/
-			gnt_box_init,			/* instance_init	*/
-			NULL					/* value_table		*/
-		};
-
-		type = g_type_register_static(GNT_TYPE_WIDGET,
-									  "GntBox",
-									  &info, 0);
-	}
-
-	return type;
-}
-
 GntWidget *gnt_box_new(gboolean homo, gboolean vert)
 {
 	GntWidget *widget = g_object_new(GNT_TYPE_BOX, "homogeneous", homo,
