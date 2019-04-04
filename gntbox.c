@@ -777,8 +777,7 @@ void gnt_box_remove(GntBox *box, GntWidget *widget)
 
 void gnt_box_remove_all(GntBox *box)
 {
-	g_list_foreach(box->list, (GFunc)gnt_widget_destroy, NULL);
-	g_list_free(box->list);
+	g_list_free_full(box->list, (GDestroyNotify)gnt_widget_destroy);
 	g_list_free(box->focus);
 	box->list = NULL;
 	box->focus = NULL;

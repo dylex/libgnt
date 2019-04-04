@@ -59,8 +59,7 @@ gnt_file_sel_destroy(GntWidget *widget)
 	g_free(sel->current);
 	g_free(sel->suggest);
 	if (sel->tags) {
-		g_list_foreach(sel->tags, (GFunc)g_free, NULL);
-		g_list_free(sel->tags);
+		g_list_free_full(sel->tags, g_free);
 	}
 }
 
@@ -240,8 +239,7 @@ location_changed(GntFileSel *sel, GError **err)
 				gnt_tree_set_row_flags(GNT_TREE(sel->files), (gpointer)str, GNT_TEXT_FLAG_BOLD);
 		}
 	}
-	g_list_foreach(files, (GFunc)gnt_file_free, NULL);
-	g_list_free(files);
+	g_list_free_full(files, (GDestroyNotify)gnt_file_free);
 	if (GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(sel), GNT_WIDGET_MAPPED))
 		gnt_widget_draw(GNT_WIDGET(sel));
 	return TRUE;
@@ -408,8 +406,7 @@ clear_tags(GntBindable *bind, G_GNUC_UNUSED GList *params)
 			gnt_tree_is_searching(GNT_TREE(tree)))
 		return FALSE;
 
-	g_list_foreach(sel->tags, (GFunc)g_free, NULL);
-	g_list_free(sel->tags);
+	g_list_free_full(sel->tags, g_free);
 	sel->tags = NULL;
 
 	for (iter = GNT_TREE(tree)->list; iter; iter = iter->next)

@@ -369,8 +369,7 @@ static void
 gnt_menu_destroy(GntWidget *widget)
 {
 	GntMenu *menu = GNT_MENU(widget);
-	g_list_foreach(menu->list, (GFunc)g_object_unref, NULL);
-	g_list_free(menu->list);
+	g_list_free_full(menu->list, g_object_unref);
 	org_destroy(widget);
 }
 

@@ -141,8 +141,7 @@ gnt_bindable_rebinding_activate(GntBindable *data, gpointer bindable)
 
 	rebind_info.params = NULL;
 
-	g_list_foreach(current_row_data, (GFunc)g_free, NULL);
-	g_list_free(current_row_data);
+	g_list_free_full(current_row_data, g_free);
 
 	gnt_box_set_alignment(GNT_BOX(vbox), GNT_ALIGN_MID);
 
