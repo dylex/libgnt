@@ -746,7 +746,7 @@ delete_forward_word(GntBindable *bind, G_GNUC_UNUSED GList *params)
 }
 
 static gboolean
-transpose_chars(GntBindable *bind, GList *null)
+transpose_chars(GntBindable *bind, GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	char *current, *prev;
@@ -760,7 +760,7 @@ transpose_chars(GntBindable *bind, GList *null)
 
 	current = entry->cursor;
 	prev = g_utf8_find_prev_char(entry->start, entry->cursor);
-	move_forward(bind, null);
+	move_forward(bind, params);
 
 	/* Let's do this dance! */
 	memcpy(hold, prev, current - prev);
