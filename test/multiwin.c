@@ -6,12 +6,14 @@
 #include "gnttree.h"
 #include "gntbox.h"
 
-gboolean show(GntWidget *w)
+gboolean
+show(G_GNUC_UNUSED GntWidget *w)
 {
 	return FALSE;
 }
 
-int main()
+int
+main(void)
 {
 #ifdef STANDALONE
 	freopen(".error", "w", stderr);

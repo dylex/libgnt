@@ -6,7 +6,7 @@
 #include <gntlabel.h>
 
 static gboolean
-key_pressed(GntEntry *entry, const char *text, gpointer null)
+key_pressed(GntEntry *entry, const char *text, G_GNUC_UNUSED gpointer unused)
 {
 	if (*text != '\r')
 		return FALSE;
@@ -20,9 +20,11 @@ key_pressed(GntEntry *entry, const char *text, gpointer null)
 		handle = g_module_open(cmd, G_MODULE_BIND_LOCAL);
 		if (handle && g_module_symbol(handle, "main", (gpointer)&func))
 		{
-			char *argv[] = {cmd, NULL};
+			char **argv = g_new0(char*, 2);
+			argv[0] = g_strdup(cmd);
 			gnt_entry_clear(entry);
 			func(1, argv);
+			g_strfreev(argv);
 		}
 		else
 		{
@@ -39,7 +41,8 @@ key_pressed(GntEntry *entry, const char *text, gpointer null)
 	return TRUE;
 }
 
-int main()
+int
+main(void)
 {
 	GntWidget *window, *entry;
 

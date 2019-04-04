@@ -53,13 +53,14 @@ key_pressed(GntWidget *w, const char *key, GntWidget *view)
 }
 
 static void
-completion_cb(GntEntry *entry, const char *start, const char *end)
+completion_cb(GntEntry *entry, const char *start, G_GNUC_UNUSED const char *end)
 {
 	if (start == entry->start)
 		gnt_widget_key_pressed(GNT_WIDGET(entry), ": ");
 }
 
-int main()
+int
+main(void)
 {
 	GntWidget *hbox, *entry, *view;
 

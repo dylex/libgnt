@@ -7,7 +7,7 @@
 #include "gntlabel.h"
 
 static void
-toggled(GntWidget *tree, gpointer key, gpointer null)
+toggled(GntWidget *tree, gpointer key, G_GNUC_UNUSED gpointer unused)
 {
 	GntWidget *w = gnt_box_new(FALSE, FALSE);
 
@@ -18,7 +18,8 @@ toggled(GntWidget *tree, gpointer key, gpointer null)
 	gnt_widget_show(w);
 }
 
-int main()
+int
+main(void)
 {
 #ifdef STANDALONE
 	freopen(".error", "w", stderr);
@@ -27,7 +28,6 @@ int main()
 
 	GntWidget *label = gnt_label_new("So wassup dudes and dudettes!!\u4e0a1\u6d772\u67003\u4f4e4\u67085\nSo this is, like,\nthe third line!! \\o/");
 	GntWidget *vbox, *hbox, *tree, *box, *button;
-	WINDOW *test;
 
 	vbox = gnt_box_new(FALSE, FALSE);
 	hbox = gnt_box_new(FALSE, TRUE);
@@ -44,7 +44,7 @@ int main()
 
 	box = gnt_box_new(FALSE, FALSE);
 	tree = gnt_tree_new();
-	gnt_tree_set_compare_func(GNT_TREE(tree), g_utf8_collate);
+	gnt_tree_set_compare_func(GNT_TREE(tree), (GCompareFunc)g_utf8_collate);
 	gnt_widget_set_name(tree, "tree");
 	gnt_box_add_widget(GNT_BOX(box), tree);
 	gnt_box_add_widget(GNT_BOX(hbox), box);

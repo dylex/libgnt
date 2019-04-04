@@ -12,10 +12,10 @@ static void
 button_activated(GntWidget *b, GntComboBox *combo)
 {
 	GntWidget *w = b->parent;
+	const gchar *text = gnt_combo_box_get_selected_data(GNT_COMBO_BOX(combo));
 
-	gnt_box_add_widget(GNT_BOX(w),
-			gnt_label_new(gnt_combo_box_get_selected_data(GNT_COMBO_BOX(combo))));
-	fprintf(stderr, "%s\n", gnt_combo_box_get_selected_data(GNT_COMBO_BOX(combo)));
+	gnt_box_add_widget(GNT_BOX(w), gnt_label_new(text));
+	fprintf(stderr, "%s\n", text);
 	gnt_box_readjust(GNT_BOX(w->parent));
 }
 
@@ -29,7 +29,8 @@ update_label(GntSlider *slider, int current_value, GntEntry *entry)
 	gnt_entry_set_text(entry, value);
 }
 
-int main()
+int
+main(void)
 {
 	GntWidget *box, *combo, *button;
 	GntWidget *hbox;

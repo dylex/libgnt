@@ -5,7 +5,7 @@
 #include <gntlabel.h>
 
 static gboolean
-print_keycode(GntEntry *entry, const char *text, gpointer null)
+print_keycode(GntEntry *entry, const char *text, G_GNUC_UNUSED gpointer unused)
 {
 	char *s = g_strdup_printf("%s ", text);
 	gnt_entry_set_text(entry, s);
@@ -34,7 +34,8 @@ print_keycode(GntEntry *entry, const char *text, gpointer null)
 		return TRUE;
 }
 
-int main()
+int
+main(void)
 {
 	GntWidget *window, *entry;
 

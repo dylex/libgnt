@@ -5,7 +5,8 @@
 #include "gntmenuitem.h"
 #include "gntwindow.h"
 
-void dothis(GntMenuItem *item, gpointer null)
+void
+dothis(G_GNUC_UNUSED GntMenuItem *item, G_GNUC_UNUSED gpointer unused)
 {
 	GntWidget *w = gnt_vbox_new(FALSE);
 	gnt_box_set_toplevel(GNT_BOX(w), TRUE);
@@ -14,13 +15,14 @@ void dothis(GntMenuItem *item, gpointer null)
 	gnt_widget_show(w);
 }
 
-int main()
+int
+main(void)
 {
 	freopen(".error", "w", stderr);
 	gnt_init();
 
 	GntWidget *menu = gnt_menu_new(GNT_MENU_TOPLEVEL);
-	GObject *item = gnt_menuitem_new("File");
+	GntMenuItem *item = gnt_menuitem_new("File");
 
 	gnt_menu_add_item(GNT_MENU(menu), GNT_MENU_ITEM(item));
 
