@@ -139,7 +139,8 @@ is_budddylist(GntWidget *win)
 }
 
 static void
-remove_border_set_position_size(GntWM *wm, GntWidget *win, int x, int y, int w, int h)
+remove_border_set_position_size(G_GNUC_UNUSED GntWM *wm, GntWidget *win, int x,
+                                int y, int w, int h)
 {
 	gnt_box_set_toplevel(GNT_BOX(win), FALSE);
 	GNT_WIDGET_SET_FLAGS(win, GNT_WIDGET_CAN_TAKE_FOCUS);
@@ -288,7 +289,7 @@ move_direction(GntBindable *bindable, GList *list)
 }
 
 static void
-refresh_window(GntWidget *widget, GntNode *node, Irssi *irssi)
+refresh_window(GntWidget *widget, G_GNUC_UNUSED GntNode *node, Irssi *irssi)
 {
 	int vert, hor;
 	int x, y, w, h;

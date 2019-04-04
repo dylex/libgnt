@@ -335,7 +335,7 @@ entry_text_changed(GntEntry *entry)
 }
 
 static gboolean
-move_back(GntBindable *bind, GList *null)
+move_back(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	if (entry->cursor <= entry->start)
@@ -349,7 +349,7 @@ move_back(GntBindable *bind, GList *null)
 }
 
 static gboolean
-move_forward(GntBindable *bind, GList *list)
+move_forward(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	if (entry->cursor >= entry->end)
@@ -363,7 +363,7 @@ move_forward(GntBindable *bind, GList *list)
 }
 
 static gboolean
-backspace(GntBindable *bind, GList *null)
+backspace(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	int len;
 	GntEntry *entry = GNT_ENTRY(bind);
@@ -389,7 +389,7 @@ backspace(GntBindable *bind, GList *null)
 }
 
 static gboolean
-delkey(GntBindable *bind, GList *null)
+delkey(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	int len;
 	GntEntry *entry = GNT_ENTRY(bind);
@@ -410,7 +410,7 @@ delkey(GntBindable *bind, GList *null)
 }
 
 static gboolean
-move_start(GntBindable *bind, GList *null)
+move_start(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	entry->scroll = entry->cursor = entry->start;
@@ -420,7 +420,7 @@ move_start(GntBindable *bind, GList *null)
 }
 
 static gboolean
-move_end(GntBindable *bind, GList *null)
+move_end(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	entry->cursor = entry->end;
@@ -433,7 +433,7 @@ move_end(GntBindable *bind, GList *null)
 }
 
 static gboolean
-history_next(GntBindable *bind, GList *null)
+history_next(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	if (entry->histlength && entry->history->prev)
@@ -450,7 +450,7 @@ history_next(GntBindable *bind, GList *null)
 }
 
 static gboolean
-history_prev(GntBindable *bind, GList *null)
+history_prev(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	if (entry->histlength && entry->history->next)
@@ -475,7 +475,7 @@ history_prev(GntBindable *bind, GList *null)
 }
 
 static gboolean
-history_search(GntBindable *bind, GList *null)
+history_search(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	GList *iter;
@@ -521,7 +521,7 @@ history_search(GntBindable *bind, GList *null)
 }
 
 static gboolean
-clipboard_paste(GntBindable *bind, GList *n)
+clipboard_paste(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	gchar *i, *text, *a, *all;
@@ -542,7 +542,7 @@ clipboard_paste(GntBindable *bind, GList *n)
 }
 
 static gboolean
-suggest_show(GntBindable *bind, GList *null)
+suggest_show(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	if (entry->ddown) {
@@ -553,7 +553,7 @@ suggest_show(GntBindable *bind, GList *null)
 }
 
 static gboolean
-suggest_next(GntBindable *bind, GList *null)
+suggest_next(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	if (entry->ddown) {
@@ -564,7 +564,7 @@ suggest_next(GntBindable *bind, GList *null)
 }
 
 static gboolean
-suggest_prev(GntBindable *bind, GList *null)
+suggest_prev(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	if (entry->ddown) {
@@ -575,7 +575,7 @@ suggest_prev(GntBindable *bind, GList *null)
 }
 
 static gboolean
-suggest_next_page(GntBindable *bind, GList *null)
+suggest_next_page(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	if (entry->ddown) {
@@ -586,7 +586,7 @@ suggest_next_page(GntBindable *bind, GList *null)
 }
 
 static gboolean
-suggest_prev_page(GntBindable *bind, GList *null)
+suggest_prev_page(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	if (entry->ddown) {
@@ -597,7 +597,7 @@ suggest_prev_page(GntBindable *bind, GList *null)
 }
 
 static gboolean
-del_to_home(GntBindable *bind, GList *null)
+del_to_home(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	if (entry->cursor <= entry->start)
@@ -613,7 +613,7 @@ del_to_home(GntBindable *bind, GList *null)
 }
 
 static gboolean
-del_to_end(GntBindable *bind, GList *null)
+del_to_end(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	if (entry->end <= entry->cursor)
@@ -668,7 +668,7 @@ next_begin_word(const char *text, const char *end)
 
 #undef SAME
 static gboolean
-move_back_word(GntBindable *bind, GList *null)
+move_back_word(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	const char *iter = g_utf8_find_prev_char(entry->start, entry->cursor);
@@ -685,7 +685,7 @@ move_back_word(GntBindable *bind, GList *null)
 }
 
 static gboolean
-del_prev_word(GntBindable *bind, GList *null)
+del_prev_word(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntWidget *widget = GNT_WIDGET(bind);
 	GntEntry *entry = GNT_ENTRY(bind);
@@ -713,7 +713,7 @@ del_prev_word(GntBindable *bind, GList *null)
 }
 
 static gboolean
-move_forward_word(GntBindable *bind, GList *list)
+move_forward_word(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	GntWidget *widget = GNT_WIDGET(bind);
@@ -727,7 +727,7 @@ move_forward_word(GntBindable *bind, GList *list)
 }
 
 static gboolean
-delete_forward_word(GntBindable *bind, GList *list)
+delete_forward_word(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	GntWidget *widget = GNT_WIDGET(bind);
@@ -774,7 +774,7 @@ transpose_chars(GntBindable *bind, GList *null)
 }
 
 static gboolean
-entry_yank(GntBindable *bind, GList *null)
+entry_yank(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
 	gnt_entry_key_pressed(GNT_WIDGET(entry), entry->killring->buffer->str);
@@ -920,7 +920,8 @@ gnt_entry_lost_focus(GntWidget *widget)
 }
 
 static gboolean
-gnt_entry_clicked(GntWidget *widget, GntMouseEvent event, int x, int y)
+gnt_entry_clicked(GntWidget *widget, GntMouseEvent event, G_GNUC_UNUSED int x,
+                  G_GNUC_UNUSED int y)
 {
 	if (event == GNT_MIDDLE_MOUSE_DOWN) {
 		clipboard_paste(GNT_BINDABLE(widget), NULL);

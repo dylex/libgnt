@@ -123,7 +123,7 @@ gnt_slider_map(GntWidget *widget)
 }
 
 static gboolean
-step_back(GntBindable *bindable, GList *null)
+step_back(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntSlider *slider = GNT_SLIDER(bindable);
 	gnt_slider_advance_step(slider, -1);
@@ -131,7 +131,7 @@ step_back(GntBindable *bindable, GList *null)
 }
 
 static gboolean
-small_step_back(GntBindable *bindable, GList *null)
+small_step_back(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntSlider *slider = GNT_SLIDER(bindable);
 	gnt_slider_set_value(slider, slider->current - slider->smallstep);
@@ -139,7 +139,7 @@ small_step_back(GntBindable *bindable, GList *null)
 }
 
 static gboolean
-large_step_back(GntBindable *bindable, GList *null)
+large_step_back(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntSlider *slider = GNT_SLIDER(bindable);
 	gnt_slider_set_value(slider, slider->current - slider->largestep);
@@ -147,7 +147,7 @@ large_step_back(GntBindable *bindable, GList *null)
 }
 
 static gboolean
-step_forward(GntBindable *bindable, GList *list)
+step_forward(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntSlider *slider = GNT_SLIDER(bindable);
 	gnt_slider_advance_step(slider, 1);
@@ -155,7 +155,7 @@ step_forward(GntBindable *bindable, GList *list)
 }
 
 static gboolean
-small_step_forward(GntBindable *bindable, GList *null)
+small_step_forward(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntSlider *slider = GNT_SLIDER(bindable);
 	gnt_slider_set_value(slider, slider->current + slider->smallstep);
@@ -163,7 +163,7 @@ small_step_forward(GntBindable *bindable, GList *null)
 }
 
 static gboolean
-large_step_forward(GntBindable *bindable, GList *null)
+large_step_forward(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntSlider *slider = GNT_SLIDER(bindable);
 	gnt_slider_set_value(slider, slider->current + slider->largestep);
@@ -171,7 +171,7 @@ large_step_forward(GntBindable *bindable, GList *null)
 }
 
 static gboolean
-move_min_value(GntBindable *bindable, GList *null)
+move_min_value(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntSlider *slider = GNT_SLIDER(bindable);
 	gnt_slider_set_value(slider, slider->min);
@@ -179,7 +179,7 @@ move_min_value(GntBindable *bindable, GList *null)
 }
 
 static gboolean
-move_max_value(GntBindable *bindable, GList *null)
+move_max_value(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntSlider *slider = GNT_SLIDER(bindable);
 	gnt_slider_set_value(slider, slider->max);

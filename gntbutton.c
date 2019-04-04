@@ -79,7 +79,8 @@ gnt_button_map(GntWidget *widget)
 }
 
 static gboolean
-gnt_button_clicked(GntWidget *widget, GntMouseEvent event, int x, int y)
+gnt_button_clicked(GntWidget *widget, GntMouseEvent event, G_GNUC_UNUSED int x,
+                   G_GNUC_UNUSED int y)
 {
 	if (event == GNT_LEFT_MOUSE_DOWN) {
 		gnt_widget_activate(widget);
@@ -97,7 +98,7 @@ gnt_button_destroy(GntWidget *widget)
 }
 
 static gboolean
-button_activate(GntBindable *bind, GList *null)
+button_activate(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	gnt_widget_activate(GNT_WIDGET(bind));
 	return TRUE;

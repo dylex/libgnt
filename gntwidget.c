@@ -101,7 +101,7 @@ gnt_widget_dummy_confirm_size(GntWidget *widget, int width, int height)
 }
 
 static gboolean
-context_menu(GntBindable *bind, GList *null)
+context_menu(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	gboolean ret = FALSE;
 	g_signal_emit(bind, signals[SIG_CONTEXT_MENU], 0, &ret);

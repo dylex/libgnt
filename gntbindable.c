@@ -67,14 +67,14 @@ gnt_bindable_free_rebind_info(void)
 }
 
 static void
-gnt_bindable_rebinding_cancel(GntWidget *button, gpointer data)
+gnt_bindable_rebinding_cancel(G_GNUC_UNUSED GntWidget *button, gpointer data)
 {
 	gnt_bindable_free_rebind_info();
 	gnt_widget_destroy(GNT_WIDGET(data));
 }
 
 static void
-gnt_bindable_rebinding_rebind(GntWidget *button, gpointer data)
+gnt_bindable_rebinding_rebind(G_GNUC_UNUSED GntWidget *button, gpointer data)
 {
 	if (rebind_info.keys) {
 		gnt_bindable_register_binding(rebind_info.klass,
@@ -91,7 +91,8 @@ gnt_bindable_rebinding_rebind(GntWidget *button, gpointer data)
 }
 
 static gboolean
-gnt_bindable_rebinding_grab_key(GntBindable *bindable, const char *text, gpointer data)
+gnt_bindable_rebinding_grab_key(G_GNUC_UNUSED GntBindable *bindable,
+                                const char *text, gpointer data)
 {
 	GntTextView *textview = GNT_TEXT_VIEW(data);
 	char *new_text;
@@ -437,7 +438,7 @@ GntBindable * gnt_bindable_bindings_view(GntBindable *bind)
 }
 
 static void
-reset_binding_window(GntBindableClass *window, gpointer k)
+reset_binding_window(G_GNUC_UNUSED GntBindableClass *window, gpointer k)
 {
 	GntBindableClass *klass = GNT_BINDABLE_CLASS(k);
 	klass->help_window = NULL;

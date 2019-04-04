@@ -169,10 +169,11 @@ GHashTable *gnt_hash_table_duplicate(GHashTable *src, GHashFunc hash,
 	return dest;
 }
 
-gboolean gnt_boolean_handled_accumulator(GSignalInvocationHint *ihint,
-				  GValue                *return_accu,
-				  const GValue          *handler_return,
-				  gpointer               dummy)
+gboolean
+gnt_boolean_handled_accumulator(G_GNUC_UNUSED GSignalInvocationHint *ihint,
+                                GValue *return_accu,
+                                const GValue *handler_return,
+                                G_GNUC_UNUSED gpointer dummy)
 {
 	gboolean continue_emission;
 	gboolean signal_handled;
@@ -481,7 +482,8 @@ free_trigger_button(TriggerButton *b)
 }
 
 static gboolean
-key_pressed(GntWidget *widget, const char *text, TriggerButton *trig)
+key_pressed(G_GNUC_UNUSED GntWidget *widget, const char *text,
+            TriggerButton *trig)
 {
 	if (text && trig->text &&
 			strcmp(text, trig->text) == 0) {

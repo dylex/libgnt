@@ -70,7 +70,7 @@ gnt_label_size_request(GntWidget *widget)
 
 static void
 gnt_label_set_property(GObject *obj, guint prop_id, const GValue *value,
-		GParamSpec *spec)
+                       G_GNUC_UNUSED GParamSpec *spec)
 {
 	GntLabel *label = GNT_LABEL(obj);
 	switch (prop_id) {
@@ -89,7 +89,7 @@ gnt_label_set_property(GObject *obj, guint prop_id, const GValue *value,
 
 static void
 gnt_label_get_property(GObject *obj, guint prop_id, GValue *value,
-		GParamSpec *spec)
+                       G_GNUC_UNUSED GParamSpec *spec)
 {
 	GntLabel *label = GNT_LABEL(obj);
 	switch (prop_id) {

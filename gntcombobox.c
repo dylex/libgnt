@@ -222,7 +222,8 @@ gnt_combo_box_lost_focus(GntWidget *widget)
 }
 
 static gboolean
-gnt_combo_box_clicked(GntWidget *widget, GntMouseEvent event, int x, int y)
+gnt_combo_box_clicked(GntWidget *widget, GntMouseEvent event,
+                      G_GNUC_UNUSED int x, G_GNUC_UNUSED int y)
 {
 	GntComboBox *box = GNT_COMBO_BOX(widget);
 	gboolean dshowing = GNT_WIDGET_IS_FLAG_SET(box->dropdown->parent, GNT_WIDGET_MAPPED);
@@ -245,14 +246,15 @@ gnt_combo_box_clicked(GntWidget *widget, GntMouseEvent event, int x, int y)
 }
 
 static void
-gnt_combo_box_size_changed(GntWidget *widget, int oldw, int oldh)
+gnt_combo_box_size_changed(GntWidget *widget, G_GNUC_UNUSED int oldw,
+                           G_GNUC_UNUSED int oldh)
 {
 	GntComboBox *box = GNT_COMBO_BOX(widget);
 	gnt_widget_set_size(box->dropdown, widget->priv.width - 1, box->dropdown->priv.height);
 }
 
 static gboolean
-dropdown_menu(GntBindable *b, GList *null)
+dropdown_menu(GntBindable *b, G_GNUC_UNUSED GList *params)
 {
 	if (GNT_WIDGET_IS_FLAG_SET(GNT_COMBO_BOX(b)->dropdown->parent, GNT_WIDGET_MAPPED))
 		return FALSE;

@@ -79,7 +79,8 @@ gnt_check_box_key_pressed(GntWidget *widget, const char *text)
 }
 
 static gboolean
-gnt_check_box_clicked(GntWidget *widget, GntMouseEvent event, int x, int y)
+gnt_check_box_clicked(GntWidget *widget, GntMouseEvent event,
+                      G_GNUC_UNUSED int x, G_GNUC_UNUSED int y)
 {
 	if (event == GNT_LEFT_MOUSE_DOWN) {
 		toggle_selection(widget);
