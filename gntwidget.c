@@ -47,17 +47,19 @@ enum
 	SIGS
 };
 
-static GObjectClass *parent_class = NULL;
 static guint signals[SIGS] = { 0 };
 
 static void init_widget(GntWidget *widget);
 
+G_DEFINE_TYPE(GntWidget, gnt_widget, GNT_TYPE_BINDABLE)
+
+/******************************************************************************
+ * GObject Implementation
+ *****************************************************************************/
 static void
-gnt_widget_init(GTypeInstance *instance, gpointer class)
+gnt_widget_init(GntWidget *widget)
 {
-	GntWidget *widget = GNT_WIDGET(instance);
 	widget->priv.name = NULL;
-	GNTDEBUG;
 }
 
 static void
@@ -74,8 +76,7 @@ gnt_widget_dispose(GObject *obj)
 {
 	GntWidget *self = GNT_WIDGET(obj);
 	g_signal_emit(self, signals[SIG_DESTROY], 0);
-	parent_class->dispose(obj);
-	GNTDEBUG;
+	G_OBJECT_CLASS(gnt_widget_parent_class)->dispose(obj);
 }
 
 static void
@@ -111,8 +112,6 @@ static void
 gnt_widget_class_init(GntWidgetClass *klass)
 {
 	GObjectClass *obj_class = G_OBJECT_CLASS(klass);
-
-	parent_class = g_type_class_peek_parent(klass);
 
 	obj_class->dispose = gnt_widget_dispose;
 
@@ -250,33 +249,6 @@ gnt_widget_class_init(GntWidgetClass *klass)
 /******************************************************************************
  * GntWidget API
  *****************************************************************************/
-GType
-gnt_widget_get_type(void)
-{
-	static GType type = 0;
-
-	if(type == 0) {
-		static const GTypeInfo info = {
-			sizeof(GntWidgetClass),
-			NULL,					/* base_init		*/
-			NULL,					/* base_finalize	*/
-			(GClassInitFunc)gnt_widget_class_init,
-			NULL,
-			NULL,					/* class_data		*/
-			sizeof(GntWidget),
-			0,						/* n_preallocs		*/
-			gnt_widget_init,					/* instance_init	*/
-			NULL					/* value_table		*/
-		};
-
-		type = g_type_register_static(GNT_TYPE_BINDABLE,
-									  "GntWidget",
-									  &info, G_TYPE_FLAG_ABSTRACT);
-	}
-
-	return type;
-}
-
 void gnt_widget_set_take_focus(GntWidget *widget, gboolean can)
 {
 	if (can)

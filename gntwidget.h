@@ -106,10 +106,10 @@ struct _GntWidget
 	WINDOW *window;
 
 	/*< private >*/
-    void *res1;
-    void *res2;
-    void *res3;
-    void *res4;
+	void *res1;
+	void *res2;
+	void *res3;
+	void *res4;
 };
 
 struct _GntWidgetClass
