@@ -40,10 +40,6 @@
 #define GNT_IS_SLIDER_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_SLIDER))
 #define GNT_SLIDER_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_SLIDER, GntSliderClass))
 
-#define GNT_SLIDER_FLAGS(obj)                (GNT_SLIDER(obj)->priv.flags)
-#define GNT_SLIDER_SET_FLAGS(obj, flags)     (GNT_SLIDER_FLAGS(obj) |= flags)
-#define GNT_SLIDER_UNSET_FLAGS(obj, flags)   (GNT_SLIDER_FLAGS(obj) &= ~(flags))
-
 typedef struct _GntSlider			GntSlider;
 typedef struct _GntSliderPriv		GntSliderPriv;
 typedef struct _GntSliderClass		GntSliderClass;

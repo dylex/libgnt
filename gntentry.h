@@ -41,10 +41,6 @@
 #define GNT_IS_ENTRY_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_ENTRY))
 #define GNT_ENTRY_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_ENTRY, GntEntryClass))
 
-#define GNT_ENTRY_FLAGS(obj)				(GNT_ENTRY(obj)->priv.flags)
-#define GNT_ENTRY_SET_FLAGS(obj, flags)		(GNT_ENTRY_FLAGS(obj) |= flags)
-#define GNT_ENTRY_UNSET_FLAGS(obj, flags)	(GNT_ENTRY_FLAGS(obj) &= ~(flags))
-
 #define	GNT_ENTRY_CHAR		'_'			/* The character to use to fill in the blank places */
 
 typedef struct _GntEntry			GntEntry;
