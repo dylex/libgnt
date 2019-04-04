@@ -33,11 +33,6 @@
 #include "gntwidget.h"
 
 #define GNT_TYPE_PROGRESS_BAR          (gnt_progress_bar_get_type ())
-#define GNT_PROGRESS_BAR(o)            (G_TYPE_CHECK_INSTANCE_CAST ((o), GNT_TYPE_PROGRESS_BAR, GntProgressBar))
-#define GNT_PROGRESS_BAR_CLASS(k)      (G_TYPE_CHECK_CLASS_CAST ((k), GNT_TYPE_PROGRESS_BAR, GntProgressBarClass))
-#define GNT_IS_PROGRESS_BAR(o)         (G_TYPE_CHECK_INSTANCE_TYPE ((o), GNT_TYPE_PROGRESS_BAR))
-#define GNT_IS_PROGRESS_BAR_CLASS(k)   (G_TYPE_CHECK_CLASS_TYPE ((k), GNT_TYPE_PROGRESS_BAR))
-#define GNT_PROGRESS_BAR_GET_CLASS(o)  (G_TYPE_INSTANCE_GET_CLASS ((o), GNT_TYPE_PROGRESS_BAR, GntProgressBarClass))
 
 typedef enum
 {
@@ -46,20 +41,6 @@ typedef enum
    GNT_PROGRESS_BOTTOM_TO_TOP,
    GNT_PROGRESS_TOP_TO_BOTTOM,
 } GntProgressBarOrientation;
-
-typedef struct _GntProgressBar GntProgressBar;
-typedef struct _GntProgressBarClass GntProgressBarClass;
-
-struct _GntProgressBarClass
-{
-   GntWidgetClass parent;
-
-	/*< private >*/
-   void (*gnt_reserved1)(void);
-   void (*gnt_reserved2)(void);
-   void (*gnt_reserved3)(void);
-   void (*gnt_reserved4)(void);
-};
 
 G_BEGIN_DECLS
 
@@ -70,8 +51,8 @@ G_BEGIN_DECLS
  *
  * Returns: The GType for GntProrgressBar
  */
-GType
-gnt_progress_bar_get_type (void);
+G_DECLARE_FINAL_TYPE(GntProgressBar, gnt_progress_bar, GNT, PROGRESS_BAR,
+		GntWidget)
 
 /**
  * gnt_progress_bar_new:
