@@ -29,6 +29,11 @@
 #include "gntwm.h"
 #include "gntws.h"
 
+G_DEFINE_TYPE(GntWS, gnt_ws, GNT_TYPE_BINDABLE)
+
+/******************************************************************************
+ * Helpers
+ *****************************************************************************/
 static void
 widget_hide(gpointer data, gpointer nodes)
 {
@@ -51,6 +56,25 @@ widget_show(gpointer data, gpointer nodes)
 	}
 }
 
+/******************************************************************************
+ * GObject Implementation
+ *****************************************************************************/
+static void
+gnt_ws_init(GntWS *ws)
+{
+	ws->list = NULL;
+	ws->ordered = NULL;
+	ws->name = NULL;
+}
+
+static void
+gnt_ws_class_init(G_GNUC_UNUSED GntWSClass *klass)
+{
+}
+
+/******************************************************************************
+ * GObject Implementation
+ *****************************************************************************/
 void
 gnt_ws_draw_taskbar(GntWS *ws, gboolean reposition)
 {
@@ -105,15 +129,6 @@ gnt_ws_draw_taskbar(GntWS *ws, gboolean reposition)
 	wrefresh(taskbar);
 }
 
-static void
-gnt_ws_init(GTypeInstance *instance, gpointer class)
-{
-	GntWS *ws = GNT_WS(instance);
-	ws->list = NULL;
-	ws->ordered = NULL;
-	ws->name = NULL;
-}
-
 void gnt_ws_add_widget(GntWS *ws, GntWidget* wid)
 {
 	GntWidget *oldfocus;
@@ -159,34 +174,6 @@ gnt_ws_show(GntWS *ws, GHashTable *nodes)
 	GList *l;
 	for (l = g_list_last(ws->ordered); l; l = g_list_previous(l))
 		widget_show(l->data, nodes);
-}
-
-GType
-gnt_ws_get_type(void)
-{
-	static GType type = 0;
-
-	if(type == 0) {
-		static const GTypeInfo info = {
-			sizeof(GntWSClass),
-			NULL,					/* base_init		*/
-			NULL,					/* base_finalize	*/
-			NULL,
-			/*(GClassInitFunc)gnt_ws_class_init,*/
-			NULL,
-			NULL,					/* class_data		*/
-			sizeof(GntWS),
-			0,						/* n_preallocs		*/
-			gnt_ws_init,			/* instance_init	*/
-			NULL					/* value_table		*/
-		};
-
-		type = g_type_register_static(GNT_TYPE_BINDABLE,
-									  "GntWS",
-									  &info, 0);
-	}
-
-	return type;
 }
 
 GntWS *gnt_ws_new(const char *name)

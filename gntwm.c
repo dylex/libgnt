@@ -104,6 +104,8 @@ static gboolean ignore_keys = FALSE;
 static gboolean started_python = FALSE;
 #endif
 
+G_DEFINE_TYPE(GntWM, gnt_wm, GNT_TYPE_BINDABLE)
+
 static GList *
 g_list_bring_to_front(GList *list, gpointer data)
 {
@@ -380,9 +382,8 @@ static gboolean check_idle(gpointer n)
 }
 
 static void
-gnt_wm_init(GTypeInstance *instance, gpointer class)
+gnt_wm_init(GntWM *wm)
 {
-	GntWM *wm = GNT_WM(instance);
 	wm->workspaces = NULL;
 	wm->name_places = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
 	wm->title_places = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
@@ -1584,33 +1585,6 @@ gnt_wm_class_init(GntWMClass *klass)
 /******************************************************************************
  * GntWM API
  *****************************************************************************/
-GType
-gnt_wm_get_type(void)
-{
-	static GType type = 0;
-
-	if(type == 0) {
-		static const GTypeInfo info = {
-			sizeof(GntWMClass),
-			NULL,					/* base_init		*/
-			NULL,					/* base_finalize	*/
-			(GClassInitFunc)gnt_wm_class_init,
-			NULL,
-			NULL,					/* class_data		*/
-			sizeof(GntWM),
-			0,						/* n_preallocs		*/
-			gnt_wm_init,			/* instance_init	*/
-			NULL					/* value_table		*/
-		};
-
-		type = g_type_register_static(GNT_TYPE_BINDABLE,
-									  "GntWM",
-									  &info, 0);
-	}
-
-	return type;
-}
-
 void
 gnt_wm_add_workspace(GntWM *wm, GntWS *ws)
 {
