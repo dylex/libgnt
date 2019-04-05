@@ -209,7 +209,7 @@ show_suggest_dropdown(GntEntry *entry)
 		gnt_tree_set_compare_func(GNT_TREE(entry->ddown), (GCompareFunc)g_utf8_collate);
 		gnt_box_add_widget(GNT_BOX(box), entry->ddown);
 
-		GNT_WIDGET_SET_FLAGS(box, GNT_WIDGET_TRANSIENT);
+		gnt_widget_set_transient(box, TRUE);
 
 		gnt_widget_get_position(GNT_WIDGET(entry), &x, &y);
 		x += offset;
@@ -1047,9 +1047,10 @@ gnt_entry_init(GntEntry *entry)
 	entry->killring = new_killring();
 	entry->search = g_new0(GntEntrySearch, 1);
 
-	GNT_WIDGET_SET_FLAGS(GNT_WIDGET(entry),
-			GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW | GNT_WIDGET_CAN_TAKE_FOCUS);
-	GNT_WIDGET_SET_FLAGS(GNT_WIDGET(entry), GNT_WIDGET_GROW_X);
+	gnt_widget_set_has_border(widget, FALSE);
+	gnt_widget_set_has_shadow(widget, FALSE);
+	gnt_widget_set_take_focus(widget, TRUE);
+	gnt_widget_set_grow_x(widget, TRUE);
 
 	widget->priv.minw = 3;
 	widget->priv.minh = 1;

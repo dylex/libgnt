@@ -143,7 +143,7 @@ remove_border_set_position_size(G_GNUC_UNUSED GntWM *wm, GntWidget *win, int x,
                                 int y, int w, int h)
 {
 	gnt_box_set_toplevel(GNT_BOX(win), FALSE);
-	GNT_WIDGET_SET_FLAGS(win, GNT_WIDGET_CAN_TAKE_FOCUS);
+	gnt_widget_set_take_focus(win, TRUE);
 
 	gnt_widget_set_position(win, x, y);
 	mvwin(win->window, y, x);

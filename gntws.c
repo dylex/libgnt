@@ -49,7 +49,7 @@ static void
 widget_show(gpointer data, gpointer nodes)
 {
 	GntNode *node = g_hash_table_lookup(nodes, data);
-	GNT_WIDGET_UNSET_FLAGS(GNT_WIDGET(data), GNT_WIDGET_INVISIBLE);
+	gnt_widget_set_visible(GNT_WIDGET(data), TRUE);
 	if (node) {
 		show_panel(node->panel);
 		gnt_wm_copy_win(GNT_WIDGET(data), node);

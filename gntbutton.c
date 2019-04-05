@@ -136,10 +136,12 @@ gnt_button_init(GntButton *button)
 
 	widget->priv.minw = 4;
 	widget->priv.minh = small_button ? 1 : 3;
-	if (small_button)
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW);
-	GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_GROW_X | GNT_WIDGET_GROW_Y);
-	GNTDEBUG;
+	if (small_button) {
+		gnt_widget_set_has_border(widget, FALSE);
+		gnt_widget_set_has_shadow(widget, FALSE);
+	}
+	gnt_widget_set_grow_x(widget, FALSE);
+	gnt_widget_set_grow_y(widget, FALSE);
 }
 
 /******************************************************************************

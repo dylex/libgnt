@@ -399,7 +399,7 @@ gnt_text_view_reflow(GntTextView *view)
 
 	view->string = g_string_set_size(view->string, string->len);
 	view->string->len = 0;
-	GNT_WIDGET_SET_FLAGS(GNT_WIDGET(view), GNT_WIDGET_DRAWING);
+	gnt_widget_set_drawing(GNT_WIDGET(view), TRUE);
 
 	for (; back; back = back->prev) {
 		line = back->data;
@@ -428,7 +428,7 @@ gnt_text_view_reflow(GntTextView *view)
 		list = list->next;
 	}
 	view->list = list;
-	GNT_WIDGET_UNSET_FLAGS(GNT_WIDGET(view), GNT_WIDGET_DRAWING);
+	gnt_widget_set_drawing(GNT_WIDGET(view), FALSE);
 	if (GNT_WIDGET(view)->window)
 		gnt_widget_draw(GNT_WIDGET(view));
 	g_string_free(string, TRUE);
@@ -462,8 +462,10 @@ gnt_text_view_init(GntTextView *view)
 	GntWidget *widget = GNT_WIDGET(view);
 	GntTextLine *line = g_new0(GntTextLine, 1);
 
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW |
-            GNT_WIDGET_GROW_Y | GNT_WIDGET_GROW_X);
+	gnt_widget_set_has_border(widget, FALSE);
+	gnt_widget_set_has_shadow(widget, FALSE);
+	gnt_widget_set_grow_x(widget, TRUE);
+	gnt_widget_set_grow_y(widget, TRUE);
 	widget->priv.minw = 5;
 	widget->priv.minh = 2;
 	view->string = g_string_new(NULL);

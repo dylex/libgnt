@@ -324,10 +324,7 @@ gnt_widget_from_xmlnode(xmlNode *node, GntWidget **data[], int max)
 	if (prop) {
 		int val;
 		if (sscanf(prop, "%d", &val) == 1) {
-			if (val)
-				GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_NO_BORDER);
-			else
-				GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_BORDER);
+			gnt_widget_set_has_border(widget, !!val);
 		}
 		xmlFree(prop);
 	}
@@ -336,10 +333,7 @@ gnt_widget_from_xmlnode(xmlNode *node, GntWidget **data[], int max)
 	if (prop) {
 		int val;
 		if (sscanf(prop, "%d", &val) == 1) {
-			if (val)
-				GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_NO_BORDER);
-			else
-				GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_BORDER);
+			gnt_widget_set_has_border(widget, !!val);
 		}
 		xmlFree(prop);
 	}

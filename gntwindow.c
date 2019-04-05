@@ -117,8 +117,9 @@ gnt_window_init(GntWindow *win)
 {
 	GntWidget *widget = GNT_WIDGET(win);
 
-	GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW);
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_CAN_TAKE_FOCUS);
+	gnt_widget_set_has_border(widget, TRUE);
+	gnt_widget_set_has_shadow(widget, TRUE);
+	gnt_widget_set_take_focus(widget, TRUE);
 
 	win->priv = g_new0(GntWindowPriv, 1);
 	win->priv->accels = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
