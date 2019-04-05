@@ -52,8 +52,6 @@ typedef struct
 	GntTree *tree;
 } BindingView;
 
-G_DEFINE_TYPE(GntBindable, gnt_bindable, G_TYPE_OBJECT)
-
 /******************************************************************************
  * Helpers
  *****************************************************************************/
@@ -223,8 +221,12 @@ binding_clone(GntBindableActionParam *param)
 	return p;
 }
 
+/******************************************************************************
+ * GObject Implementation
+ *****************************************************************************/
+
 static void
-duplicate_hashes(GntBindableClass *klass)
+gnt_bindable_base_init(GntBindableClass *klass)
 {
 	/* Duplicate the bindings from parent class */
 	if (klass->actions) {
@@ -244,17 +246,8 @@ duplicate_hashes(GntBindableClass *klass)
 	GNTDEBUG;
 }
 
-/******************************************************************************
- * GObject Implementation
- *****************************************************************************/
-
 static void
-gnt_bindable_init(G_GNUC_UNUSED GntBindable *bindable)
-{
-}
-
-static void
-gnt_bindable_class_init(GntBindableClass *klass)
+gnt_bindable_class_init(GntBindableClass *klass, G_GNUC_UNUSED gpointer data)
 {
 	klass->actions = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
 				(GDestroyNotify)gnt_bindable_action_free);
@@ -267,6 +260,33 @@ gnt_bindable_class_init(GntBindableClass *klass)
 /******************************************************************************
  * GntBindable API
  *****************************************************************************/
+GType
+gnt_bindable_get_type(void)
+{
+	static volatile gsize g_define_type_id__volatile = 0;
+	if (g_once_init_enter(&g_define_type_id__volatile)) {
+		static const GTypeInfo info = {
+		        sizeof(GntBindableClass),
+		        (GBaseInitFunc)gnt_bindable_base_init, /* base_init */
+		        NULL, /* base_finalize */
+		        (GClassInitFunc)gnt_bindable_class_init,
+		        NULL,
+		        NULL, /* class_data */
+		        sizeof(GntBindable),
+		        0,    /* n_preallocs */
+		        NULL, /* instance_init */
+		        NULL  /* value_table */
+		};
+
+		GType g_define_type_id =
+		        g_type_register_static(G_TYPE_OBJECT, "GntBindable",
+		                               &info, G_TYPE_FLAG_ABSTRACT);
+		g_once_init_leave(&g_define_type_id__volatile,
+		                  g_define_type_id);
+	}
+
+	return g_define_type_id__volatile;
+}
 
 /*
  * Key Remaps
