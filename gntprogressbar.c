@@ -134,7 +134,9 @@ gnt_progress_bar_init (GTypeInstance *instance, gpointer g_class)
 	GntProgressBarPrivate *priv = GNT_PROGRESS_BAR_GET_PRIVATE (GNT_PROGRESS_BAR (widget));
 
 	gnt_widget_set_take_focus (widget, FALSE);
-	GNT_WIDGET_SET_FLAGS (widget, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW | GNT_WIDGET_GROW_X);
+	gnt_widget_set_has_border(widget, FALSE);
+	gnt_widget_set_has_shadow(widget, FALSE);
+	gnt_widget_set_grow_x(widget, TRUE);
 
 	widget->priv.minw = 8;
 	widget->priv.minh = 1;
@@ -186,8 +188,9 @@ gnt_progress_bar_set_fraction (GntProgressBar *pbar, gdouble fraction)
 	else
 		priv->fraction = fraction;
 
-	if ((GNT_WIDGET_FLAGS(pbar) & GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(GNT_WIDGET(pbar))) {
 		gnt_widget_draw(GNT_WIDGET(pbar));
+	}
 }
 
 void
@@ -200,19 +203,20 @@ gnt_progress_bar_set_orientation (GntProgressBar *pbar,
 	priv->orientation = orientation;
 	if (orientation == GNT_PROGRESS_LEFT_TO_RIGHT ||
 			orientation == GNT_PROGRESS_RIGHT_TO_LEFT) {
-		GNT_WIDGET_SET_FLAGS(pbar, GNT_WIDGET_GROW_X);
-		GNT_WIDGET_UNSET_FLAGS(pbar, GNT_WIDGET_GROW_Y);
+		gnt_widget_set_grow_x(widget, TRUE);
+		gnt_widget_set_grow_y(widget, FALSE);
 		widget->priv.minw = 8;
 		widget->priv.minh = 1;
 	} else {
-		GNT_WIDGET_UNSET_FLAGS(pbar, GNT_WIDGET_GROW_X);
-		GNT_WIDGET_SET_FLAGS(pbar, GNT_WIDGET_GROW_Y);
+		gnt_widget_set_grow_x(widget, FALSE);
+		gnt_widget_set_grow_y(widget, TRUE);
 		widget->priv.minw = 1;
 		widget->priv.minh = 8;
 	}
 
-	if ((GNT_WIDGET_FLAGS(pbar) & GNT_WIDGET_MAPPED))
-		gnt_widget_draw(GNT_WIDGET(pbar));
+	if (gnt_widget_get_mapped(widget)) {
+		gnt_widget_draw(widget);
+	}
 }
 
 void

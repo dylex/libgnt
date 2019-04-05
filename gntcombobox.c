@@ -142,7 +142,7 @@ popup_dropdown(GntComboBox *box)
 	parent->priv.width = widget->priv.width;
 	parent->priv.height = height + 2;
 
-	GNT_WIDGET_UNSET_FLAGS(parent, GNT_WIDGET_INVISIBLE);
+	gnt_widget_set_visible(parent, TRUE);
 	gnt_widget_draw(parent);
 }
 
@@ -303,12 +303,15 @@ gnt_combo_box_init(GTypeInstance *instance, gpointer class)
 	GntWidget *widget = GNT_WIDGET(instance);
 	GntComboBox *combo = GNT_COMBO_BOX(instance);
 
-	GNT_WIDGET_SET_FLAGS(GNT_WIDGET(instance),
-			GNT_WIDGET_GROW_X | GNT_WIDGET_CAN_TAKE_FOCUS | GNT_WIDGET_NO_SHADOW);
+	gnt_widget_set_grow_x(widget, TRUE);
+	gnt_widget_set_take_focus(widget, TRUE);
+	gnt_widget_set_has_shadow(widget, FALSE);
 	combo->dropdown = gnt_tree_new();
 
 	box = gnt_box_new(FALSE, FALSE);
-	GNT_WIDGET_SET_FLAGS(box, GNT_WIDGET_NO_SHADOW | GNT_WIDGET_NO_BORDER | GNT_WIDGET_TRANSIENT);
+	gnt_widget_set_has_shadow(box, FALSE);
+	gnt_widget_set_has_border(box, FALSE);
+	gnt_widget_set_transient(box, TRUE);
 	gnt_box_set_pad(GNT_BOX(box), 0);
 	gnt_box_add_widget(GNT_BOX(box), combo->dropdown);
 
