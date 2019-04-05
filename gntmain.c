@@ -100,7 +100,7 @@ static struct {
 } escape_stuff;
 
 static gboolean
-escape_timeout(gpointer data)
+escape_timeout(G_GNUC_UNUSED gpointer data)
 {
 	gnt_wm_process_input(wm, "\033");
 	escape_stuff.timer = 0;
@@ -246,7 +246,8 @@ detect_mouse_action(const char *buffer)
 #endif
 
 static gboolean
-io_invoke_error(GIOChannel *source, GIOCondition cond, gpointer data)
+io_invoke_error(GIOChannel *source, G_GNUC_UNUSED GIOCondition cond,
+                gpointer data)
 {
 	/* XXX: it throws an error after evey io_invoke, I have no idea why */
 #ifndef _WIN32
@@ -262,9 +263,9 @@ io_invoke_error(GIOChannel *source, GIOCondition cond, gpointer data)
 	return TRUE;
 }
 
-
 static gboolean
-io_invoke(GIOChannel *source, GIOCondition cond, gpointer null)
+io_invoke(GIOChannel *source, G_GNUC_UNUSED GIOCondition cond,
+          G_GNUC_UNUSED gpointer data)
 {
 #ifdef _WIN32
 	/* We need:
@@ -470,13 +471,13 @@ clean_pid(void)
 #endif
 
 static void
-exit_confirmed(gpointer null)
+exit_confirmed(G_GNUC_UNUSED gpointer data)
 {
 	gnt_bindable_perform_action_named(GNT_BINDABLE(wm), "wm-quit", NULL);
 }
 
 static void
-exit_win_close(GntWidget *w, GntWidget **win)
+exit_win_close(G_GNUC_UNUSED GntWidget *w, GntWidget **win)
 {
 	*win = NULL;
 }
@@ -778,7 +779,7 @@ void gnt_register_action(const char *label, void (*callback)(void))
 }
 
 static void
-reset_menu(GntWidget *widget, gpointer null)
+reset_menu(G_GNUC_UNUSED GntWidget *widget, G_GNUC_UNUSED gpointer data)
 {
 	wm->menu = NULL;
 }
@@ -823,7 +824,7 @@ typedef struct
 } ChildProcess;
 
 static void
-reap_child(GPid pid, gint status, gpointer data)
+reap_child(G_GNUC_UNUSED GPid pid, gint status, gpointer data)
 {
 	ChildProcess *cp = data;
 	if (cp->callback) {

@@ -78,7 +78,7 @@ envelope_normal_window(GntWidget *win)
 }
 
 static void
-s_decorate_window(GntWM *wm, GntWidget *win)
+s_decorate_window(G_GNUC_UNUSED GntWM *wm, GntWidget *win)
 {
 	const char *name;
 
@@ -162,7 +162,8 @@ find_widget(GntWM *wm, const char *wname)
 }
 
 static gboolean
-s_mouse_clicked(GntWM *wm, GntMouseEvent event, int cx, int cy, GntWidget *widget)
+s_mouse_clicked(G_GNUC_UNUSED GntWM *wm, GntMouseEvent event, int cx, int cy,
+                GntWidget *widget)
 {
 	int x, y, w, h;
 
@@ -186,7 +187,7 @@ s_mouse_clicked(GntWM *wm, GntMouseEvent event, int cx, int cy, GntWidget *widge
 }
 
 static gboolean
-raise_main_window(GntBindable *bindable, GList *null)
+raise_main_window(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
 	GntWidget *main_window = find_widget(wm, "MainWindow");

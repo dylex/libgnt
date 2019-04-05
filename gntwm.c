@@ -292,7 +292,7 @@ sanitize_position(GntWidget *widget, int *x, int *y, gboolean m)
 }
 
 static void
-refresh_node(GntWidget *widget, GntNode *node, gpointer m)
+refresh_node(GntWidget *widget, G_GNUC_UNUSED GntNode *node, gpointer m)
 {
 	int x, y, w, h;
 	int nw, nh;
@@ -372,7 +372,8 @@ read_window_positions(GntWM *wm)
 	g_key_file_free(gfile);
 }
 
-static gboolean check_idle(gpointer n)
+static gboolean
+check_idle(G_GNUC_UNUSED gpointer n)
 {
 	if (idle_update) {
 		time(&last_active_time);
@@ -444,7 +445,7 @@ switch_window(GntWM *wm, int direction, gboolean urgent)
 }
 
 static gboolean
-window_next(GntBindable *bindable, GList *null)
+window_next(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
 	switch_window(wm, 1, FALSE);
@@ -452,7 +453,7 @@ window_next(GntBindable *bindable, GList *null)
 }
 
 static gboolean
-window_prev(GntBindable *bindable, GList *null)
+window_prev(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
 	switch_window(wm, -1, FALSE);
@@ -483,7 +484,7 @@ switch_window_n(GntBindable *bind, GList *list)
 }
 
 static gboolean
-window_scroll_up(GntBindable *bindable, GList *null)
+window_scroll_up(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
 	GntWidget *window;
@@ -506,7 +507,7 @@ window_scroll_up(GntBindable *bindable, GList *null)
 }
 
 static gboolean
-window_scroll_down(GntBindable *bindable, GList *null)
+window_scroll_down(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
 	GntWidget *window;
@@ -531,7 +532,7 @@ window_scroll_down(GntBindable *bindable, GList *null)
 }
 
 static gboolean
-window_close(GntBindable *bindable, GList *null)
+window_close(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
 
@@ -547,7 +548,7 @@ window_close(GntBindable *bindable, GList *null)
 }
 
 static void
-destroy__list(GntWidget *widget, GntWM *wm)
+destroy__list(G_GNUC_UNUSED GntWidget *widget, GntWM *wm)
 {
 	wm->_list.window = NULL;
 	wm->_list.tree = NULL;
@@ -680,7 +681,7 @@ list_of_windows(GntWM *wm, gboolean workspace)
 }
 
 static gboolean
-window_list(GntBindable *bindable, GList *null)
+window_list(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
 
@@ -696,7 +697,8 @@ window_list(GntBindable *bindable, GList *null)
 }
 
 static void
-dump_file_save(GntFileSel *fs, const char *path, const char *f, gpointer n)
+dump_file_save(GntFileSel *fs, const char *path, G_GNUC_UNUSED const char *f,
+               G_GNUC_UNUSED gpointer n)
 {
 	FILE *file;
 	int x, y;
@@ -843,13 +845,13 @@ dump_file_save(GntFileSel *fs, const char *path, const char *f, gpointer n)
 }
 
 static void
-dump_file_cancel(GntWidget *w, GntFileSel *fs)
+dump_file_cancel(G_GNUC_UNUSED GntWidget *w, GntFileSel *fs)
 {
 	gnt_widget_destroy(GNT_WIDGET(fs));
 }
 
 static gboolean
-dump_screen(GntBindable *b, GList *null)
+dump_screen(G_GNUC_UNUSED GntBindable *b, G_GNUC_UNUSED GList *params)
 {
 	GntWidget *window = gnt_file_sel_new();
 	GntFileSel *sel = GNT_FILE_SEL(window);
@@ -900,7 +902,7 @@ shift_window(GntWM *wm, GntWidget *widget, int dir)
 }
 
 static gboolean
-shift_left(GntBindable *bindable, GList *null)
+shift_left(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
 	if (wm->_list.window)
@@ -914,7 +916,7 @@ shift_left(GntBindable *bindable, GList *null)
 }
 
 static gboolean
-shift_right(GntBindable *bindable, GList *null)
+shift_right(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
 
@@ -946,7 +948,7 @@ compare_action(gconstpointer p1, gconstpointer p2)
 }
 
 static gboolean
-list_actions(GntBindable *bindable, GList *null)
+list_actions(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWidget *tree, *win;
 	GList *iter;
@@ -1065,7 +1067,7 @@ ensure_normal_mode(GntWM *wm)
 }
 
 static gboolean
-start_move(GntBindable *bindable, GList *null)
+start_move(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
 	if (wm->_list.window || wm->menu)
@@ -1080,7 +1082,7 @@ start_move(GntBindable *bindable, GList *null)
 }
 
 static gboolean
-start_resize(GntBindable *bindable, GList *null)
+start_resize(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
 	if (wm->_list.window || wm->menu)
@@ -1095,7 +1097,7 @@ start_resize(GntBindable *bindable, GList *null)
 }
 
 static gboolean
-wm_quit(GntBindable *bindable, GList *list)
+wm_quit(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
 	if (write_timeout)
@@ -1105,13 +1107,14 @@ wm_quit(GntBindable *bindable, GList *list)
 }
 
 static gboolean
-return_true(GntWM *wm, GntWidget *w, int *a, int *b)
+return_true(G_GNUC_UNUSED GntWM *wm, G_GNUC_UNUSED GntWidget *w,
+            G_GNUC_UNUSED int *a, G_GNUC_UNUSED int *b)
 {
 	return TRUE;
 }
 
 static gboolean
-refresh_screen(GntBindable *bindable, GList *null)
+refresh_screen(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
 	GList *iter;
@@ -1136,7 +1139,8 @@ refresh_screen(GntBindable *bindable, GList *null)
 }
 
 static gboolean
-toggle_clipboard(GntBindable *bindable, GList *n)
+toggle_clipboard(G_GNUC_UNUSED GntBindable *bindable,
+                 G_GNUC_UNUSED GList *params)
 {
 	static GntWidget *clip;
 	gchar *text;
@@ -1169,7 +1173,7 @@ static void remove_tag(gpointer wid, gpointer wim)
 }
 
 static gboolean
-tag_widget(GntBindable *b, GList *params)
+tag_widget(GntBindable *b, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(b);
 	GntWidget *widget;
@@ -1198,7 +1202,7 @@ widget_move_ws(gpointer wid, gpointer w)
 }
 
 static gboolean
-place_tagged(GntBindable *b, GList *params)
+place_tagged(GntBindable *b, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(b);
 	g_list_foreach(wm->tagged, widget_move_ws, wm);
@@ -1209,7 +1213,7 @@ place_tagged(GntBindable *b, GList *params)
 }
 
 static gboolean
-workspace_list(GntBindable *b, GList *params)
+workspace_list(GntBindable *b, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(b);
 
@@ -1222,7 +1226,7 @@ workspace_list(GntBindable *b, GList *params)
 }
 
 static gboolean
-workspace_new(GntBindable *bindable, GList *null)
+workspace_new(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
 	GntWS *ws = gnt_ws_new(NULL);
@@ -1232,7 +1236,7 @@ workspace_new(GntBindable *bindable, GList *null)
 }
 
 static gboolean
-ignore_keys_start(GntBindable *bindable, GList *n)
+ignore_keys_start(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
 
@@ -1244,7 +1248,8 @@ ignore_keys_start(GntBindable *bindable, GList *n)
 }
 
 static gboolean
-ignore_keys_end(GntBindable *bindable, GList *n)
+ignore_keys_end(G_GNUC_UNUSED GntBindable *bindable,
+                G_GNUC_UNUSED GList *params)
 {
 	if (ignore_keys) {
 		ignore_keys = FALSE;
@@ -1254,7 +1259,7 @@ ignore_keys_end(GntBindable *bindable, GList *n)
 }
 
 static gboolean
-window_next_urgent(GntBindable *bindable, GList *n)
+window_next_urgent(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
 	switch_window(wm, 1, TRUE);
@@ -1262,7 +1267,7 @@ window_next_urgent(GntBindable *bindable, GList *n)
 }
 
 static gboolean
-window_prev_urgent(GntBindable *bindable, GList *n)
+window_prev_urgent(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
 	switch_window(wm, -1, TRUE);
@@ -1271,7 +1276,8 @@ window_prev_urgent(GntBindable *bindable, GList *n)
 
 #ifdef USE_PYTHON
 static void
-python_script_selected(GntFileSel *fs, const char *path, const char *f, gpointer n)
+python_script_selected(GntFileSel *fs, const char *path,
+                       G_GNUC_UNUSED const char *f, G_GNUC_UNUSED gpointer n)
 {
 	char *dir = g_path_get_dirname(path);
 	FILE *file = fopen(path, "r");
@@ -1296,7 +1302,7 @@ python_script_selected(GntFileSel *fs, const char *path, const char *f, gpointer
 }
 
 static gboolean
-run_python(GntBindable *bindable, GList *n)
+run_python(G_GNUC_UNUSED GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWidget *window = gnt_file_sel_new();
 	GntFileSel *sel = GNT_FILE_SEL(window);
@@ -1327,13 +1333,13 @@ help_for_bindable(GntWM *wm, GntBindable *bindable)
 }
 
 static gboolean
-help_for_wm(GntBindable *bindable, GList *null)
+help_for_wm(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	return help_for_bindable(GNT_WM(bindable),bindable);
 }
 
 static gboolean
-help_for_window(GntBindable *bindable, GList *null)
+help_for_window(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
 	GntWidget *widget;
@@ -1347,7 +1353,7 @@ help_for_window(GntBindable *bindable, GList *null)
 }
 
 static gboolean
-help_for_widget(GntBindable *bindable, GList *null)
+help_for_widget(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
 	GntWidget *widget;
@@ -1363,7 +1369,7 @@ help_for_widget(GntBindable *bindable, GList *null)
 }
 
 static void
-accumulate_windows(gpointer window, gpointer node, gpointer p)
+accumulate_windows(gpointer window, G_GNUC_UNUSED gpointer node, gpointer p)
 {
 	GList *list = *(GList**)p;
 	list = g_list_prepend(list, window);
@@ -1634,13 +1640,13 @@ gnt_wm_switch_workspace_next(GntWM *wm)
 }
 
 static gboolean
-workspace_next(GntBindable *wm, GList *n)
+workspace_next(GntBindable *wm, G_GNUC_UNUSED GList *params)
 {
 	return gnt_wm_switch_workspace_next(GNT_WM(wm));
 }
 
 static gboolean
-workspace_prev(GntBindable *wm, GList *n)
+workspace_prev(GntBindable *wm, G_GNUC_UNUSED GList *params)
 {
 	return gnt_wm_switch_workspace_prev(GNT_WM(wm));
 }
@@ -1684,7 +1690,8 @@ GntWS *gnt_wm_widget_find_workspace(GntWM *wm, GntWidget *widget)
 	return NULL;
 }
 
-static void free_workspaces(gpointer data, gpointer n)
+static void
+free_workspaces(gpointer data, G_GNUC_UNUSED gpointer n)
 {
 	GntWS *s = data;
 	g_free(s->name);
@@ -1714,7 +1721,7 @@ update_window_in_list(GntWM *wm, GntWidget *wid)
 }
 
 static gboolean
-match_title(gpointer title, gpointer n, gpointer wid_title)
+match_title(gpointer title, G_GNUC_UNUSED gpointer n, gpointer wid_title)
 {
 	/* XXX: do any regex magic here. */
 	if (g_strrstr((gchar *)wid_title, (gchar *)title))
@@ -2019,13 +2026,13 @@ gboolean gnt_wm_process_input(GntWM *wm, const char *keys)
 }
 
 static void
-gnt_wm_win_resized(GntWM *wm, GntNode *node)
+gnt_wm_win_resized(G_GNUC_UNUSED GntWM *wm, G_GNUC_UNUSED GntNode *node)
 {
 	/*refresh_node(node->me, node, NULL);*/
 }
 
 static void
-gnt_wm_win_moved(GntWM *wm, GntNode *node)
+gnt_wm_win_moved(G_GNUC_UNUSED GntWM *wm, GntNode *node)
 {
 	refresh_node(node->me, node, NULL);
 }

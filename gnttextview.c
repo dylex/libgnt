@@ -204,20 +204,21 @@ gnt_text_view_map(GntWidget *widget)
 }
 
 static gboolean
-gnt_text_view_key_pressed(GntWidget *widget, const char *text)
+gnt_text_view_key_pressed(G_GNUC_UNUSED GntWidget *widget,
+                          G_GNUC_UNUSED const char *text)
 {
 	return FALSE;
 }
 
 static void
-free_text_segment(gpointer data, gpointer null)
+free_text_segment(gpointer data, G_GNUC_UNUSED gpointer unused)
 {
 	GntTextSegment *seg = data;
 	g_free(seg);
 }
 
 static void
-free_text_line(gpointer data, gpointer null)
+free_text_line(gpointer data, G_GNUC_UNUSED gpointer unused)
 {
 	GntTextLine *line = data;
 	g_list_foreach(line->segments, free_text_segment, NULL);
@@ -226,7 +227,7 @@ free_text_line(gpointer data, gpointer null)
 }
 
 static void
-free_tag(gpointer data, gpointer null)
+free_tag(gpointer data, G_GNUC_UNUSED gpointer unused)
 {
 	GntTextTag *tag = data;
 	g_free(tag->name);
@@ -315,7 +316,8 @@ select_word_text(GntTextView *view, gchar *c)
 	return g_string_new_len(start, endsize - start);
 }
 
-static gboolean too_slow(gpointer n)
+static gboolean
+too_slow(G_GNUC_UNUSED gpointer n)
 {
 	double_click = FALSE;
 	return FALSE;
@@ -433,7 +435,7 @@ gnt_text_view_reflow(GntTextView *view)
 }
 
 static void
-gnt_text_view_size_changed(GntWidget *widget, int w, int h)
+gnt_text_view_size_changed(GntWidget *widget, int w, G_GNUC_UNUSED int h)
 {
 	if (w != widget->priv.width && GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED)) {
 		gnt_text_view_reflow(GNT_TEXT_VIEW(widget));
@@ -803,7 +805,7 @@ int gnt_text_view_tag_change(GntTextView *view, const char *name, const char *te
 }
 
 static gboolean
-scroll_tv(GntWidget *wid, const char *key, GntTextView *tv)
+scroll_tv(G_GNUC_UNUSED GntWidget *wid, const char *key, GntTextView *tv)
 {
 	if (strcmp(key, GNT_KEY_PGUP) == 0) {
 		gnt_text_view_scroll(tv, -(GNT_WIDGET(tv)->priv.height - 2));
@@ -848,7 +850,7 @@ cleanup_pageditor(void)
 }
 
 static void
-editor_end_cb(int status, gpointer data)
+editor_end_cb(int status, G_GNUC_UNUSED gpointer data)
 {
 	if (status == 0) {
 		char *text = NULL;
@@ -863,7 +865,7 @@ editor_end_cb(int status, gpointer data)
 }
 
 static void
-pager_end_cb(int status, gpointer data)
+pager_end_cb(G_GNUC_UNUSED int status, G_GNUC_UNUSED gpointer data)
 {
 	cleanup_pageditor();
 }

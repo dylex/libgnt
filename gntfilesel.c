@@ -274,7 +274,8 @@ dir_key_pressed(GntTree *tree, const char *key, GntFileSel *sel)
 }
 
 static gboolean
-location_key_pressed(GntTree *tree, const char *key, GntFileSel *sel)
+location_key_pressed(G_GNUC_UNUSED GntTree *tree, const char *key,
+                     GntFileSel *sel)
 {
 	char *path;
 	char *str;
@@ -310,7 +311,8 @@ success:
 }
 
 static void
-file_sel_changed(GntWidget *widget, gpointer old, gpointer current, GntFileSel *sel)
+file_sel_changed(GntWidget *widget, G_GNUC_UNUSED gpointer old,
+                 G_GNUC_UNUSED gpointer current, GntFileSel *sel)
 {
 	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_HAS_FOCUS)) {
 		g_free(sel->suggest);
@@ -359,7 +361,7 @@ gnt_file_sel_map(GntWidget *widget)
 }
 
 static gboolean
-toggle_tag_selection(GntBindable *bind, GList *null)
+toggle_tag_selection(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntFileSel *sel = GNT_FILE_SEL(bind);
 	char *str;
@@ -393,7 +395,7 @@ toggle_tag_selection(GntBindable *bind, GList *null)
 }
 
 static gboolean
-clear_tags(GntBindable *bind, GList *null)
+clear_tags(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntFileSel *sel = GNT_FILE_SEL(bind);
 	GntWidget *tree;
@@ -417,7 +419,7 @@ clear_tags(GntBindable *bind, GList *null)
 }
 
 static gboolean
-up_directory(GntBindable *bind, GList *null)
+up_directory(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	char *path, *dir;
 	GntFileSel *sel = GNT_FILE_SEL(bind);
@@ -514,7 +516,7 @@ gnt_file_sel_init(GntFileSel *sel)
  * GntFileSel API
  *****************************************************************************/
 static void
-select_activated_cb(GntWidget *button, GntFileSel *sel)
+select_activated_cb(G_GNUC_UNUSED GntWidget *button, GntFileSel *sel)
 {
 	char *path = gnt_file_sel_get_selected_file(sel);
 	char *file = g_path_get_basename(path);

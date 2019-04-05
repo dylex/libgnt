@@ -73,7 +73,7 @@ gnt_line_map(GntWidget *widget)
 
 static void
 gnt_line_set_property(GObject *obj, guint prop_id, const GValue *value,
-		GParamSpec *spec)
+                      G_GNUC_UNUSED GParamSpec *spec)
 {
 	GntLine *line = GNT_LINE(obj);
 	switch (prop_id) {
@@ -92,7 +92,7 @@ gnt_line_set_property(GObject *obj, guint prop_id, const GValue *value,
 
 static void
 gnt_line_get_property(GObject *obj, guint prop_id, GValue *value,
-		GParamSpec *spec)
+                      G_GNUC_UNUSED GParamSpec *spec)
 {
 	GntLine *line = GNT_LINE(obj);
 	switch (prop_id) {

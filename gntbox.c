@@ -348,13 +348,13 @@ box_focus_change(GntBox *box, gboolean next)
 }
 
 static gboolean
-action_focus_next(GntBindable *bindable, GList *null)
+action_focus_next(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	return box_focus_change(GNT_BOX(bindable), TRUE);
 }
 
 static gboolean
-action_focus_prev(GntBindable *bindable, GList *null)
+action_focus_prev(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	return box_focus_change(GNT_BOX(bindable), FALSE);
 }
@@ -533,7 +533,7 @@ gnt_box_clicked(GntWidget *widget, GntMouseEvent event, int cx, int cy)
 
 static void
 gnt_box_set_property(GObject *obj, guint prop_id, const GValue *value,
-		GParamSpec *spec)
+                     G_GNUC_UNUSED GParamSpec *spec)
 {
 	GntBox *box = GNT_BOX(obj);
 	switch (prop_id) {
@@ -551,7 +551,7 @@ gnt_box_set_property(GObject *obj, guint prop_id, const GValue *value,
 
 static void
 gnt_box_get_property(GObject *obj, guint prop_id, GValue *value,
-		GParamSpec *spec)
+                     G_GNUC_UNUSED GParamSpec *spec)
 {
 	GntBox *box = GNT_BOX(obj);
 	switch (prop_id) {

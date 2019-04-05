@@ -46,7 +46,7 @@ static void (*org_destroy)(GntWidget *widget);
 G_DEFINE_TYPE(GntWindow, gnt_window, GNT_TYPE_BOX)
 
 static gboolean
-show_menu(GntBindable *bind, GList *null)
+show_menu(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntWindow *win = GNT_WINDOW(bind);
 	if (win->menu) {

@@ -674,7 +674,7 @@ tree_selection_changed(GntTree *tree, GntTreeRow *old, GntTreeRow *current)
 }
 
 static gboolean
-action_down(GntBindable *bind, GList *null)
+action_down(GntBindable *bind, G_GNUC_UNUSED GList *unused)
 {
 	int dist;
 	GntTree *tree = GNT_TREE(bind);
@@ -693,7 +693,7 @@ action_down(GntBindable *bind, GList *null)
 }
 
 static gboolean
-action_move_parent(GntBindable *bind, GList *null)
+action_move_parent(GntBindable *bind, G_GNUC_UNUSED GList *unused)
 {
 	GntTree *tree = GNT_TREE(bind);
 	GntTreeRow *row = tree->current;
@@ -712,7 +712,7 @@ action_move_parent(GntBindable *bind, GList *null)
 }
 
 static gboolean
-action_up(GntBindable *bind, GList *list)
+action_up(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	int dist;
 	GntTree *tree = GNT_TREE(bind);
@@ -732,7 +732,7 @@ action_up(GntBindable *bind, GList *list)
 }
 
 static gboolean
-action_page_down(GntBindable *bind, GList *null)
+action_page_down(GntBindable *bind, G_GNUC_UNUSED GList *unused)
 {
 	GntTree *tree = GNT_TREE(bind);
 	GntTreeRow *old = tree->current;
@@ -756,7 +756,7 @@ action_page_down(GntBindable *bind, GList *null)
 }
 
 static gboolean
-action_page_up(GntBindable *bind, GList *null)
+action_page_up(GntBindable *bind, G_GNUC_UNUSED GList *unused)
 {
 	GntWidget *widget = GNT_WIDGET(bind);
 	GntTree *tree = GNT_TREE(bind);
@@ -884,7 +884,8 @@ gnt_tree_destroy(GntWidget *widget)
 }
 
 static gboolean
-gnt_tree_clicked(GntWidget *widget, GntMouseEvent event, int x, int y)
+gnt_tree_clicked(GntWidget *widget, GntMouseEvent event, G_GNUC_UNUSED int x,
+                 G_GNUC_UNUSED int y)
 {
 	GntTree *tree = GNT_TREE(widget);
 	GntTreeRow *old = tree->current;
@@ -926,7 +927,8 @@ gnt_tree_clicked(GntWidget *widget, GntMouseEvent event, int x, int y)
 }
 
 static void
-gnt_tree_size_changed(GntWidget *widget, int w, int h)
+gnt_tree_size_changed(GntWidget *widget, G_GNUC_UNUSED int w,
+                      G_GNUC_UNUSED int h)
 {
 	GntTree *tree = GNT_TREE(widget);
 	if (widget->priv.width <= 0)
@@ -936,7 +938,7 @@ gnt_tree_size_changed(GntWidget *widget, int w, int h)
 }
 
 static gboolean
-start_search(GntBindable *bindable, GList *list)
+start_search(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntTree *tree = GNT_TREE(bindable);
 	if (tree->priv->search)
@@ -948,7 +950,7 @@ start_search(GntBindable *bindable, GList *list)
 }
 
 static gboolean
-end_search_action(GntBindable *bindable, GList *list)
+end_search_action(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntTree *tree = GNT_TREE(bindable);
 	if (tree->priv->search == NULL)
@@ -960,7 +962,7 @@ end_search_action(GntBindable *bindable, GList *list)
 }
 
 static gboolean
-move_first_action(GntBindable *bind, GList *null)
+move_first_action(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntTree *tree = GNT_TREE(bind);
 	GntTreeRow *row = tree->root;
@@ -978,7 +980,7 @@ move_first_action(GntBindable *bind, GList *null)
 }
 
 static gboolean
-move_last_action(GntBindable *bind, GList *null)
+move_last_action(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntTree *tree = GNT_TREE(bind);
 	GntTreeRow *old = tree->current;
@@ -1000,7 +1002,7 @@ move_last_action(GntBindable *bind, GList *null)
 
 static void
 gnt_tree_set_property(GObject *obj, guint prop_id, const GValue *value,
-		GParamSpec *spec)
+                      G_GNUC_UNUSED GParamSpec *spec)
 {
 	GntTree *tree = GNT_TREE(obj);
 	switch (prop_id) {
@@ -1018,7 +1020,7 @@ gnt_tree_set_property(GObject *obj, guint prop_id, const GValue *value,
 
 static void
 gnt_tree_get_property(GObject *obj, guint prop_id, GValue *value,
-		GParamSpec *spec)
+                      G_GNUC_UNUSED GParamSpec *spec)
 {
 	GntTree *tree = GNT_TREE(obj);
 	switch (prop_id) {
@@ -1508,16 +1510,10 @@ void gnt_tree_remove(GntTree *tree, gpointer key)
 	}
 }
 
-static gboolean
-return_true(gpointer key, gpointer data, gpointer null)
-{
-	return TRUE;
-}
-
 void gnt_tree_remove_all(GntTree *tree)
 {
 	tree->root = NULL;
-	g_hash_table_foreach_remove(tree->hash, (GHRFunc)return_true, tree);
+	g_hash_table_remove_all(tree->hash);
 	g_list_free(tree->list);
 	tree->list = NULL;
 	tree->current = tree->top = tree->bottom = NULL;
@@ -1813,7 +1809,6 @@ void gnt_tree_adjust_columns(GntTree *tree)
 
 void gnt_tree_set_hash_fns(GntTree *tree, gpointer hash, gpointer eq, gpointer kd)
 {
-	g_hash_table_foreach_remove(tree->hash, return_true, NULL);
 	g_hash_table_destroy(tree->hash);
 	tree->hash = g_hash_table_new_full(hash, eq, kd, free_tree_row);
 }
