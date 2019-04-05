@@ -722,7 +722,7 @@ void gnt_widget_set_urgent(GntWidget *widget)
 	if (wm->cws->ordered && wm->cws->ordered->data == widget)
 		return;
 
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_URGENT);
+	gnt_widget_set_is_urgent(widget, TRUE);
 
 	gnt_wm_update_window(wm, widget);
 }
@@ -792,7 +792,7 @@ gboolean gnt_screen_menu_show(gpointer newmenu)
 	}
 
 	wm->menu = newmenu;
-	GNT_WIDGET_UNSET_FLAGS(GNT_WIDGET(wm->menu), GNT_WIDGET_INVISIBLE);
+	gnt_widget_set_visible(GNT_WIDGET(wm->menu), TRUE);
 	gnt_widget_draw(GNT_WIDGET(wm->menu));
 
 	g_signal_connect(G_OBJECT(wm->menu), "hide", G_CALLBACK(reset_menu), NULL);

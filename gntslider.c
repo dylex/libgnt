@@ -226,7 +226,9 @@ static void
 gnt_slider_init(GntSlider *slider)
 {
 	GntWidget *widget = GNT_WIDGET(slider);
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_SHADOW | GNT_WIDGET_NO_BORDER | GNT_WIDGET_CAN_TAKE_FOCUS);
+	gnt_widget_set_has_shadow(widget, FALSE);
+	gnt_widget_set_has_border(widget, FALSE);
+	gnt_widget_set_take_focus(widget, TRUE);
 	widget->priv.minw = 1;
 	widget->priv.minh = 1;
 	GNTDEBUG;
@@ -243,9 +245,9 @@ GntWidget *gnt_slider_new(gboolean vertical, int max, int min)
 	slider->vertical = vertical;
 
 	if (vertical) {
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_GROW_Y);
+		gnt_widget_set_grow_y(widget, TRUE);
 	} else {
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_GROW_X);
+		gnt_widget_set_grow_x(widget, TRUE);
 	}
 
 	gnt_slider_set_range(slider, max, min);

@@ -222,8 +222,8 @@ update_act_msg(void)
 	g_string_erase(text, text->len - 2, 2);
 	message = gnt_vbox_new(FALSE);
 	label = gnt_label_new_with_format(text->str, GNT_TEXT_FLAG_BOLD | GNT_TEXT_FLAG_HIGHLIGHT);
-	GNT_WIDGET_UNSET_FLAGS(GNT_BOX(message), GNT_WIDGET_CAN_TAKE_FOCUS);
-	GNT_WIDGET_SET_FLAGS(GNT_BOX(message), GNT_WIDGET_TRANSIENT);
+	gnt_widget_set_take_focus(message, FALSE);
+	gnt_widget_set_transient(message, TRUE);
 	gnt_box_add_widget(GNT_BOX(message), label);
 	gnt_widget_set_name(message, "wm-message");
 	gnt_widget_set_position(message, 0, 0);
@@ -564,7 +564,7 @@ setup__list(GntWM *wm)
 	win = wm->_list.window = gnt_box_new(FALSE, FALSE);
 	gnt_box_set_toplevel(GNT_BOX(win), TRUE);
 	gnt_box_set_pad(GNT_BOX(win), 0);
-	GNT_WIDGET_SET_FLAGS(win, GNT_WIDGET_TRANSIENT);
+	gnt_widget_set_transient(win, TRUE);
 
 	tree = wm->_list.tree = gnt_tree_new();
 	gnt_box_add_widget(GNT_BOX(win), tree);
@@ -965,7 +965,7 @@ list_actions(GntBindable *bindable, GList *null)
 	tree = wm->actions->tree;
 
 	gnt_box_set_title(GNT_BOX(win), "Actions");
-	GNT_WIDGET_SET_FLAGS(tree, GNT_WIDGET_NO_BORDER);
+	gnt_widget_set_has_border(tree, FALSE);
 	/* XXX: Do we really want this? */
 	gnt_tree_set_compare_func(GNT_TREE(tree), compare_action);
 
@@ -1147,8 +1147,8 @@ toggle_clipboard(GntBindable *bindable, GList *n)
 	}
 	text = gnt_get_clipboard_string();
 	clip = gnt_hwindow_new(FALSE);
-	GNT_WIDGET_SET_FLAGS(clip, GNT_WIDGET_TRANSIENT);
-	GNT_WIDGET_SET_FLAGS(clip, GNT_WIDGET_NO_BORDER);
+	gnt_widget_set_transient(clip, TRUE);
+	gnt_widget_set_has_border(clip, FALSE);
 	gnt_box_set_pad(GNT_BOX(clip), 0);
 	gnt_box_add_widget(GNT_BOX(clip), gnt_label_new(" "));
 	gnt_box_add_widget(GNT_BOX(clip), gnt_label_new(text));
@@ -2153,7 +2153,7 @@ gnt_wm_give_focus(GntWM *wm, GntWidget *widget)
 	}
 
 	gnt_widget_set_focus(widget, TRUE);
-	GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_URGENT);
+	gnt_widget_set_is_urgent(widget, FALSE);
 	gnt_widget_draw(widget);
 	top_panel(node->panel);
 

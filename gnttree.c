@@ -792,7 +792,7 @@ end_search(GntTree *tree)
 		g_string_free(tree->priv->search, TRUE);
 		tree->priv->search = NULL;
 		tree->priv->search_timeout = 0;
-		GNT_WIDGET_UNSET_FLAGS(GNT_WIDGET(tree), GNT_WIDGET_DISABLE_ACTIONS);
+		gnt_widget_set_disable_actions(GNT_WIDGET(tree), FALSE);
 	}
 }
 
@@ -941,7 +941,7 @@ start_search(GntBindable *bindable, GList *list)
 	GntTree *tree = GNT_TREE(bindable);
 	if (tree->priv->search)
 		return FALSE;
-	GNT_WIDGET_SET_FLAGS(GNT_WIDGET(tree), GNT_WIDGET_DISABLE_ACTIONS);
+	gnt_widget_set_disable_actions(GNT_WIDGET(tree), TRUE);
 	tree->priv->search = g_string_new(NULL);
 	tree->priv->search_timeout = g_timeout_add_seconds(SEARCH_TIMEOUT_S, search_timeout, tree);
 	return TRUE;
@@ -953,7 +953,7 @@ end_search_action(GntBindable *bindable, GList *list)
 	GntTree *tree = GNT_TREE(bindable);
 	if (tree->priv->search == NULL)
 		return FALSE;
-	GNT_WIDGET_UNSET_FLAGS(GNT_WIDGET(tree), GNT_WIDGET_DISABLE_ACTIONS);
+	gnt_widget_set_disable_actions(GNT_WIDGET(tree), FALSE);
 	end_search(tree);
 	redraw_tree(tree);
 	return TRUE;
@@ -1129,8 +1129,9 @@ gnt_tree_init(GntTree *tree)
 	tree->show_separator = TRUE;
 	tree->priv = g_new0(GntTreePriv, 1);
 
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_GROW_X | GNT_WIDGET_GROW_Y |
-			GNT_WIDGET_CAN_TAKE_FOCUS | GNT_WIDGET_NO_SHADOW);
+	gnt_widget_set_grow_x(widget, TRUE);
+	gnt_widget_set_grow_y(widget, TRUE);
+	gnt_widget_set_has_shadow(widget, FALSE);
 	gnt_widget_set_take_focus(widget, TRUE);
 	widget->priv.minw = 4;
 	widget->priv.minh = 1;

@@ -79,7 +79,7 @@ main(void)
 
 	entry = gnt_entry_new(NULL);
 	gnt_widget_set_name(entry, "entry");
-	GNT_WIDGET_SET_FLAGS(entry, GNT_WIDGET_CAN_TAKE_FOCUS);
+	gnt_widget_set_take_focus(entry, TRUE);
 
 	g_signal_connect(G_OBJECT(entry), "completion", G_CALLBACK(completion_cb), NULL);
 

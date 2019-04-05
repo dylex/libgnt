@@ -113,8 +113,8 @@ gnt_check_box_init(GntCheckBox *box)
 	GntWidget *widget = GNT_WIDGET(box);
 	widget->priv.minh = 1;
 	widget->priv.minw = 4;
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW);
-	GNTDEBUG;
+	gnt_widget_set_has_border(widget, FALSE);
+	gnt_widget_set_has_shadow(widget, FALSE);
 }
 
 /******************************************************************************

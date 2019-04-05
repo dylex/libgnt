@@ -68,7 +68,7 @@ gnt_widget_map(GntWidget *widget)
 	/* Get some default size for the widget */
 	GNTDEBUG;
 	g_signal_emit(widget, signals[SIG_MAP], 0);
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_MAPPED);
+	gnt_widget_set_mapped(widget, TRUE);
 }
 
 static void
@@ -82,8 +82,9 @@ gnt_widget_dispose(GObject *obj)
 static void
 gnt_widget_focus_change(GntWidget *widget)
 {
-	if (GNT_WIDGET_FLAGS(widget) & GNT_WIDGET_MAPPED)
+	if (gnt_widget_get_mapped(widget)) {
 		gnt_widget_draw(widget);
+	}
 }
 
 static gboolean
@@ -262,7 +263,7 @@ gnt_widget_destroy(GntWidget *widget)
 {
 	g_return_if_fail(GNT_IS_WIDGET(widget));
 
-	if(!(GNT_WIDGET_FLAGS(widget) & GNT_WIDGET_DESTROYING)) {
+	if (!gnt_widget_in_destruction(widget)) {
 		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_DESTROYING);
 		gnt_widget_hide(widget);
 		delwin(widget->window);
@@ -284,11 +285,11 @@ void
 gnt_widget_draw(GntWidget *widget)
 {
 	/* Draw the widget */
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_DRAWING))
+	if (gnt_widget_get_drawing(widget))
 		return;
 
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_DRAWING);
-	if (!(GNT_WIDGET_FLAGS(widget) & GNT_WIDGET_MAPPED)) {
+	gnt_widget_set_drawing(widget, TRUE);
+	if (!gnt_widget_get_mapped(widget)) {
 		gnt_widget_map(widget);
 	}
 
@@ -301,7 +302,7 @@ gnt_widget_draw(GntWidget *widget)
 
 	g_signal_emit(widget, signals[SIG_DRAW], 0);
 	gnt_widget_queue_update(widget);
-	GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_DRAWING);
+	gnt_widget_set_drawing(widget, FALSE);
 }
 
 gboolean
@@ -342,8 +343,8 @@ gnt_widget_hide(GntWidget *widget)
 	g_signal_emit(widget, signals[SIG_HIDE], 0);
 	wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_NORMAL));
 	gnt_screen_release(widget);
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_INVISIBLE);
-	GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_MAPPED);
+	gnt_widget_set_visible(widget, FALSE);
+	gnt_widget_set_mapped(widget, FALSE);
 }
 
 void
@@ -394,8 +395,7 @@ init_widget(GntWidget *widget)
 	wbkgd(widget->window, gnt_color_pair(GNT_COLOR_NORMAL));
 	werase(widget->window);
 
-	if (!(GNT_WIDGET_FLAGS(widget) & GNT_WIDGET_NO_BORDER))
-	{
+	if (gnt_widget_get_has_border(widget)) {
 		/* - This is ugly. */
 		/* - What's your point? */
 		mvwvline(widget->window, 0, 0, ACS_VLINE | gnt_color_pair(GNT_COLOR_NORMAL), widget->priv.height);
@@ -465,10 +465,11 @@ gnt_widget_set_size(GntWidget *widget, int width, int height)
 		{
 			init_widget(widget);
 		}
-		if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED))
+		if (gnt_widget_get_mapped(widget)) {
 			init_widget(widget);
-		else
-			GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_MAPPED);
+		} else {
+			gnt_widget_set_mapped(widget, TRUE);
+		}
 	}
 
 	return ret;
@@ -480,18 +481,15 @@ gnt_widget_set_focus(GntWidget *widget, gboolean set)
 	if (!(GNT_WIDGET_FLAGS(widget) & GNT_WIDGET_CAN_TAKE_FOCUS))
 		return FALSE;
 
-	if (set && !GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_HAS_FOCUS))
-	{
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_HAS_FOCUS);
+	if (set && !gnt_widget_get_has_focus(widget)) {
+		gnt_widget_set_has_focus(widget, TRUE);
 		g_signal_emit(widget, signals[SIG_GIVE_FOCUS], 0);
-	}
-	else if (!set && GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_HAS_FOCUS))
-	{
-		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_HAS_FOCUS);
+	} else if (!set && gnt_widget_get_has_focus(widget)) {
+		gnt_widget_set_has_focus(widget, FALSE);
 		g_signal_emit(widget, signals[SIG_LOST_FOCUS], 0);
-	}
-	else
+	} else {
 		return FALSE;
+	}
 
 	return TRUE;
 }

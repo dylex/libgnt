@@ -114,8 +114,7 @@ reposition_children(GntWidget *widget)
 	max = 0;
 	curx = widget->priv.x;
 	cury = widget->priv.y;
-	if (!(GNT_WIDGET_FLAGS(widget) & GNT_WIDGET_NO_BORDER))
-	{
+	if (gnt_widget_get_has_border(widget)) {
 		has_border = TRUE;
 		curx += 1;
 		cury += 1;
@@ -320,9 +319,9 @@ gnt_box_key_pressed(GntWidget *widget, const char *text)
 
 	/* This dance is necessary to make sure that the child widgets get a chance
 	   to trigger their bindings first */
-	GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_DISABLE_ACTIONS);
+	gnt_widget_set_disable_actions(widget, FALSE);
 	ret = gnt_widget_key_pressed(widget, text);
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_DISABLE_ACTIONS);
+	gnt_widget_set_disable_actions(widget, TRUE);
 	return ret;
 }
 
@@ -621,9 +620,12 @@ gnt_box_init(GntBox *box)
 	GntWidget *widget = GNT_WIDGET(box);
 	/* Initially make both the height and width resizable.
 	 * Update the flags as necessary when widgets are added to it. */
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_GROW_X | GNT_WIDGET_GROW_Y);
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_CAN_TAKE_FOCUS | GNT_WIDGET_DISABLE_ACTIONS);
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW);
+	gnt_widget_set_grow_x(widget, TRUE);
+	gnt_widget_set_grow_y(widget, TRUE);
+	gnt_widget_set_take_focus(widget, TRUE);
+	gnt_widget_set_disable_actions(widget, TRUE);
+	gnt_widget_set_has_border(widget, FALSE);
+	gnt_widget_set_has_shadow(widget, FALSE);
 	box->pad = 1;
 	box->fill = TRUE;
 	GNTDEBUG;
@@ -679,16 +681,10 @@ void gnt_box_set_pad(GntBox *box, int pad)
 void gnt_box_set_toplevel(GntBox *box, gboolean set)
 {
 	GntWidget *widget = GNT_WIDGET(box);
-	if (set)
-	{
-		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW);
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_CAN_TAKE_FOCUS);
-	}
-	else
-	{
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW);
-		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_CAN_TAKE_FOCUS);
-	}
+
+	gnt_widget_set_has_border(widget, set);
+	gnt_widget_set_has_shadow(widget, set);
+	gnt_widget_set_take_focus(widget, set);
 }
 
 void gnt_box_sync_children(GntBox *box)
@@ -812,14 +808,14 @@ void gnt_box_readjust(GntBox *box)
 			gnt_box_readjust(GNT_BOX(w));
 		else
 		{
-			GNT_WIDGET_UNSET_FLAGS(w, GNT_WIDGET_MAPPED);
+			gnt_widget_set_mapped(w, FALSE);
 			w->priv.width = 0;
 			w->priv.height = 0;
 		}
 	}
 
 	wid = GNT_WIDGET(box);
-	GNT_WIDGET_UNSET_FLAGS(wid, GNT_WIDGET_MAPPED);
+	gnt_widget_set_mapped(wid, FALSE);
 	wid->priv.width = 0;
 	wid->priv.height = 0;
 
