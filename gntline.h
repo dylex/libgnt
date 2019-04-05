@@ -41,10 +41,6 @@
 #define GNT_IS_LINE_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_LINE))
 #define GNT_LINE_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_LINE, GntLineClass))
 
-#define GNT_LINE_FLAGS(obj)				(GNT_LINE(obj)->priv.flags)
-#define GNT_LINE_SET_FLAGS(obj, flags)		(GNT_LINE_FLAGS(obj) |= flags)
-#define GNT_LINE_UNSET_FLAGS(obj, flags)	(GNT_LINE_FLAGS(obj) &= ~(flags))
-
 typedef struct _GntLine			GntLine;
 typedef struct _GntLinePriv		GntLinePriv;
 typedef struct _GntLineClass		GntLineClass;

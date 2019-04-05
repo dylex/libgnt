@@ -42,10 +42,6 @@
 #define GNT_IS_WINDOW_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_WINDOW))
 #define GNT_WINDOW_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_WINDOW, GntWindowClass))
 
-#define GNT_WINDOW_FLAGS(obj)				(GNT_WINDOW(obj)->priv.flags)
-#define GNT_WINDOW_SET_FLAGS(obj, flags)		(GNT_WINDOW_FLAGS(obj) |= flags)
-#define GNT_WINDOW_UNSET_FLAGS(obj, flags)	(GNT_WINDOW_FLAGS(obj) &= ~(flags))
-
 typedef struct _GntWindow			GntWindow;
 typedef struct _GntWindowPriv		GntWindowPriv;
 typedef struct _GntWindowClass		GntWindowClass;

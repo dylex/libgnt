@@ -41,10 +41,6 @@
 #define GNT_IS_CHECK_BOX_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_CHECK_BOX))
 #define GNT_CHECK_BOX_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_CHECK_BOX, GntCheckBoxClass))
 
-#define GNT_CHECK_BOX_FLAGS(obj)				(GNT_CHECK_BOX(obj)->priv.flags)
-#define GNT_CHECK_BOX_SET_FLAGS(obj, flags)		(GNT_CHECK_BOX_FLAGS(obj) |= flags)
-#define GNT_CHECK_BOX_UNSET_FLAGS(obj, flags)	(GNT_CHECK_BOX_FLAGS(obj) &= ~(flags))
-
 typedef struct _GntCheckBox			GntCheckBox;
 typedef struct _GntCheckBoxPriv		GntCheckBoxPriv;
 typedef struct _GntCheckBoxClass		GntCheckBoxClass;

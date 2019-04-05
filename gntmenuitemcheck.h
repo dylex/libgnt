@@ -41,10 +41,6 @@
 #define GNT_IS_MENU_ITEM_CHECK_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_MENU_ITEM_CHECK))
 #define GNT_MENU_ITEM_CHECK_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_MENU_ITEM_CHECK, GntMenuItemCheckClass))
 
-#define GNT_MENU_ITEM_CHECK_FLAGS(obj)				(GNT_MENU_ITEM_CHECK(obj)->priv.flags)
-#define GNT_MENU_ITEM_CHECK_SET_FLAGS(obj, flags)		(GNT_MENU_ITEM_CHECK_FLAGS(obj) |= flags)
-#define GNT_MENU_ITEM_CHECK_UNSET_FLAGS(obj, flags)	(GNT_MENU_ITEM_CHECK_FLAGS(obj) &= ~(flags))
-
 typedef struct _GntMenuItemCheck			GntMenuItemCheck;
 typedef struct _GntMenuItemCheckPriv		GntMenuItemCheckPriv;
 typedef struct _GntMenuItemCheckClass		GntMenuItemCheckClass;
