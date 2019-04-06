@@ -1,4 +1,4 @@
-plugindir = get_option('libdir') + '/gnt'
+plugindir = get_option('libdir') + '/gnt3'
 
 irssi = library('irssi', 'irssi.c',
     dependencies : [ncurses, gobject, libgnt_dep],

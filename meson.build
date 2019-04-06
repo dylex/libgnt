@@ -212,16 +212,16 @@ configure_file(output : 'gntconfig.h',
 configure_file(input : 'gntversion.h.in', output : 'gntversion.h',
     configuration : gnt_config,
     install : true,
-    install_dir : join_paths(get_option('includedir'), 'gnt'))
+    install_dir : join_paths(get_option('includedir'), 'gnt3'))
 # This is temporary until we can hide GObject internals:
 gnt_h = configure_file(input : 'gnt.h.in', output : 'gnt.h',
     configuration : gnt_config,
     install : true,
-    install_dir : join_paths(get_option('includedir'), 'gnt'))
+    install_dir : join_paths(get_option('includedir'), 'gnt3'))
 
 gmodule = dependency('gmodule-2.0')
 
-install_headers(libgnt_headers, subdir : 'gnt')
+install_headers(libgnt_headers, subdir : 'gnt3')
 
 if host_machine.system() == 'windows'
 	windows = import('windows')
@@ -249,11 +249,11 @@ pkgconfig.generate(
     name : 'LibGNT',
     description : 'Glib Ncurses Toolkit is a collection of curses-widgets.',
     version : meson.project_version(),
-    filebase : 'gnt',
-    subdirs : 'gnt',
+    filebase : 'gnt3',
+    subdirs : 'gnt3',
     libraries : [libgnt],
     requires : ['glib-2.0'],
-    variables : ['plugindir = ${libdir}/gnt'],
+    variables : ['plugindir = ${libdir}/gnt3'],
     )
 
 if get_option('introspection') and host_machine.system() != 'windows'
