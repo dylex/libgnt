@@ -41,7 +41,6 @@
 #define GNT_SLIDER_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_SLIDER, GntSliderClass))
 
 typedef struct _GntSlider			GntSlider;
-typedef struct _GntSliderPriv		GntSliderPriv;
 typedef struct _GntSliderClass		GntSliderClass;
 
 struct _GntSlider

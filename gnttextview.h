@@ -42,7 +42,6 @@
 #define GNT_TEXT_VIEW_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_TEXT_VIEW, GntTextViewClass))
 
 typedef struct _GntTextView			GntTextView;
-typedef struct _GntTextViewPriv		GntTextViewPriv;
 typedef struct _GntTextViewClass		GntTextViewClass;
 
 typedef enum

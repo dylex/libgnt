@@ -42,7 +42,6 @@
 #define GNT_MENU_ITEM_CHECK_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_MENU_ITEM_CHECK, GntMenuItemCheckClass))
 
 typedef struct _GntMenuItemCheck			GntMenuItemCheck;
-typedef struct _GntMenuItemCheckPriv		GntMenuItemCheckPriv;
 typedef struct _GntMenuItemCheckClass		GntMenuItemCheckClass;
 
 struct _GntMenuItemCheck

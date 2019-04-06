@@ -42,7 +42,6 @@
 #define GNT_COMBO_BOX_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_COMBO_BOX, GntComboBoxClass))
 
 typedef struct _GntComboBox			GntComboBox;
-typedef struct _GntComboBoxPriv		GntComboBoxPriv;
 typedef struct _GntComboBoxClass		GntComboBoxClass;
 
 struct _GntComboBox

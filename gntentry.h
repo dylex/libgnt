@@ -44,7 +44,6 @@
 #define	GNT_ENTRY_CHAR		'_'			/* The character to use to fill in the blank places */
 
 typedef struct _GntEntry			GntEntry;
-typedef struct _GntEntryPriv		GntEntryPriv;
 typedef struct _GntEntryClass	GntEntryClass;
 typedef struct _GntEntryKillRing    GntEntryKillRing;
 typedef struct _GntEntrySearch		GntEntrySearch;

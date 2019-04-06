@@ -42,7 +42,6 @@
 #define GNT_CHECK_BOX_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_CHECK_BOX, GntCheckBoxClass))
 
 typedef struct _GntCheckBox			GntCheckBox;
-typedef struct _GntCheckBoxPriv		GntCheckBoxPriv;
 typedef struct _GntCheckBoxClass		GntCheckBoxClass;
 
 struct _GntCheckBox

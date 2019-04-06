@@ -42,7 +42,6 @@
 #define GNT_LINE_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_LINE, GntLineClass))
 
 typedef struct _GntLine			GntLine;
-typedef struct _GntLinePriv		GntLinePriv;
 typedef struct _GntLineClass		GntLineClass;
 
 struct _GntLine

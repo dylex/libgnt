@@ -44,7 +44,6 @@
 #define GNT_TYPE_FILE					(gnt_file_get_type())
 
 typedef struct _GntFileSel			GntFileSel;
-typedef struct _GntFileSelPriv		GntFileSelPriv;
 typedef struct _GntFileSelClass		GntFileSelClass;
 typedef struct _GntFile             GntFile;
 
