@@ -110,6 +110,18 @@ GntWidget * gnt_window_box_new(gboolean homo, gboolean vert);
 void gnt_window_set_menu(GntWindow *window, GntMenu *menu);
 
 /**
+ * gnt_window_get_menu:
+ * @window:  The window.
+ *
+ * Get the menu for a window.
+ *
+ * Returns: (transfer none) (nullable):  The menu for the window.
+ *
+ * Since: 2.14.0
+ */
+GntMenu *gnt_window_get_menu(GntWindow *window);
+
+/**
  * gnt_window_get_accel_item:
  * @window:    The window.
  * @key:       The keystroke.
