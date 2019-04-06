@@ -182,3 +182,19 @@ GntWidget *gnt_button_new(const char *text)
 	return widget;
 }
 
+const gchar *
+gnt_button_get_text(GntButton *button)
+{
+	g_return_val_if_fail(GNT_IS_BUTTON(button), NULL);
+
+	return button->priv->text;
+}
+
+void
+gnt_button_set_text(GntButton *button, const gchar *text)
+{
+	g_return_if_fail(GNT_IS_BUTTON(button));
+
+	g_free(button->priv->text);
+	button->priv->text = g_strdup(text);
+}
