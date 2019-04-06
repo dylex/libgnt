@@ -43,7 +43,6 @@
 #define GNT_WINDOW_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_WINDOW, GntWindowClass))
 
 typedef struct _GntWindow			GntWindow;
-typedef struct _GntWindowPriv		GntWindowPriv;
 typedef struct _GntWindowClass		GntWindowClass;
 
 typedef enum
@@ -56,7 +55,6 @@ struct _GntWindow
 {
 	GntBox parent;
 	GntMenu *menu;
-	GntWindowPriv *priv;
 };
 
 struct _GntWindowClass

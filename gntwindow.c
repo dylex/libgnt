@@ -26,11 +26,11 @@
 
 #include <string.h>
 
-struct _GntWindowPriv
+typedef struct
 {
 	GHashTable *accels;   /* key => menuitem-id */
 	GntWindowFlags flags;
-};
+} GntWindowPrivate;
 
 enum
 {
@@ -43,7 +43,7 @@ static guint signals[SIGS] = { 0 };
 
 static void (*org_destroy)(GntWidget *widget);
 
-G_DEFINE_TYPE(GntWindow, gnt_window, GNT_TYPE_BOX)
+G_DEFINE_TYPE_WITH_PRIVATE(GntWindow, gnt_window, GNT_TYPE_BOX)
 
 static gboolean
 show_menu(GntBindable *bind, G_GNUC_UNUSED GList *params)
@@ -69,13 +69,12 @@ static void
 gnt_window_destroy(GntWidget *widget)
 {
 	GntWindow *window = GNT_WINDOW(widget);
+	GntWindowPrivate *priv = gnt_window_get_instance_private(window);
+
 	if (window->menu)
 		gnt_widget_destroy(GNT_WIDGET(window->menu));
-	if (window->priv) {
-		if (window->priv->accels)
-			g_hash_table_destroy(window->priv->accels);
-		g_free(window->priv);
-	}
+	g_clear_pointer(&priv->accels, g_hash_table_destroy);
+
 	org_destroy(widget);
 }
 
@@ -116,14 +115,14 @@ static void
 gnt_window_init(GntWindow *win)
 {
 	GntWidget *widget = GNT_WIDGET(win);
+	GntWindowPrivate *priv = gnt_window_get_instance_private(win);
 
 	gnt_widget_set_has_border(widget, TRUE);
 	gnt_widget_set_has_shadow(widget, TRUE);
 	gnt_widget_set_take_focus(widget, TRUE);
 
-	win->priv = g_new0(GntWindowPriv, 1);
-	win->priv->accels = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-	GNTDEBUG;
+	priv->accels =
+	        g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
 }
 
 /******************************************************************************
@@ -169,36 +168,40 @@ void gnt_window_set_menu(GntWindow *window, GntMenu *menu)
 	if (window->menu)
 		gnt_widget_destroy(GNT_WIDGET(window->menu));
 	window->menu = menu;
-	if (name && window->priv) {
-		if (!gnt_style_read_menu_accels(name, window->priv->accels)) {
-			g_hash_table_destroy(window->priv->accels);
-			window->priv->accels = NULL;
+	if (name) {
+		GntWindowPrivate *priv =
+		        gnt_window_get_instance_private(window);
+		if (!gnt_style_read_menu_accels(name, priv->accels)) {
+			g_clear_pointer(&priv->accels, g_hash_table_destroy);
 		}
 	}
 }
 
 const char * gnt_window_get_accel_item(GntWindow *window, const char *key)
 {
-	if (window->priv->accels)
-		return g_hash_table_lookup(window->priv->accels, key);
+	GntWindowPrivate *priv = gnt_window_get_instance_private(window);
+	if (priv->accels)
+		return g_hash_table_lookup(priv->accels, key);
 	return NULL;
 }
 
 void gnt_window_set_maximize(GntWindow *window, GntWindowFlags maximize)
 {
+	GntWindowPrivate *priv = gnt_window_get_instance_private(window);
 	if (maximize & GNT_WINDOW_MAXIMIZE_X)
-		window->priv->flags |= GNT_WINDOW_MAXIMIZE_X;
+		priv->flags |= GNT_WINDOW_MAXIMIZE_X;
 	else
-		window->priv->flags &= ~GNT_WINDOW_MAXIMIZE_X;
+		priv->flags &= ~GNT_WINDOW_MAXIMIZE_X;
 
 	if (maximize & GNT_WINDOW_MAXIMIZE_Y)
-		window->priv->flags |= GNT_WINDOW_MAXIMIZE_Y;
+		priv->flags |= GNT_WINDOW_MAXIMIZE_Y;
 	else
-		window->priv->flags &= ~GNT_WINDOW_MAXIMIZE_Y;
+		priv->flags &= ~GNT_WINDOW_MAXIMIZE_Y;
 }
 
 GntWindowFlags gnt_window_get_maximize(GntWindow *window)
 {
-	return (window->priv->flags & (GNT_WINDOW_MAXIMIZE_X | GNT_WINDOW_MAXIMIZE_Y));
+	GntWindowPrivate *priv = gnt_window_get_instance_private(window);
+	return (priv->flags & (GNT_WINDOW_MAXIMIZE_X | GNT_WINDOW_MAXIMIZE_Y));
 }
 
