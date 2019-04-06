@@ -23,10 +23,10 @@
 #
 
 # the last version for Finch 2 was 2.8.10,
-# the first version for Finch 3 was 2.9.0
+# the first version for Finch 3 was 3.0.0
 
 project('libgnt', 'c',
-    version : '2.9.0-devel',
+    version : '3.0.0-devel',
     meson_version : '>=0.37.0')
 gnt_soversion = 1
 
