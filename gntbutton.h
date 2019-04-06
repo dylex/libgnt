@@ -93,6 +93,29 @@ GType gnt_button_get_type(void);
  */
 GntWidget * gnt_button_new(const char *text);
 
+/**
+ * gnt_button_set_text:
+ * @button: The button.
+ * @text:   The text for the button.
+ *
+ * Set the text of a button.
+ *
+ * Since: 2.14.0
+ */
+void gnt_button_set_text(GntButton *button, const gchar *text);
+
+/**
+ * gnt_button_get_text:
+ * @button: The button.
+ *
+ * Get the text of a button.
+ *
+ * Returns: The text for the button.
+ *
+ * Since: 2.14.0
+ */
+const gchar *gnt_button_get_text(GntButton *button);
+
 G_END_DECLS
 
 #endif /* GNT_BUTTON_H */
