@@ -30,6 +30,7 @@ typedef struct
 {
 	GHashTable *accels;   /* key => menuitem-id */
 	GntWindowFlags flags;
+	GntMenu *menu;
 } GntWindowPrivate;
 
 enum
@@ -49,8 +50,10 @@ static gboolean
 show_menu(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntWindow *win = GNT_WINDOW(bind);
-	if (win->menu) {
-		GntMenu *menu = win->menu;
+	GntWindowPrivate *priv = gnt_window_get_instance_private(win);
+
+	if (priv->menu) {
+		GntMenu *menu = priv->menu;
 
 		gnt_screen_menu_show(menu);
 		if (menu->type == GNT_MENU_TOPLEVEL) {
@@ -71,8 +74,8 @@ gnt_window_destroy(GntWidget *widget)
 	GntWindow *window = GNT_WINDOW(widget);
 	GntWindowPrivate *priv = gnt_window_get_instance_private(window);
 
-	if (window->menu)
-		gnt_widget_destroy(GNT_WIDGET(window->menu));
+	if (priv->menu)
+		gnt_widget_destroy(GNT_WIDGET(priv->menu));
 	g_clear_pointer(&priv->accels, g_hash_table_destroy);
 
 	org_destroy(widget);
@@ -150,8 +153,9 @@ GntWidget *gnt_window_box_new(gboolean homo, gboolean vert)
 void
 gnt_window_workspace_hiding(GntWindow *window)
 {
-	if (window->menu)
-		gnt_widget_hide(GNT_WIDGET(window->menu));
+	GntWindowPrivate *priv = gnt_window_get_instance_private(window);
+	if (priv->menu)
+		gnt_widget_hide(GNT_WIDGET(priv->menu));
 	g_signal_emit(window, signals[SIG_WORKSPACE_HIDE], 0);
 }
 
@@ -163,14 +167,13 @@ gnt_window_workspace_showing(GntWindow *window)
 
 void gnt_window_set_menu(GntWindow *window, GntMenu *menu)
 {
+	GntWindowPrivate *priv = gnt_window_get_instance_private(window);
 	/* If a menu already existed, then destroy that first. */
 	const char *name = gnt_widget_get_name(GNT_WIDGET(window));
-	if (window->menu)
-		gnt_widget_destroy(GNT_WIDGET(window->menu));
-	window->menu = menu;
+	if (priv->menu)
+		gnt_widget_destroy(GNT_WIDGET(priv->menu));
+	priv->menu = menu;
 	if (name) {
-		GntWindowPrivate *priv =
-		        gnt_window_get_instance_private(window);
 		if (!gnt_style_read_menu_accels(name, priv->accels)) {
 			g_clear_pointer(&priv->accels, g_hash_table_destroy);
 		}
@@ -180,9 +183,11 @@ void gnt_window_set_menu(GntWindow *window, GntMenu *menu)
 GntMenu *
 gnt_window_get_menu(GntWindow *window)
 {
+	GntWindowPrivate *priv = gnt_window_get_instance_private(window);
+
 	g_return_val_if_fail(GNT_IS_WINDOW(window), NULL);
 
-	return window->menu;
+	return priv->menu;
 }
 
 const char * gnt_window_get_accel_item(GntWindow *window, const char *key)
