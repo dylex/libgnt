@@ -43,30 +43,27 @@
 #include "gntwindow.h"
 #include "gntlabel.h"
 
-#define TYPE_IRSSI				(irssi_get_type())
+#define GNT_TYPE_IRSSI_WM gnt_irssi_wm_get_type()
+G_DECLARE_FINAL_TYPE(GntIrssiWM, gnt_irssi_wm, GNT, IRSSI_WM, GntWM)
 
-typedef struct _Irssi
+struct _GntIrssiWM
 {
-	GntWM inherit;
+	GntWM parent;
 	int vert;
 	int horiz;
 
 	/* This is changed whenever the buddylist is opened/closed or resized. */
 	int buddylistwidth;
-} Irssi;
+};
 
-typedef struct _IrssiClass
-{
-	GntWMClass inherit;
-} IrssiClass;
-
-GType irssi_get_type(void);
+G_DEFINE_TYPE(GntIrssiWM, gnt_irssi_wm, GNT_TYPE_WM)
 void gntwm_init(GntWM **wm);
 
 static void (*org_new_window)(GntWM *wm, GntWidget *win);
 
 static void
-get_xywh_for_frame(Irssi *irssi, int hor, int vert, int *x, int *y, int *w, int *h)
+get_xywh_for_frame(GntIrssiWM *irssi, int hor, int vert, int *x, int *y, int *w,
+                   int *h)
 {
 	int width, height, rx, ry;
 
@@ -99,7 +96,7 @@ get_xywh_for_frame(Irssi *irssi, int hor, int vert, int *x, int *y, int *w, int 
 }
 
 static void
-draw_line_separators(Irssi *irssi)
+draw_line_separators(GntIrssiWM *irssi)
 {
 	int x, y;
 	int width, height;
@@ -153,12 +150,14 @@ remove_border_set_position_size(G_GNUC_UNUSED GntWM *wm, GntWidget *win, int x,
 static void
 irssi_new_window(GntWM *wm, GntWidget *win)
 {
+	GntIrssiWM *irssi = NULL;
 	const char *name;
 	int x, y, w, h;
 
 	g_return_if_fail(win != NULL);
 	g_return_if_fail(wm != NULL);
 
+	irssi = GNT_IRSSI_WM(wm);
 	name = gnt_widget_get_name(win);
 	if (!name || !strstr(name, "conversation-window")) {
 		if (!GNT_IS_MENU(win) && !GNT_WIDGET_IS_FLAG_SET(win, GNT_WIDGET_TRANSIENT)) {
@@ -171,8 +170,9 @@ irssi_new_window(GntWM *wm, GntWidget *win)
 			} else {
 				gnt_window_set_maximize(GNT_WINDOW(win), GNT_WINDOW_MAXIMIZE_Y);
 				remove_border_set_position_size(wm, win, 0, 0, -1, getmaxy(stdscr) - 1);
-				gnt_widget_get_size(win, &((Irssi*)wm)->buddylistwidth, NULL);
-				draw_line_separators((Irssi*)wm);
+				gnt_widget_get_size(win, &irssi->buddylistwidth,
+				                    NULL);
+				draw_line_separators(irssi);
 			}
 		}
 		org_new_window(wm, win);
@@ -184,7 +184,7 @@ irssi_new_window(GntWM *wm, GntWidget *win)
 	/* XXX: There should be some way to remember which frame a conversation window
 	 * was in the last time. Perhaps save them in some ~/.gntpositionirssi or some
 	 * such. */
-	get_xywh_for_frame((Irssi*)wm, 0, 0, &x, &y, &w, &h);
+	get_xywh_for_frame(irssi, 0, 0, &x, &y, &w, &h);
 	remove_border_set_position_size(wm, win, x, y, w, h);
 	org_new_window(wm, win);
 }
@@ -192,18 +192,22 @@ irssi_new_window(GntWM *wm, GntWidget *win)
 static void
 irssi_window_resized(GntWM *wm, GntNode *node)
 {
+	GntIrssiWM *irssi = NULL;
 	if (!is_budddylist(node->me))
 		return;
 
-	gnt_widget_get_size(node->me, &((Irssi*)wm)->buddylistwidth, NULL);
-	draw_line_separators((Irssi*)wm);
+	irssi = GNT_IRSSI_WM(wm);
+	gnt_widget_get_size(node->me, &irssi->buddylistwidth, NULL);
+	draw_line_separators(irssi);
 }
 
 static gboolean
 irssi_close_window(GntWM *wm, GntWidget *win)
 {
-	if (is_budddylist(win))
-		((Irssi*)wm)->buddylistwidth = 0;
+	if (is_budddylist(win)) {
+		GntIrssiWM *irssi = GNT_IRSSI_WM(wm);
+		irssi->buddylistwidth = 0;
+	}
 	return FALSE;
 }
 
@@ -239,7 +243,7 @@ irssi_update_window(GntWM *wm, GntNode *node)
 }
 
 static void
-find_window_position(Irssi *irssi, GntWidget *win, int *h, int *v)
+find_window_position(GntIrssiWM *irssi, GntWidget *win, int *h, int *v)
 {
 	int x, y;
 	int width, height;
@@ -258,7 +262,7 @@ static gboolean
 move_direction(GntBindable *bindable, GList *list)
 {
 	GntWM *wm = GNT_WM(bindable);
-	Irssi *irssi = (Irssi*)wm;
+	GntIrssiWM *irssi = GNT_IRSSI_WM(wm);
 	int vert, hor;
 	int x, y, w, h;
 	GntWidget *win;
@@ -289,7 +293,8 @@ move_direction(GntBindable *bindable, GList *list)
 }
 
 static void
-refresh_window(GntWidget *widget, G_GNUC_UNUSED GntNode *node, Irssi *irssi)
+refresh_window(GntWidget *widget, G_GNUC_UNUSED GntNode *node,
+               GntIrssiWM *irssi)
 {
 	int vert, hor;
 	int x, y, w, h;
@@ -319,12 +324,13 @@ refresh_window(GntWidget *widget, G_GNUC_UNUSED GntNode *node, Irssi *irssi)
 static void
 irssi_terminal_refresh(GntWM *wm)
 {
-	draw_line_separators((Irssi*)wm);
+	GntIrssiWM *irssi = GNT_IRSSI_WM(wm);
+	draw_line_separators(irssi);
 	g_hash_table_foreach(wm->nodes, (GHFunc)refresh_window, wm);
 }
 
 static void
-irssi_class_init(IrssiClass *klass)
+gnt_irssi_wm_class_init(GntIrssiWMClass *klass)
 {
 	GntWMClass *pclass = GNT_WM_CLASS(klass);
 
@@ -349,12 +355,17 @@ irssi_class_init(IrssiClass *klass)
 	GNTDEBUG;
 }
 
+static void
+gnt_irssi_wm_init(G_GNUC_UNUSED GntIrssiWM *self)
+{
+}
+
 void gntwm_init(GntWM **wm)
 {
 	char *style = NULL;
-	Irssi *irssi;
+	GntIrssiWM *irssi;
 
-	irssi = g_object_new(TYPE_IRSSI, NULL);
+	irssi = g_object_new(GNT_TYPE_IRSSI_WM, NULL);
 	*wm = GNT_WM(irssi);
 
 	style = gnt_style_get_from_name("irssi", "split-v");
@@ -370,30 +381,3 @@ void gntwm_init(GntWM **wm)
 
 	irssi->buddylistwidth = 0;
 }
-
-GType irssi_get_type(void)
-{
-	static GType type = 0;
-
-	if(type == 0) {
-		static const GTypeInfo info = {
-			sizeof(IrssiClass),
-			NULL,           /* base_init		*/
-			NULL,           /* base_finalize	*/
-			(GClassInitFunc)irssi_class_init,
-			NULL,
-			NULL,           /* class_data		*/
-			sizeof(Irssi),
-			0,              /* n_preallocs		*/
-			NULL,	        /* instance_init	*/
-			NULL
-		};
-
-		type = g_type_register_static(GNT_TYPE_WM,
-		                              "GntIrssi",
-		                              &info, 0);
-	}
-
-	return type;
-}
-

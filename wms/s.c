@@ -33,23 +33,15 @@
 #include "gntwindow.h"
 #include "gntlabel.h"
 
-#define TYPE_S				(s_get_type())
+#define GNT_TYPE_S_WM gnt_s_wm_get_type()
+G_DECLARE_FINAL_TYPE(GntSWM, gnt_s_wm, GNT, S_WM, GntWM)
 
-#ifdef _S
-#undef _S
-#endif
-
-typedef struct _S
+struct _GntSWM
 {
-	GntWM inherit;
-} S;
+	GntWM parent;
+};
 
-typedef struct _SClass
-{
-	GntWMClass inherit;
-} SClass;
-
-GType s_get_type(void);
+G_DEFINE_TYPE(GntSWM, gnt_s_wm, GNT_TYPE_WM)
 void gntwm_init(GntWM **wm);
 
 static void (*org_new_window)(GntWM *wm, GntWidget *win);
@@ -197,7 +189,7 @@ raise_main_window(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 }
 
 static void
-s_class_init(SClass *klass)
+gnt_s_wm_class_init(GntSWMClass *klass)
 {
 	GntWMClass *pclass = GNT_WM_CLASS(klass);
 
@@ -215,34 +207,13 @@ s_class_init(SClass *klass)
 	GNTDEBUG;
 }
 
-void gntwm_init(GntWM **wm)
+static void
+gnt_s_wm_init(G_GNUC_UNUSED GntSWM *self)
 {
-	*wm = g_object_new(TYPE_S, NULL);
 }
 
-GType s_get_type(void)
+void
+gntwm_init(GntWM **wm)
 {
-	static GType type = 0;
-
-	if(type == 0) {
-		static const GTypeInfo info = {
-			sizeof(SClass),
-			NULL,					/* base_init		*/
-			NULL,					/* base_finalize	*/
-			(GClassInitFunc)s_class_init,
-			NULL,
-			NULL,                   /* class_data		*/
-			sizeof(S),
-			0,                      /* n_preallocs		*/
-			NULL,	            /* instance_init	*/
-			NULL
-		};
-
-		type = g_type_register_static(GNT_TYPE_WM,
-									  "GntS",
-									  &info, 0);
-	}
-
-	return type;
+	*wm = g_object_new(GNT_TYPE_S_WM, NULL);
 }
-
