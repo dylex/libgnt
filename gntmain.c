@@ -607,8 +607,6 @@ void gnt_init()
 	initscr();
 	typeahead(-1);
 	noecho();
-	curs_set(0);
-	keypad(stdscr, 1);
 
 	gnt_init_keys();
 	gnt_init_styles();
@@ -653,6 +651,7 @@ void gnt_init()
 	signal(SIGPIPE, SIG_IGN);
 
 	init_wm();
+	refresh_screen();
 
 	clipboard = g_object_new(GNT_TYPE_CLIPBOARD, NULL);
 }
