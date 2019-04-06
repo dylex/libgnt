@@ -107,6 +107,18 @@ GntWidget * gnt_window_box_new(gboolean homo, gboolean vert);
 void gnt_window_set_menu(GntWindow *window, GntMenu *menu);
 
 /**
+ * gnt_window_get_menu:
+ * @window:  The window.
+ *
+ * Get the menu for a window.
+ *
+ * Returns: (transfer none) (nullable):  The menu for the window.
+ *
+ * Since: 2.9.0
+ */
+GntMenu *gnt_window_get_menu(GntWindow *window);
+
+/**
  * Return the id of a menuitem specified to a keystroke.
  *
  * @param window    The window.

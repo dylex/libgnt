@@ -209,6 +209,14 @@ void gnt_window_set_menu(GntWindow *window, GntMenu *menu)
 	}
 }
 
+GntMenu *
+gnt_window_get_menu(GntWindow *window)
+{
+	g_return_val_if_fail(GNT_IS_WINDOW(window), NULL);
+
+	return window->menu;
+}
+
 const char * gnt_window_get_accel_item(GntWindow *window, const char *key)
 {
 	if (window->priv->accels)

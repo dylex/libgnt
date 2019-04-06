@@ -2048,7 +2048,7 @@ gboolean gnt_wm_process_input(GntWM *wm, const char *keys)
 	else if (wm->cws->ordered) {
 		GntWidget *win = wm->cws->ordered->data;
 		if (GNT_IS_WINDOW(win)) {
-			GntMenu *menu = GNT_WINDOW(win)->menu;
+			GntMenu *menu = gnt_window_get_menu(GNT_WINDOW(win));
 			if (menu) {
 				const char *id = gnt_window_get_accel_item(GNT_WINDOW(win), keys);
 				if (id) {
