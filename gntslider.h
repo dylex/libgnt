@@ -97,6 +97,18 @@ GType gnt_slider_get_gtype(void);
 GntWidget * gnt_slider_new(gboolean orient, int max, int min);
 
 /**
+ * gnt_slider_get_vertical:
+ * @slider:  The slider
+ *
+ * Get whether the slider is vertical or not.
+ *
+ * Returns:  Whether the slider is vertical.
+ *
+ * Since: 2.9.0
+ */
+gboolean gnt_slider_get_vertical(GntSlider *slider);
+
+/**
  * Set the range of the slider.
  *
  * @param slider  The slider
@@ -106,6 +118,18 @@ GntWidget * gnt_slider_new(gboolean orient, int max, int min);
  * @since 2.0.0 (gnt), 2.1.0 (pidgin)
  */
 void gnt_slider_set_range(GntSlider *slider, int max, int min);
+
+/**
+ * gnt_slider_get_range:
+ * @slider:     The slider
+ * @max: (out): The maximum value
+ * @min: (out): The minimum value
+ *
+ * Get the range of the slider.
+ *
+ * Since: 2.9.0
+ */
+void gnt_slider_get_range(GntSlider *slider, int *max, int *min);
 
 /**
  * Sets the amount of change at each step.
@@ -118,6 +142,18 @@ void gnt_slider_set_range(GntSlider *slider, int max, int min);
 void gnt_slider_set_step(GntSlider *slider, int step);
 
 /**
+ * gnt_slider_get_step:
+ * @slider:  The slider
+ *
+ * Gets the amount of change at each step.
+ *
+ * Returns:  The amount for each step
+ *
+ * Since: 2.9.0
+ */
+int gnt_slider_get_step(GntSlider *slider);
+
+/**
  * Sets the amount of change a small step.
  *
  * @param slider  The slider
@@ -128,6 +164,18 @@ void gnt_slider_set_step(GntSlider *slider, int step);
 void gnt_slider_set_small_step(GntSlider *slider, int step);
 
 /**
+ * gnt_slider_get_small_step:
+ * @slider:  The slider
+ *
+ * Gets the amount of change for a small step.
+ *
+ * Returns:  The amount for a small step (of the slider)
+ *
+ * Since: 2.9.0
+ */
+int gnt_slider_get_small_step(GntSlider *slider);
+
+/**
  * Sets the amount of change a large step.
  *
  * @param slider  The slider
@@ -136,6 +184,18 @@ void gnt_slider_set_small_step(GntSlider *slider, int step);
  * @since 2.2.0
  */
 void gnt_slider_set_large_step(GntSlider *slider, int step);
+
+/**
+ * gnt_slider_get_large_step:
+ * @slider:  The slider
+ *
+ * Gets the amount of change for a large step.
+ *
+ * Returns:  The amount for a large step (of the slider)
+ *
+ * Since: 2.9.0
+ */
+int gnt_slider_get_large_step(GntSlider *slider);
 
 /**
  * Advance the slider forward or backward.
