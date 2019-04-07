@@ -33,29 +33,9 @@
 #include "gnt.h"
 #include "gntlabel.h"
 
-#define GNT_TYPE_SLIDER             (gnt_slider_get_type())
-#define GNT_SLIDER(obj)             (G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_SLIDER, GntSlider))
-#define GNT_SLIDER_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_SLIDER, GntSliderClass))
-#define GNT_IS_SLIDER(obj)          (G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_SLIDER))
-#define GNT_IS_SLIDER_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_SLIDER))
-#define GNT_SLIDER_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_SLIDER, GntSliderClass))
+#define GNT_TYPE_SLIDER gnt_slider_get_type()
 
-typedef struct _GntSlider			GntSlider;
-typedef struct _GntSliderClass		GntSliderClass;
-
-struct _GntSlider
-{
-	GntWidget parent;
-
-	gboolean vertical;
-
-	int max;        /* maximum value */
-	int min;        /* minimum value */
-	int step;       /* amount to change at each step */
-	int current;    /* current value */
-	int smallstep;
-	int largestep;
-};
+typedef struct _GntSlider GntSlider;
 
 struct _GntSliderClass
 {
@@ -79,7 +59,7 @@ G_BEGIN_DECLS
  *
  * Since: 2.0.0
  */
-GType gnt_slider_get_type(void);
+G_DECLARE_DERIVABLE_TYPE(GntSlider, gnt_slider, GNT, SLIDER, GntWidget)
 
 #define gnt_hslider_new(max, min) gnt_slider_new(FALSE, max, min)
 #define gnt_vslider_new(max, min) gnt_slider_new(TRUE, max, min)

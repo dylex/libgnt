@@ -26,6 +26,17 @@
 #include "gntslider.h"
 #include "gntstyle.h"
 
+typedef struct
+{
+	gboolean vertical;
+	int max;     /* maximum value */
+	int min;     /* minimum value */
+	int step;    /* amount to change at each step */
+	int current; /* current value */
+	int smallstep;
+	int largestep;
+} GntSliderPrivate;
+
 enum
 {
 	SIG_VALUE_CHANGED,
@@ -34,16 +45,16 @@ enum
 
 static guint signals[SIGS] = { 0 };
 
-G_DEFINE_TYPE(GntSlider, gnt_slider, GNT_TYPE_WIDGET)
+G_DEFINE_TYPE_WITH_PRIVATE(GntSlider, gnt_slider, GNT_TYPE_WIDGET)
 
 /* returns TRUE if the value was changed */
 static gboolean
-sanitize_value(GntSlider *slider)
+sanitize_value(GntSliderPrivate *priv)
 {
-	if (slider->current < slider->min)
-		slider->current = slider->min;
-	else if (slider->current > slider->max)
-		slider->current = slider->max;
+	if (priv->current < priv->min)
+		priv->current = priv->min;
+	else if (priv->current > priv->max)
+		priv->current = priv->max;
 	else
 		return FALSE;
 	return TRUE;
@@ -60,17 +71,19 @@ redraw_slider(GntSlider *slider)
 static void
 slider_value_changed(GntSlider *slider)
 {
-	g_signal_emit(slider, signals[SIG_VALUE_CHANGED], 0, slider->current);
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
+	g_signal_emit(slider, signals[SIG_VALUE_CHANGED], 0, priv->current);
 }
 
 static void
 gnt_slider_draw(GntWidget *widget)
 {
 	GntSlider *slider = GNT_SLIDER(widget);
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
 	int attr = 0;
 	int position, size = 0;
 
-	if (slider->vertical)
+	if (priv->vertical)
 		size = widget->priv.height;
 	else
 		size = widget->priv.width;
@@ -80,11 +93,12 @@ gnt_slider_draw(GntWidget *widget)
 	else
 		attr |= GNT_COLOR_HIGHLIGHT_D;
 
-	if (slider->max != slider->min)
-		position = ((size - 1) * (slider->current - slider->min)) / (slider->max - slider->min);
+	if (priv->max != priv->min)
+		position = ((size - 1) * (priv->current - priv->min)) /
+		           (priv->max - priv->min);
 	else
 		position = 0;
-	if (slider->vertical) {
+	if (priv->vertical) {
 		mvwvline(widget->window, size-position, 0, ACS_VLINE | gnt_color_pair(GNT_COLOR_NORMAL) | A_BOLD,
 				position);
 		mvwvline(widget->window, 0, 0, ACS_VLINE | gnt_color_pair(GNT_COLOR_NORMAL),
@@ -96,16 +110,17 @@ gnt_slider_draw(GntWidget *widget)
 				size - position);
 	}
 
-	mvwaddch(widget->window,
-			slider->vertical ? (size - position - 1) : 0,
-			slider->vertical ? 0 : position,
-			ACS_CKBOARD | gnt_color_pair(attr));
+	mvwaddch(widget->window, priv->vertical ? (size - position - 1) : 0,
+	         priv->vertical ? 0 : position,
+	         ACS_CKBOARD | gnt_color_pair(attr));
 }
 
 static void
 gnt_slider_size_request(GntWidget *widget)
 {
-	if (GNT_SLIDER(widget)->vertical) {
+	GntSliderPrivate *priv =
+	        gnt_slider_get_instance_private(GNT_SLIDER(widget));
+	if (priv->vertical) {
 		widget->priv.width = 1;
 		widget->priv.height = 5;
 	} else {
@@ -134,7 +149,8 @@ static gboolean
 small_step_back(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntSlider *slider = GNT_SLIDER(bindable);
-	gnt_slider_set_value(slider, slider->current - slider->smallstep);
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
+	gnt_slider_set_value(slider, priv->current - priv->smallstep);
 	return TRUE;
 }
 
@@ -142,7 +158,8 @@ static gboolean
 large_step_back(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntSlider *slider = GNT_SLIDER(bindable);
-	gnt_slider_set_value(slider, slider->current - slider->largestep);
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
+	gnt_slider_set_value(slider, priv->current - priv->largestep);
 	return TRUE;
 }
 
@@ -158,7 +175,8 @@ static gboolean
 small_step_forward(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntSlider *slider = GNT_SLIDER(bindable);
-	gnt_slider_set_value(slider, slider->current + slider->smallstep);
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
+	gnt_slider_set_value(slider, priv->current + priv->smallstep);
 	return TRUE;
 }
 
@@ -166,7 +184,8 @@ static gboolean
 large_step_forward(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntSlider *slider = GNT_SLIDER(bindable);
-	gnt_slider_set_value(slider, slider->current + slider->largestep);
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
+	gnt_slider_set_value(slider, priv->current + priv->largestep);
 	return TRUE;
 }
 
@@ -174,7 +193,8 @@ static gboolean
 move_min_value(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntSlider *slider = GNT_SLIDER(bindable);
-	gnt_slider_set_value(slider, slider->min);
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
+	gnt_slider_set_value(slider, priv->min);
 	return TRUE;
 }
 
@@ -182,7 +202,8 @@ static gboolean
 move_max_value(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntSlider *slider = GNT_SLIDER(bindable);
-	gnt_slider_set_value(slider, slider->max);
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
+	gnt_slider_set_value(slider, priv->max);
 	return TRUE;
 }
 
@@ -241,8 +262,9 @@ GntWidget *gnt_slider_new(gboolean vertical, int max, int min)
 {
 	GntWidget *widget = g_object_new(GNT_TYPE_SLIDER, NULL);
 	GntSlider *slider = GNT_SLIDER(widget);
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
 
-	slider->vertical = vertical;
+	priv->vertical = vertical;
 
 	if (vertical) {
 		gnt_widget_set_grow_y(widget, TRUE);
@@ -251,7 +273,7 @@ GntWidget *gnt_slider_new(gboolean vertical, int max, int min)
 	}
 
 	gnt_slider_set_range(slider, max, min);
-	slider->step = 1;
+	priv->step = 1;
 
 	return widget;
 }
@@ -259,20 +281,22 @@ GntWidget *gnt_slider_new(gboolean vertical, int max, int min)
 gboolean
 gnt_slider_get_vertical(GntSlider *slider)
 {
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
 	g_return_val_if_fail(GNT_IS_SLIDER(slider), FALSE);
 
-	return slider->vertical;
+	return priv->vertical;
 }
 
 void gnt_slider_set_value(GntSlider *slider, int value)
 {
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
 	int old;
-	if (slider->current == value)
+	if (priv->current == value)
 		return;
-	old = slider->current;
-	slider->current = value;
-	sanitize_value(slider);
-	if (old == slider->current)
+	old = priv->current;
+	priv->current = value;
+	sanitize_value(priv);
+	if (old == priv->current)
 		return;
 	redraw_slider(slider);
 	slider_value_changed(slider);
@@ -280,75 +304,86 @@ void gnt_slider_set_value(GntSlider *slider, int value)
 
 int gnt_slider_get_value(GntSlider *slider)
 {
-	return slider->current;
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
+	return priv->current;
 }
 
 int gnt_slider_advance_step(GntSlider *slider, int steps)
 {
-	gnt_slider_set_value(slider, slider->current + steps * slider->step);
-	return slider->current;
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
+	gnt_slider_set_value(slider, priv->current + steps * priv->step);
+	return priv->current;
 }
 
 void gnt_slider_set_step(GntSlider *slider, int step)
 {
-	slider->step = step;
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
+	priv->step = step;
 }
 
 int
 gnt_slider_get_step(GntSlider *slider)
 {
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
 	g_return_val_if_fail(GNT_IS_SLIDER(slider), 0);
 
-	return slider->step;
+	return priv->step;
 }
 
 void gnt_slider_set_small_step(GntSlider *slider, int step)
 {
-	slider->smallstep = step;
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
+	priv->smallstep = step;
 }
 
 int
 gnt_slider_get_small_step(GntSlider *slider)
 {
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
 	g_return_val_if_fail(GNT_IS_SLIDER(slider), 0);
 
-	return slider->smallstep;
+	return priv->smallstep;
 }
 
 void gnt_slider_set_large_step(GntSlider *slider, int step)
 {
-	slider->largestep = step;
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
+	priv->largestep = step;
 }
 
 int
 gnt_slider_get_large_step(GntSlider *slider)
 {
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
 	g_return_val_if_fail(GNT_IS_SLIDER(slider), 0);
 
-	return slider->largestep;
+	return priv->largestep;
 }
 
 void gnt_slider_set_range(GntSlider *slider, int max, int min)
 {
-	slider->max = MAX(max, min);
-	slider->min = MIN(max, min);
-	sanitize_value(slider);
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
+	priv->max = MAX(max, min);
+	priv->min = MIN(max, min);
+	sanitize_value(priv);
 }
 
 void
 gnt_slider_get_range(GntSlider *slider, int *max, int *min)
 {
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
 	g_return_if_fail(GNT_IS_SLIDER(slider));
 
-	*max = slider->max;
-	*min = slider->min;
+	*max = priv->max;
+	*min = priv->min;
 }
 
 static void
 update_label(GntSlider *slider, int current_value, GntLabel *label)
 {
+	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
 	char value[256];
-	g_snprintf(value, sizeof(value), "%d/%d", current_value, slider->max);
+	g_snprintf(value, sizeof(value), "%d/%d", current_value, priv->max);
 	gnt_label_set_text(label, value);
 }
 
