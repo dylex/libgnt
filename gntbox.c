@@ -82,8 +82,7 @@ gnt_box_draw(GntWidget *widget)
 
 	g_list_foreach(box->list, (GFunc)gnt_widget_draw, NULL);
 
-	if (box->title && !GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER))
-	{
+	if (box->title && gnt_widget_get_has_border(widget)) {
 		int pos, right;
 		char *title = g_strdup(box->title);
 
@@ -685,7 +684,7 @@ void gnt_box_set_title(GntBox *b, const char *title)
 	char *prev = b->title;
 	GntWidget *w = GNT_WIDGET(b);
 	b->title = g_strdup(title);
-	if (w->window && !GNT_WIDGET_IS_FLAG_SET(w, GNT_WIDGET_NO_BORDER)) {
+	if (w->window && gnt_widget_get_has_border(w)) {
 		/* Erase the old title */
 		int pos, right;
 		get_title_thingies(b, prev, &pos, &right);
@@ -714,10 +713,7 @@ void gnt_box_sync_children(GntBox *box)
 {
 	GList *iter;
 	GntWidget *widget = GNT_WIDGET(box);
-	int pos = 1;
-
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER))
-		pos = 0;
+	int pos = gnt_widget_get_has_border(widget) ? 1 : 0;
 
 	if (!box->active)
 		find_focusable_widget(box);

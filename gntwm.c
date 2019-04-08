@@ -1032,7 +1032,7 @@ window_reverse(GntWidget *win, gboolean set, GntWM *wm)
 	int w, h;
 	WINDOW *d;
 
-	if (GNT_WIDGET_IS_FLAG_SET(win, GNT_WIDGET_NO_BORDER))
+	if (!gnt_widget_get_has_border(win))
 		return;
 
 	d = win->window;

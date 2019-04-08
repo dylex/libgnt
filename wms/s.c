@@ -47,7 +47,7 @@ envelope_normal_window(GntWidget *win)
 {
 	int w, h;
 
-	if (GNT_WIDGET_IS_FLAG_SET(win, GNT_WIDGET_NO_BORDER | GNT_WIDGET_TRANSIENT))
+	if (!gnt_widget_get_has_border(win) || gnt_widget_get_transient(win))
 		return;
 
 	gnt_widget_get_size(win, &w, &h);
@@ -145,8 +145,7 @@ s_mouse_clicked(GntWM *wm, GntMouseEvent event, int cx, int cy, GntWidget *widge
 		return FALSE;
 		/* This might be a place to bring up a context menu */
 
-	if (event != GNT_LEFT_MOUSE_DOWN ||
-			GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER))
+	if (event != GNT_LEFT_MOUSE_DOWN || !gnt_widget_get_has_border(widget))
 		return FALSE;
 
 	gnt_widget_get_position(widget, &x, &y);
