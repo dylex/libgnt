@@ -314,7 +314,7 @@ static void
 file_sel_changed(GntWidget *widget, G_GNUC_UNUSED gpointer old,
                  G_GNUC_UNUSED gpointer current, GntFileSel *sel)
 {
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_HAS_FOCUS)) {
+	if (gnt_widget_get_has_focus(widget)) {
 		g_free(sel->suggest);
 		sel->suggest = NULL;
 		update_location(sel);

@@ -1846,8 +1846,9 @@ void gnt_wm_new_window(GntWM *wm, GntWidget *widget)
 	g_signal_emit(wm, signals[SIG_DECORATE_WIN], 0, widget);
 
 	if (wm->windows && !gnt_widget_get_transient(widget)) {
-		if ((GNT_IS_BOX(widget) && GNT_BOX(widget)->title) && wm->_list.window != widget
-				&& GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_CAN_TAKE_FOCUS)) {
+		if ((GNT_IS_BOX(widget) && GNT_BOX(widget)->title) &&
+		    wm->_list.window != widget &&
+		    gnt_widget_get_take_focus(widget)) {
 			gnt_tree_add_row_last(GNT_TREE(wm->windows->tree), widget,
 					gnt_tree_create_row(GNT_TREE(wm->windows->tree), GNT_BOX(widget)->title),
 					g_object_get_data(G_OBJECT(wm->windows->tree), "workspace") ? wm->cws : NULL);

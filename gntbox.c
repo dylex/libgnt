@@ -54,7 +54,7 @@ add_to_focus(gpointer value, gpointer data)
 
 	if (GNT_IS_BOX(w))
 		g_list_foreach(GNT_BOX(w)->list, add_to_focus, box);
-	else if (GNT_WIDGET_IS_FLAG_SET(w, GNT_WIDGET_CAN_TAKE_FOCUS))
+	else if (gnt_widget_get_take_focus(w))
 		box->focus = g_list_append(box->focus, w);
 }
 
@@ -274,8 +274,7 @@ find_next_focus(GntBox *box)
 		else if (box->focus)
 			box->active = box->focus->data;
 		if (gnt_widget_get_visible(box->active) &&
-		    GNT_WIDGET_IS_FLAG_SET(box->active,
-		                           GNT_WIDGET_CAN_TAKE_FOCUS)) {
+		    gnt_widget_get_take_focus(box->active)) {
 			break;
 		}
 	} while (box->active != last);
@@ -520,7 +519,7 @@ gnt_box_clicked(GntWidget *widget, GntMouseEvent event, int cx, int cy)
 
 		if (cx >= x && cx < x + w && cy >= y && cy < y + h) {
 			if (event <= GNT_MIDDLE_MOUSE_DOWN &&
-				GNT_WIDGET_IS_FLAG_SET(wid, GNT_WIDGET_CAN_TAKE_FOCUS)) {
+			    gnt_widget_get_take_focus(wid)) {
 				while (widget->parent)
 					widget = widget->parent;
 				gnt_box_give_focus_to_child(GNT_BOX(widget), wid);
@@ -757,9 +756,8 @@ void gnt_box_set_alignment(GntBox *box, GntAlignment alignment)
 void gnt_box_remove(GntBox *box, GntWidget *widget)
 {
 	box->list = g_list_remove(box->list, widget);
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_CAN_TAKE_FOCUS)
-			&& GNT_WIDGET(box)->parent == NULL && box->focus)
-	{
+	if (gnt_widget_get_take_focus(widget) &&
+	    GNT_WIDGET(box)->parent == NULL && box->focus) {
 		if (widget == box->active)
 		{
 			find_next_focus(box);
