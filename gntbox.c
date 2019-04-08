@@ -121,7 +121,7 @@ reposition_children(GntWidget *widget)
 
 	for (iter = box->list; iter; iter = iter->next)
 	{
-		if (GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(iter->data), GNT_WIDGET_INVISIBLE))
+		if (!gnt_widget_get_visible(GNT_WIDGET(iter->data)))
 			continue;
 		gnt_widget_set_position(GNT_WIDGET(iter->data), curx, cury);
 		gnt_widget_get_size(GNT_WIDGET(iter->data), &w, &h);
@@ -273,9 +273,11 @@ find_next_focus(GntBox *box)
 			box->active = iter->next->data;
 		else if (box->focus)
 			box->active = box->focus->data;
-		if (!GNT_WIDGET_IS_FLAG_SET(box->active, GNT_WIDGET_INVISIBLE) &&
-				GNT_WIDGET_IS_FLAG_SET(box->active, GNT_WIDGET_CAN_TAKE_FOCUS))
+		if (gnt_widget_get_visible(box->active) &&
+		    GNT_WIDGET_IS_FLAG_SET(box->active,
+		                           GNT_WIDGET_CAN_TAKE_FOCUS)) {
 			break;
+		}
 	} while (box->active != last);
 }
 
@@ -296,7 +298,7 @@ find_prev_focus(GntBox *box)
 			box->active = g_list_last(box->focus)->data;
 		else
 			box->active = iter->prev->data;
-		if (!GNT_WIDGET_IS_FLAG_SET(box->active, GNT_WIDGET_INVISIBLE))
+		if (gnt_widget_get_visible(box->active))
 			break;
 	} while (box->active != last);
 }
@@ -421,8 +423,8 @@ gnt_box_confirm_size(GntWidget *widget, int width, int height)
 		gnt_widget_get_size(wid, &w, &h);
 
 		if (wid != last && !child && w > 0 && h > 0 &&
-				!GNT_WIDGET_IS_FLAG_SET(wid, GNT_WIDGET_INVISIBLE) &&
-				gnt_widget_confirm_size(wid, w - wchange, h - hchange)) {
+		    gnt_widget_get_visible(wid) &&
+		    gnt_widget_confirm_size(wid, w - wchange, h - hchange)) {
 			child = wid;
 			break;
 		}
@@ -724,7 +726,7 @@ void gnt_box_sync_children(GntBox *box)
 		int height, width;
 		int x, y;
 
-		if (GNT_WIDGET_IS_FLAG_SET(w, GNT_WIDGET_INVISIBLE))
+		if (!gnt_widget_get_visible(w))
 			continue;
 
 		if (GNT_IS_BOX(w))

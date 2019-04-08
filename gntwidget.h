@@ -304,6 +304,18 @@ void gnt_widget_set_take_focus(GntWidget *widget, gboolean set);
 void gnt_widget_set_visible(GntWidget *widget, gboolean set);
 
 /**
+ * gnt_widget_get_visible:
+ * @widget:  The widget.
+ *
+ * Get the visibility of a widget.
+ *
+ * Returns:  Whether the widget is visible or not.
+ *
+ * Since: 2.9.0
+ */
+gboolean gnt_widget_get_visible(GntWidget *widget);
+
+/**
  * Check whether the widget has shadows.
  *
  * @param widget  The widget.
