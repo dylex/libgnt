@@ -210,8 +210,8 @@ detect_mouse_action(const char *buffer)
 	if (widget && gnt_wm_process_click(wm, event, x, y, widget))
 		return TRUE;
 
-	if (event == GNT_LEFT_MOUSE_DOWN && widget && widget != wm->_list.window &&
-			!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_TRANSIENT)) {
+	if (event == GNT_LEFT_MOUSE_DOWN && widget &&
+	    widget != wm->_list.window && !gnt_widget_get_transient(widget)) {
 		if (widget != wm->cws->ordered->data) {
 			gnt_wm_raise_window(wm, widget);
 		}

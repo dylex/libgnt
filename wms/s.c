@@ -121,7 +121,7 @@ s_new_window(GntWM *wm, GntWidget *win)
 			mvwin(win->window, y, x);
 
 			gnt_widget_set_size(win, -1, h + 2);  /* XXX: Why is the +2 needed here? -- sadrul */
-		} else if (!GNT_WIDGET_IS_FLAG_SET(win, GNT_WIDGET_TRANSIENT)) {
+		} else if (!gnt_widget_get_transient(win)) {
 			const char *title = GNT_BOX(win)->title;
 			if (title == NULL || !g_hash_table_lookup(wm->positions, title)) {
 				/* In the middle of the screen */
