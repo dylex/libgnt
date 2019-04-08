@@ -86,7 +86,7 @@ gnt_ws_draw_taskbar(GntWS *ws, gboolean reposition)
 		if (w == ws->ordered->data) {
 			/* This is the current window in focus */
 			color = GNT_COLOR_TITLE;
-		} else if (GNT_WIDGET_IS_FLAG_SET(w, GNT_WIDGET_URGENT)) {
+		} else if (gnt_widget_get_is_urgent(w)) {
 			/* This is a window with the URGENT hint set */
 			color = GNT_COLOR_URGENT;
 		} else {

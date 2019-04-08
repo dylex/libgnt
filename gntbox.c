@@ -307,7 +307,7 @@ gnt_box_key_pressed(GntWidget *widget, const char *text)
 	GntBox *box = GNT_BOX(widget);
 	gboolean ret;
 
-	if (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_DISABLE_ACTIONS))
+	if (!gnt_widget_get_disable_actions(widget))
 		return FALSE;
 
 	if (box->active == NULL && !find_focusable_widget(box))

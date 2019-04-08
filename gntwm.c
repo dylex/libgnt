@@ -439,7 +439,7 @@ switch_window(GntWM *wm, int direction, gboolean urgent)
 			pos = 0;
 		} else
 			wid = g_list_nth_data(wm->cws->list, pos);
-	} while (urgent && !GNT_WIDGET_IS_FLAG_SET(wid, GNT_WIDGET_URGENT) && pos != orgpos);
+	} while (urgent && !gnt_widget_get_is_urgent(wid) && pos != orgpos);
 
 	gnt_wm_raise_window(wm, wid);
 }
@@ -1752,7 +1752,7 @@ update_window_in_list(GntWM *wm, GntWidget *wid)
 
 	if (wm->cws->ordered && wid == wm->cws->ordered->data)
 		flag |= GNT_TEXT_FLAG_DIM;
-	else if (GNT_WIDGET_IS_FLAG_SET(wid, GNT_WIDGET_URGENT))
+	else if (gnt_widget_get_is_urgent(wid))
 		flag |= GNT_TEXT_FLAG_BOLD;
 
 	gnt_tree_set_row_flags(GNT_TREE(wm->windows->tree), wid, flag);
@@ -2234,7 +2234,7 @@ void gnt_wm_update_window(GntWM *wm, GntWidget *widget)
 		gnt_wm_copy_win(widget, node);
 		gnt_ws_draw_taskbar(wm->cws, FALSE);
 		update_screen(wm);
-	} else if (ws && ws != wm->cws && GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_URGENT)) {
+	} else if (ws && ws != wm->cws && gnt_widget_get_is_urgent(widget)) {
 		if (!act || (act && !g_list_find(act, ws)))
 			act = g_list_prepend(act, ws);
 		update_act_msg();
