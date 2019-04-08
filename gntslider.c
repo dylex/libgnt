@@ -53,7 +53,7 @@ static void
 redraw_slider(GntSlider *slider)
 {
 	GntWidget *widget = GNT_WIDGET(slider);
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(widget))
 		gnt_widget_draw(widget);
 }
 

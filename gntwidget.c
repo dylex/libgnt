@@ -527,8 +527,7 @@ gnt_widget_set_size(GntWidget *widget, int width, int height)
 	if (height <= 0)
 		height = widget->priv.height;
 
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED))
-	{
+	if (gnt_widget_get_mapped(widget)) {
 		ret = gnt_widget_confirm_size(widget, width, height);
 	}
 
@@ -608,8 +607,9 @@ update_queue_callback(gpointer data)
 
 	if (!g_object_get_data(G_OBJECT(widget), "gnt:queue_update"))
 		return FALSE;
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(widget)) {
 		gnt_screen_update(widget);
+	}
 	g_object_set_data(G_OBJECT(widget), "gnt:queue_update", NULL);
 	return FALSE;
 }
