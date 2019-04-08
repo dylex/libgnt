@@ -426,7 +426,7 @@ redraw_tree(GntTree *tree)
 	int rows, scrcol;
 	int current = 0;
 
-	if (!GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(tree), GNT_WIDGET_MAPPED))
+	if (!gnt_widget_get_mapped(GNT_WIDGET(tree)))
 		return;
 
 	pos = gnt_widget_get_has_border(widget) ? 1 : 0;
@@ -1543,9 +1543,11 @@ void gnt_tree_change_text(GntTree *tree, gpointer key, int colno, const char *te
 			col->text = g_strdup(text ? text : "");
 		}
 
-		if (GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(tree), GNT_WIDGET_MAPPED) &&
-			get_distance(tree->top, row) >= 0 && get_distance(row, tree->bottom) >= 0)
+		if (gnt_widget_get_mapped(GNT_WIDGET(tree)) &&
+		    get_distance(tree->top, row) >= 0 &&
+		    get_distance(row, tree->bottom) >= 0) {
 			redraw_tree(tree);
+		}
 	}
 }
 
@@ -1838,7 +1840,7 @@ void gnt_tree_set_column_visible(GntTree *tree, int col, gboolean vis)
 					break;
 			}
 	}
-	if (GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(tree), GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(GNT_WIDGET(tree)))
 		readjust_columns(tree);
 }
 

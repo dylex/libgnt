@@ -189,8 +189,7 @@ gnt_text_view_draw(GntWidget *widget)
 static void
 gnt_text_view_size_request(GntWidget *widget)
 {
-	if (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED))
-	{
+	if (!gnt_widget_get_mapped(widget)) {
 		gnt_widget_set_size(widget, 64, 20);
 	}
 }
@@ -437,7 +436,7 @@ gnt_text_view_reflow(GntTextView *view)
 static void
 gnt_text_view_size_changed(GntWidget *widget, int w, G_GNUC_UNUSED int h)
 {
-	if (w != widget->priv.width && GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED)) {
+	if (w != widget->priv.width && gnt_widget_get_mapped(widget)) {
 		gnt_text_view_reflow(GNT_TEXT_VIEW(widget));
 	}
 }

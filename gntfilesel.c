@@ -200,8 +200,9 @@ location_changed(GntFileSel *sel, GError **err)
 		gnt_tree_remove_all(GNT_TREE(sel->files));
 	gnt_entry_set_text(GNT_ENTRY(sel->location), NULL);
 	if (sel->current == NULL) {
-		if (GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(sel), GNT_WIDGET_MAPPED))
+		if (gnt_widget_get_mapped(GNT_WIDGET(sel))) {
 			gnt_widget_draw(GNT_WIDGET(sel));
+		}
 		return TRUE;
 	}
 
@@ -240,8 +241,9 @@ location_changed(GntFileSel *sel, GError **err)
 		}
 	}
 	g_list_free_full(files, (GDestroyNotify)gnt_file_free);
-	if (GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(sel), GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(GNT_WIDGET(sel))) {
 		gnt_widget_draw(GNT_WIDGET(sel));
+	}
 	return TRUE;
 }
 

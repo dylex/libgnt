@@ -767,7 +767,7 @@ void gnt_box_remove(GntBox *box, GntWidget *widget)
 		box->focus = g_list_remove(box->focus, widget);
 	}
 
-	if (GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(box), GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(GNT_WIDGET(box)))
 		gnt_widget_draw(GNT_WIDGET(box));
 }
 
