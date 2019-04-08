@@ -561,6 +561,14 @@ void gnt_widget_set_visible(GntWidget *widget, gboolean set)
 		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_INVISIBLE);
 }
 
+gboolean
+gnt_widget_get_visible(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return !GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_INVISIBLE);
+}
+
 gboolean gnt_widget_has_shadow(GntWidget *widget)
 {
 	return (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_SHADOW) &&

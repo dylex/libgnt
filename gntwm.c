@@ -1826,8 +1826,8 @@ void gnt_wm_new_window(GntWM *wm, GntWidget *widget)
 	while (widget->parent)
 		widget = widget->parent;
 
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_INVISIBLE) ||
-			g_hash_table_lookup(wm->nodes, widget)) {
+	if (!gnt_widget_get_visible(widget) ||
+	    g_hash_table_lookup(wm->nodes, widget)) {
 		update_screen(wm);
 		return;
 	}
