@@ -296,6 +296,18 @@ void gnt_widget_queue_update(GntWidget *widget);
 void gnt_widget_set_take_focus(GntWidget *widget, gboolean set);
 
 /**
+ * gnt_widget_get_take_focus:
+ * @widget:   The widget.
+ *
+ * Get whether a widget can take focus or not.
+ *
+ * Returns:   %TRUE if the widget can take focus.
+ *
+ * Since: 2.9.0
+ */
+gboolean gnt_widget_get_take_focus(GntWidget *widget);
+
+/**
  * Set the visibility of a widget.
  *
  * @param widget  The widget.

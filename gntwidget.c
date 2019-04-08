@@ -310,6 +310,14 @@ void gnt_widget_set_take_focus(GntWidget *widget, gboolean can)
 		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_CAN_TAKE_FOCUS);
 }
 
+gboolean
+gnt_widget_get_take_focus(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_CAN_TAKE_FOCUS);
+}
+
 /**
  * gnt_widget_destroy:
  * @obj: The #GntWidget instance.
@@ -402,7 +410,7 @@ gboolean
 gnt_widget_key_pressed(GntWidget *widget, const char *keys)
 {
 	gboolean ret;
-	if (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_CAN_TAKE_FOCUS))
+	if (!gnt_widget_get_take_focus(widget))
 		return FALSE;
 
 	if (!gnt_widget_get_disable_actions(widget) &&
@@ -576,7 +584,7 @@ gnt_widget_set_size(GntWidget *widget, int width, int height)
 gboolean
 gnt_widget_set_focus(GntWidget *widget, gboolean set)
 {
-	if (!(GNT_WIDGET_FLAGS(widget) & GNT_WIDGET_CAN_TAKE_FOCUS))
+	if (!gnt_widget_get_take_focus(widget))
 		return FALSE;
 
 	if (set && !gnt_widget_get_has_focus(widget)) {
