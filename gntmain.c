@@ -114,16 +114,18 @@ gnt_set_config_dir(const gchar *config_dir)
 		gnt_warning("gnt_set_config_dir failed: %s",
 			"gnt already initialized");
 	}
-	free(custom_config_dir);
+	g_free(custom_config_dir);
 	custom_config_dir = g_strdup(config_dir);
 }
 
 const gchar *
 gnt_get_config_dir(void)
 {
-	if (custom_config_dir)
-		return custom_config_dir;
-	return g_get_home_dir();
+	if (custom_config_dir == NULL) {
+		custom_config_dir =
+		        g_build_filename(g_get_user_config_dir(), "gnt", NULL);
+	}
+	return custom_config_dir;
 }
 
 #ifndef _WIN32
@@ -745,6 +747,8 @@ void gnt_quit()
 	gnt_uninit_colors();
 	gnt_uninit_styles();
 	endwin();
+
+	g_clear_pointer(&custom_config_dir, g_free);
 }
 
 gboolean gnt_ascii_only()
