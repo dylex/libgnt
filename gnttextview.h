@@ -34,15 +34,7 @@
 #include "gntcolors.h"
 #include "gntkeys.h"
 
-#define GNT_TYPE_TEXT_VIEW				(gnt_text_view_get_type())
-#define GNT_TEXT_VIEW(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_TEXT_VIEW, GntTextView))
-#define GNT_TEXT_VIEW_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_TEXT_VIEW, GntTextViewClass))
-#define GNT_IS_TEXT_VIEW(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_TEXT_VIEW))
-#define GNT_IS_TEXT_VIEW_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_TEXT_VIEW))
-#define GNT_TEXT_VIEW_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_TEXT_VIEW, GntTextViewClass))
-
-typedef struct _GntTextView			GntTextView;
-typedef struct _GntTextViewClass		GntTextViewClass;
+#define GNT_TYPE_TEXT_VIEW gnt_text_view_get_type()
 
 typedef enum
 {
@@ -50,17 +42,6 @@ typedef enum
 	GNT_TEXT_VIEW_WRAP_CHAR     = 1 << 1,
 	GNT_TEXT_VIEW_TOP_ALIGN     = 1 << 2,
 } GntTextViewFlag;
-
-struct _GntTextView
-{
-	GntWidget parent;
-
-	GString *string;
-	GList *list;        /* List of GntTextLine */
-
-	GList *tags;       /* A list of tags */
-	GntTextViewFlag flags;
-};
 
 typedef enum
 {
@@ -72,17 +53,6 @@ typedef enum
 	GNT_TEXT_FLAG_HIGHLIGHT   = 1 << 4,
 } GntTextFormatFlags;
 
-struct _GntTextViewClass
-{
-	GntWidgetClass parent;
-
-	/*< private >*/
-	void (*gnt_reserved1)(void);
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
-};
-
 G_BEGIN_DECLS
 
 /**
@@ -90,7 +60,7 @@ G_BEGIN_DECLS
  *
  * Returns:  GType for GntTextView.
  */
-GType gnt_text_view_get_type(void);
+G_DECLARE_FINAL_TYPE(GntTextView, gnt_text_view, GNT, TEXT_VIEW, GntWidget)
 
 /**
  * gnt_text_view_new:
