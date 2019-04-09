@@ -890,14 +890,12 @@ gnt_entry_destroy(GntWidget *widget)
 	if (entry->history)
 	{
 		entry->history = g_list_first(entry->history);
-		g_list_foreach(entry->history, (GFunc)g_free, NULL);
-		g_list_free(entry->history);
+		g_list_free_full(entry->history, g_free);
 	}
 
 	if (entry->suggests)
 	{
-		g_list_foreach(entry->suggests, (GFunc)g_free, NULL);
-		g_list_free(entry->suggests);
+		g_list_free_full(entry->suggests, g_free);
 	}
 
 	if (entry->ddown)
@@ -1174,8 +1172,7 @@ void gnt_entry_set_history_length(GntEntry *entry, int num)
 		if (entry->history)
 		{
 			entry->history = g_list_first(entry->history);
-			g_list_foreach(entry->history, (GFunc)g_free, NULL);
-			g_list_free(entry->history);
+			g_list_free_full(entry->history, g_free);
 			entry->history = NULL;
 		}
 		return;

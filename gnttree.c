@@ -1160,8 +1160,7 @@ free_tree_row(gpointer data)
 	if (!row)
 		return;
 
-	g_list_foreach(row->columns, (GFunc)free_tree_col, NULL);
-	g_list_free(row->columns);
+	g_list_free_full(row->columns, free_tree_col);
 	g_free(row);
 }
 

@@ -1382,8 +1382,7 @@ gnt_wm_destroy(GObject *obj)
 	GntWM *wm = GNT_WM(obj);
 	GList *list = NULL;
 	g_hash_table_foreach(wm->nodes, accumulate_windows, &list);
-	g_list_foreach(list, (GFunc)gnt_widget_destroy, NULL);
-	g_list_free(list);
+	g_list_free_full(list, (GDestroyNotify)gnt_widget_destroy);
 	g_hash_table_destroy(wm->nodes);
 	wm->nodes = NULL;
 

@@ -182,8 +182,7 @@ gnt_combo_box_key_pressed(GntWidget *widget, const char *text)
 			GList *list = gnt_tree_get_row_text_list(tree, key); \
 			gboolean found = FALSE; \
 			found = (list->data && g_ascii_strncasecmp(text, list->data, len) == 0); \
-			g_list_foreach(list, (GFunc)g_free, NULL); \
-			g_list_free(list); \
+			g_list_free_full(list, g_free); \
 			if (found) { \
 				if (!showing) \
 					popup_dropdown(box); \
