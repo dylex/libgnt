@@ -34,35 +34,7 @@
 #include "gntkeys.h"
 #include "gntwidget.h"
 
-#define GNT_TYPE_COMBO_BOX				(gnt_combo_box_get_type())
-#define GNT_COMBO_BOX(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_COMBO_BOX, GntComboBox))
-#define GNT_COMBO_BOX_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_COMBO_BOX, GntComboBoxClass))
-#define GNT_IS_COMBO_BOX(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_COMBO_BOX))
-#define GNT_IS_COMBO_BOX_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_COMBO_BOX))
-#define GNT_COMBO_BOX_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_COMBO_BOX, GntComboBoxClass))
-
-typedef struct _GntComboBox			GntComboBox;
-typedef struct _GntComboBoxClass		GntComboBoxClass;
-
-struct _GntComboBox
-{
-	GntWidget parent;
-
-	GntWidget *dropdown;   /* This is a GntTree */
-
-	void *selected;        /* Currently selected key */
-};
-
-struct _GntComboBoxClass
-{
-	GntWidgetClass parent;
-
-	/*< private >*/
-	void (*gnt_reserved1)(void);
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
-};
+#define GNT_TYPE_COMBO_BOX gnt_combo_box_get_type()
 
 G_BEGIN_DECLS
 
@@ -71,7 +43,7 @@ G_BEGIN_DECLS
  *
  * Returns:  Get the GType for GntComboBox
  */
-GType gnt_combo_box_get_type(void);
+G_DECLARE_FINAL_TYPE(GntComboBox, gnt_combo_box, GNT, COMBO_BOX, GntWidget)
 
 /**
  * gnt_combo_box_new:
