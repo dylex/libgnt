@@ -54,7 +54,7 @@ add_to_focus(gpointer value, gpointer data)
 
 	if (GNT_IS_BOX(w))
 		g_list_foreach(GNT_BOX(w)->list, add_to_focus, box);
-	else if (GNT_WIDGET_IS_FLAG_SET(w, GNT_WIDGET_CAN_TAKE_FOCUS))
+	else if (gnt_widget_get_take_focus(w))
 		box->focus = g_list_append(box->focus, w);
 }
 
@@ -82,8 +82,7 @@ gnt_box_draw(GntWidget *widget)
 
 	g_list_foreach(box->list, (GFunc)gnt_widget_draw, NULL);
 
-	if (box->title && !GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER))
-	{
+	if (box->title && gnt_widget_get_has_border(widget)) {
 		int pos, right;
 		char *title = g_strdup(box->title);
 
@@ -122,7 +121,7 @@ reposition_children(GntWidget *widget)
 
 	for (iter = box->list; iter; iter = iter->next)
 	{
-		if (GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(iter->data), GNT_WIDGET_INVISIBLE))
+		if (!gnt_widget_get_visible(GNT_WIDGET(iter->data)))
 			continue;
 		gnt_widget_set_position(GNT_WIDGET(iter->data), curx, cury);
 		gnt_widget_get_size(GNT_WIDGET(iter->data), &w, &h);
@@ -274,9 +273,10 @@ find_next_focus(GntBox *box)
 			box->active = iter->next->data;
 		else if (box->focus)
 			box->active = box->focus->data;
-		if (!GNT_WIDGET_IS_FLAG_SET(box->active, GNT_WIDGET_INVISIBLE) &&
-				GNT_WIDGET_IS_FLAG_SET(box->active, GNT_WIDGET_CAN_TAKE_FOCUS))
+		if (gnt_widget_get_visible(box->active) &&
+		    gnt_widget_get_take_focus(box->active)) {
 			break;
+		}
 	} while (box->active != last);
 }
 
@@ -297,7 +297,7 @@ find_prev_focus(GntBox *box)
 			box->active = g_list_last(box->focus)->data;
 		else
 			box->active = iter->prev->data;
-		if (!GNT_WIDGET_IS_FLAG_SET(box->active, GNT_WIDGET_INVISIBLE))
+		if (gnt_widget_get_visible(box->active))
 			break;
 	} while (box->active != last);
 }
@@ -308,7 +308,7 @@ gnt_box_key_pressed(GntWidget *widget, const char *text)
 	GntBox *box = GNT_BOX(widget);
 	gboolean ret;
 
-	if (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_DISABLE_ACTIONS))
+	if (!gnt_widget_get_disable_actions(widget))
 		return FALSE;
 
 	if (box->active == NULL && !find_focusable_widget(box))
@@ -422,8 +422,8 @@ gnt_box_confirm_size(GntWidget *widget, int width, int height)
 		gnt_widget_get_size(wid, &w, &h);
 
 		if (wid != last && !child && w > 0 && h > 0 &&
-				!GNT_WIDGET_IS_FLAG_SET(wid, GNT_WIDGET_INVISIBLE) &&
-				gnt_widget_confirm_size(wid, w - wchange, h - hchange)) {
+		    gnt_widget_get_visible(wid) &&
+		    gnt_widget_confirm_size(wid, w - wchange, h - hchange)) {
 			child = wid;
 			break;
 		}
@@ -519,7 +519,7 @@ gnt_box_clicked(GntWidget *widget, GntMouseEvent event, int cx, int cy)
 
 		if (cx >= x && cx < x + w && cy >= y && cy < y + h) {
 			if (event <= GNT_MIDDLE_MOUSE_DOWN &&
-				GNT_WIDGET_IS_FLAG_SET(wid, GNT_WIDGET_CAN_TAKE_FOCUS)) {
+			    gnt_widget_get_take_focus(wid)) {
 				while (widget->parent)
 					widget = widget->parent;
 				gnt_box_give_focus_to_child(GNT_BOX(widget), wid);
@@ -662,7 +662,7 @@ void gnt_box_set_title(GntBox *b, const char *title)
 	char *prev = b->title;
 	GntWidget *w = GNT_WIDGET(b);
 	b->title = g_strdup(title);
-	if (w->window && !GNT_WIDGET_IS_FLAG_SET(w, GNT_WIDGET_NO_BORDER)) {
+	if (w->window && gnt_widget_get_has_border(w)) {
 		/* Erase the old title */
 		int pos, right;
 		get_title_thingies(b, prev, &pos, &right);
@@ -691,10 +691,7 @@ void gnt_box_sync_children(GntBox *box)
 {
 	GList *iter;
 	GntWidget *widget = GNT_WIDGET(box);
-	int pos = 1;
-
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER))
-		pos = 0;
+	int pos = gnt_widget_get_has_border(widget) ? 1 : 0;
 
 	if (!box->active)
 		find_focusable_widget(box);
@@ -710,7 +707,7 @@ void gnt_box_sync_children(GntBox *box)
 			continue;
 		}
 
-		if (GNT_WIDGET_IS_FLAG_SET(w, GNT_WIDGET_INVISIBLE))
+		if (!gnt_widget_get_visible(w))
 			continue;
 
 		if (GNT_IS_BOX(w))
@@ -759,9 +756,8 @@ void gnt_box_set_alignment(GntBox *box, GntAlignment alignment)
 void gnt_box_remove(GntBox *box, GntWidget *widget)
 {
 	box->list = g_list_remove(box->list, widget);
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_CAN_TAKE_FOCUS)
-			&& GNT_WIDGET(box)->parent == NULL && box->focus)
-	{
+	if (gnt_widget_get_take_focus(widget) &&
+	    GNT_WIDGET(box)->parent == NULL && box->focus) {
 		if (widget == box->active)
 		{
 			find_next_focus(box);
@@ -771,7 +767,7 @@ void gnt_box_remove(GntBox *box, GntWidget *widget)
 		box->focus = g_list_remove(box->focus, widget);
 	}
 
-	if (GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(box), GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(GNT_WIDGET(box)))
 		gnt_widget_draw(GNT_WIDGET(box));
 }
 

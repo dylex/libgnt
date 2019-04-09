@@ -91,13 +91,20 @@ static gboolean
 gnt_widget_dummy_confirm_size(GntWidget *widget, int width, int height)
 {
 	gboolean shadow;
-	if (width < widget->priv.minw || height < widget->priv.minh)
+	if (width < widget->priv.minw || height < widget->priv.minh) {
 		return FALSE;
+	}
+
 	shadow = gnt_widget_has_shadow(widget);
-	if (widget->priv.width + shadow != width && !GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_GROW_X))
+	if (widget->priv.width + shadow != width &&
+	    !gnt_widget_get_grow_x(widget)) {
 		return FALSE;
-	if (widget->priv.height + shadow != height && !GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_GROW_Y))
+	}
+	if (widget->priv.height + shadow != height &&
+	    !gnt_widget_get_grow_y(widget)) {
 		return FALSE;
+	}
+
 	return TRUE;
 }
 
@@ -258,6 +265,14 @@ void gnt_widget_set_take_focus(GntWidget *widget, gboolean can)
 		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_CAN_TAKE_FOCUS);
 }
 
+gboolean
+gnt_widget_get_take_focus(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_CAN_TAKE_FOCUS);
+}
+
 void
 gnt_widget_destroy(GntWidget *widget)
 {
@@ -309,12 +324,13 @@ gboolean
 gnt_widget_key_pressed(GntWidget *widget, const char *keys)
 {
 	gboolean ret;
-	if (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_CAN_TAKE_FOCUS))
+	if (!gnt_widget_get_take_focus(widget))
 		return FALSE;
 
-	if (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_DISABLE_ACTIONS) &&
-			gnt_bindable_perform_action_key(GNT_BINDABLE(widget), keys))
+	if (!gnt_widget_get_disable_actions(widget) &&
+	    gnt_bindable_perform_action_key(GNT_BINDABLE(widget), keys)) {
 		return TRUE;
+	}
 
 	keys = gnt_bindable_remap_keys(GNT_BINDABLE(widget), keys);
 	g_signal_emit(widget, signals[SIG_KEY_PRESSED], 0, keys, &ret);
@@ -436,8 +452,7 @@ gnt_widget_set_size(GntWidget *widget, int width, int height)
 	if (height <= 0)
 		height = widget->priv.height;
 
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED))
-	{
+	if (gnt_widget_get_mapped(widget)) {
 		ret = gnt_widget_confirm_size(widget, width, height);
 	}
 
@@ -478,7 +493,7 @@ gnt_widget_set_size(GntWidget *widget, int width, int height)
 gboolean
 gnt_widget_set_focus(GntWidget *widget, gboolean set)
 {
-	if (!(GNT_WIDGET_FLAGS(widget) & GNT_WIDGET_CAN_TAKE_FOCUS))
+	if (!gnt_widget_get_take_focus(widget))
 		return FALSE;
 
 	if (set && !gnt_widget_get_has_focus(widget)) {
@@ -517,8 +532,9 @@ update_queue_callback(gpointer data)
 
 	if (!g_object_get_data(G_OBJECT(widget), "gnt:queue_update"))
 		return FALSE;
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(widget)) {
 		gnt_screen_update(widget);
+	}
 	g_object_set_data(G_OBJECT(widget), "gnt:queue_update", NULL);
 	return FALSE;
 }
@@ -551,6 +567,14 @@ void gnt_widget_set_visible(GntWidget *widget, gboolean set)
 		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_INVISIBLE);
 	else
 		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_INVISIBLE);
+}
+
+gboolean
+gnt_widget_get_visible(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return !GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_INVISIBLE);
 }
 
 gboolean gnt_widget_has_shadow(GntWidget *widget)

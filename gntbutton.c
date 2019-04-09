@@ -66,8 +66,9 @@ gnt_button_size_request(GntWidget *widget)
 	gnt_util_get_text_bound(button->priv->text,
 			&widget->priv.width, &widget->priv.height);
 	widget->priv.width += 4;
-	if (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER))
+	if (gnt_widget_get_has_border(widget)) {
 		widget->priv.height += 2;
+	}
 }
 
 static void

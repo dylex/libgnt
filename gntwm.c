@@ -439,7 +439,7 @@ switch_window(GntWM *wm, int direction, gboolean urgent)
 			pos = 0;
 		} else
 			wid = g_list_nth_data(wm->cws->list, pos);
-	} while (urgent && !GNT_WIDGET_IS_FLAG_SET(wid, GNT_WIDGET_URGENT) && pos != orgpos);
+	} while (urgent && !gnt_widget_get_is_urgent(wid) && pos != orgpos);
 
 	gnt_wm_raise_window(wm, wid);
 }
@@ -1033,7 +1033,7 @@ window_reverse(GntWidget *win, gboolean set, GntWM *wm)
 	int w, h;
 	WINDOW *d;
 
-	if (GNT_WIDGET_IS_FLAG_SET(win, GNT_WIDGET_NO_BORDER))
+	if (!gnt_widget_get_has_border(win))
 		return;
 
 	d = win->window;
@@ -1713,7 +1713,7 @@ update_window_in_list(GntWM *wm, GntWidget *wid)
 
 	if (wm->cws->ordered && wid == wm->cws->ordered->data)
 		flag |= GNT_TEXT_FLAG_DIM;
-	else if (GNT_WIDGET_IS_FLAG_SET(wid, GNT_WIDGET_URGENT))
+	else if (gnt_widget_get_is_urgent(wid))
 		flag |= GNT_TEXT_FLAG_BOLD;
 
 	gnt_tree_set_row_flags(GNT_TREE(wm->windows->tree), wid, flag);
@@ -1761,7 +1761,7 @@ gnt_wm_new_window_real(GntWM *wm, GntWidget *widget)
 
 	refresh_node(widget, node, GINT_TO_POINTER(TRUE));
 
-	transient = !!GNT_WIDGET_IS_FLAG_SET(node->me, GNT_WIDGET_TRANSIENT);
+	transient = gnt_widget_get_transient(node->me);
 
 #if 1
 	{
@@ -1826,8 +1826,8 @@ void gnt_wm_new_window(GntWM *wm, GntWidget *widget)
 	while (widget->parent)
 		widget = widget->parent;
 
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_INVISIBLE) ||
-			g_hash_table_lookup(wm->nodes, widget)) {
+	if (!gnt_widget_get_visible(widget) ||
+	    g_hash_table_lookup(wm->nodes, widget)) {
 		update_screen(wm);
 		return;
 	}
@@ -1845,9 +1845,10 @@ void gnt_wm_new_window(GntWM *wm, GntWidget *widget)
 	g_signal_emit(wm, signals[SIG_NEW_WIN], 0, widget);
 	g_signal_emit(wm, signals[SIG_DECORATE_WIN], 0, widget);
 
-	if (wm->windows && !GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_TRANSIENT)) {
-		if ((GNT_IS_BOX(widget) && GNT_BOX(widget)->title) && wm->_list.window != widget
-				&& GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_CAN_TAKE_FOCUS)) {
+	if (wm->windows && !gnt_widget_get_transient(widget)) {
+		if ((GNT_IS_BOX(widget) && GNT_BOX(widget)->title) &&
+		    wm->_list.window != widget &&
+		    gnt_widget_get_take_focus(widget)) {
 			gnt_tree_add_row_last(GNT_TREE(wm->windows->tree), widget,
 					gnt_tree_create_row(GNT_TREE(wm->windows->tree), GNT_BOX(widget)->title),
 					g_object_get_data(G_OBJECT(wm->windows->tree), "workspace") ? wm->cws : NULL);
@@ -1868,7 +1869,7 @@ void gnt_wm_window_close(GntWM *wm, GntWidget *widget)
 {
 	GntWS *s;
 	int pos;
-	gboolean transient = !!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_TRANSIENT);
+	gboolean transient = gnt_widget_get_transient(widget);
 
 	s = gnt_wm_widget_find_workspace(wm, widget);
 
@@ -2128,7 +2129,7 @@ void gnt_wm_move_window(GntWM *wm, GntWidget *widget, int x, int y)
 
 	g_signal_emit(wm, signals[SIG_MOVED], 0, node);
 	if (gnt_style_get_bool(GNT_STYLE_REMPOS, TRUE) && GNT_IS_BOX(widget) &&
-		!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_TRANSIENT)) {
+	    !gnt_widget_get_transient(widget)) {
 		const char *title = GNT_BOX(widget)->title;
 		if (title) {
 			GntPosition *p = g_new0(GntPosition, 1);
@@ -2191,11 +2192,11 @@ void gnt_wm_update_window(GntWM *wm, GntWidget *widget)
 	} else
 		g_signal_emit(wm, signals[SIG_UPDATE_WIN], 0, node);
 
-	if (ws == wm->cws || GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_TRANSIENT)) {
+	if (ws == wm->cws || gnt_widget_get_transient(widget)) {
 		gnt_wm_copy_win(widget, node);
 		gnt_ws_draw_taskbar(wm->cws, FALSE);
 		update_screen(wm);
-	} else if (ws && ws != wm->cws && GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_URGENT)) {
+	} else if (ws && ws != wm->cws && gnt_widget_get_is_urgent(widget)) {
 		if (!act || (act && !g_list_find(act, ws)))
 			act = g_list_prepend(act, ws);
 		update_act_msg();

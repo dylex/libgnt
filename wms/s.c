@@ -61,7 +61,7 @@ envelope_normal_window(GntWidget *win)
 {
 	int w, h;
 
-	if (GNT_WIDGET_IS_FLAG_SET(win, GNT_WIDGET_NO_BORDER | GNT_WIDGET_TRANSIENT))
+	if (!gnt_widget_get_has_border(win) || gnt_widget_get_transient(win))
 		return;
 
 	gnt_widget_get_size(win, &w, &h);
@@ -121,7 +121,7 @@ s_new_window(GntWM *wm, GntWidget *win)
 			mvwin(win->window, y, x);
 
 			gnt_widget_set_size(win, -1, h + 2);  /* XXX: Why is the +2 needed here? -- sadrul */
-		} else if (!GNT_WIDGET_IS_FLAG_SET(win, GNT_WIDGET_TRANSIENT)) {
+		} else if (!gnt_widget_get_transient(win)) {
 			const char *title = GNT_BOX(win)->title;
 			if (title == NULL || !g_hash_table_lookup(wm->positions, title)) {
 				/* In the middle of the screen */
@@ -163,8 +163,7 @@ s_mouse_clicked(G_GNUC_UNUSED GntWM *wm, GntMouseEvent event, int cx, int cy,
 		return FALSE;
 		/* This might be a place to bring up a context menu */
 
-	if (event != GNT_LEFT_MOUSE_DOWN ||
-			GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER))
+	if (event != GNT_LEFT_MOUSE_DOWN || !gnt_widget_get_has_border(widget))
 		return FALSE;
 
 	gnt_widget_get_position(widget, &x, &y);

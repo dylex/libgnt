@@ -306,8 +306,7 @@ gnt_entry_draw(GntWidget *widget)
 static void
 gnt_entry_size_request(GntWidget *widget)
 {
-	if (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED))
-	{
+	if (!gnt_widget_get_mapped(widget)) {
 		widget->priv.height = 1;
 		widget->priv.width = 20;
 	}
@@ -1102,7 +1101,7 @@ gnt_entry_set_text_internal(GntEntry *entry, const char *text)
 	if ((entry->cursor = entry->end - cursor) > entry->end)
 		entry->cursor = entry->end;
 
-	if (GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(entry), GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(GNT_WIDGET(entry)))
 		entry_redraw(GNT_WIDGET(entry));
 }
 

@@ -105,8 +105,7 @@ gnt_combo_box_draw(GntWidget *widget)
 static void
 gnt_combo_box_size_request(GntWidget *widget)
 {
-	if (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED))
-	{
+	if (!gnt_widget_get_mapped(widget)) {
 		GntWidget *dd = GNT_COMBO_BOX(widget)->dropdown;
 		gnt_widget_size_request(dd);
 		widget->priv.height = 3;   /* For now, a combobox will have border */
@@ -150,7 +149,7 @@ static gboolean
 gnt_combo_box_key_pressed(GntWidget *widget, const char *text)
 {
 	GntComboBox *box = GNT_COMBO_BOX(widget);
-	gboolean showing = !!GNT_WIDGET_IS_FLAG_SET(box->dropdown->parent, GNT_WIDGET_MAPPED);
+	gboolean showing = gnt_widget_get_mapped(box->dropdown->parent);
 
 	if (showing) {
 		if (text[1] == 0) {
@@ -215,7 +214,7 @@ static void
 gnt_combo_box_lost_focus(GntWidget *widget)
 {
 	GntComboBox *combo = GNT_COMBO_BOX(widget);
-	if (GNT_WIDGET_IS_FLAG_SET(combo->dropdown->parent, GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(combo->dropdown->parent))
 		hide_popup(combo, FALSE);
 	widget_lost_focus(widget);
 }
@@ -225,7 +224,7 @@ gnt_combo_box_clicked(GntWidget *widget, GntMouseEvent event,
                       G_GNUC_UNUSED int x, G_GNUC_UNUSED int y)
 {
 	GntComboBox *box = GNT_COMBO_BOX(widget);
-	gboolean dshowing = GNT_WIDGET_IS_FLAG_SET(box->dropdown->parent, GNT_WIDGET_MAPPED);
+	gboolean dshowing = gnt_widget_get_mapped(box->dropdown->parent);
 
 	if (event == GNT_MOUSE_SCROLL_UP) {
 		if (dshowing)
@@ -255,7 +254,7 @@ gnt_combo_box_size_changed(GntWidget *widget, G_GNUC_UNUSED int oldw,
 static gboolean
 dropdown_menu(GntBindable *b, G_GNUC_UNUSED GList *params)
 {
-	if (GNT_WIDGET_IS_FLAG_SET(GNT_COMBO_BOX(b)->dropdown->parent, GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(GNT_COMBO_BOX(b)->dropdown->parent))
 		return FALSE;
 	popup_dropdown(GNT_COMBO_BOX(b));
 	return TRUE;

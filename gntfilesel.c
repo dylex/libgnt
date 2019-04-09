@@ -200,8 +200,9 @@ location_changed(GntFileSel *sel, GError **err)
 		gnt_tree_remove_all(GNT_TREE(sel->files));
 	gnt_entry_set_text(GNT_ENTRY(sel->location), NULL);
 	if (sel->current == NULL) {
-		if (GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(sel), GNT_WIDGET_MAPPED))
+		if (gnt_widget_get_mapped(GNT_WIDGET(sel))) {
 			gnt_widget_draw(GNT_WIDGET(sel));
+		}
 		return TRUE;
 	}
 
@@ -240,8 +241,9 @@ location_changed(GntFileSel *sel, GError **err)
 		}
 	}
 	g_list_free_full(files, (GDestroyNotify)gnt_file_free);
-	if (GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(sel), GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(GNT_WIDGET(sel))) {
 		gnt_widget_draw(GNT_WIDGET(sel));
+	}
 	return TRUE;
 }
 
@@ -312,7 +314,7 @@ static void
 file_sel_changed(GntWidget *widget, G_GNUC_UNUSED gpointer old,
                  G_GNUC_UNUSED gpointer current, GntFileSel *sel)
 {
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_HAS_FOCUS)) {
+	if (gnt_widget_get_has_focus(widget)) {
 		g_free(sel->suggest);
 		sel->suggest = NULL;
 		update_location(sel);

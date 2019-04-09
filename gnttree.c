@@ -111,8 +111,9 @@ readjust_columns(GntTree *tree)
 	int width;
 #define WIDTH(i) (tree->columns[i].width_ratio ? tree->columns[i].width_ratio : tree->columns[i].width)
 	gnt_widget_get_size(GNT_WIDGET(tree), &width, NULL);
-	if (!GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(tree), GNT_WIDGET_NO_BORDER))
+	if (gnt_widget_get_has_border(GNT_WIDGET(tree))) {
 		width -= 2;
+	}
 	width -= 1;  /* Exclude the scrollbar from the calculation */
 	for (i = 0, total = 0; i < tree->ncol ; i++) {
 		if (tree->columns[i].flags & GNT_TREE_COLUMN_INVISIBLE)
@@ -425,13 +426,10 @@ redraw_tree(GntTree *tree)
 	int rows, scrcol;
 	int current = 0;
 
-	if (!GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(tree), GNT_WIDGET_MAPPED))
+	if (!gnt_widget_get_mapped(GNT_WIDGET(tree)))
 		return;
 
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER))
-		pos = 0;
-	else
-		pos = 1;
+	pos = gnt_widget_get_has_border(widget) ? 1 : 0;
 
 	if (tree->top == NULL)
 		tree->top = tree->root;
@@ -642,7 +640,7 @@ gnt_tree_size_request(GntWidget *widget)
 	{
 		GntTree *tree = GNT_TREE(widget);
 		int i, width = 0;
-		width = 1 + 2 * (!GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(tree), GNT_WIDGET_NO_BORDER));
+		width = gnt_widget_get_has_border(GNT_WIDGET(tree)) ? 3 : 1;
 		for (i = 0; i < tree->ncol; i++)
 			if (!COLUMN_INVISIBLE(tree, i)) {
 				width = width + tree->columns[i].width;
@@ -766,8 +764,10 @@ action_page_up(GntBindable *bind, G_GNUC_UNUSED GList *unused)
 	if (tree->top != tree->root)
 	{
 		int dist = get_distance(tree->top, tree->current);
-		row = get_prev_n(tree->top, widget->priv.height - 1 -
-			tree->show_title * 2 - 2 * (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER) == 0));
+		row = get_prev_n(
+		        tree->top,
+		        widget->priv.height - 1 - tree->show_title * 2 -
+		                (gnt_widget_get_has_border(widget) ? 2 : 0));
 		if (row == NULL)
 			row = tree->root;
 		tree->top = row;
@@ -896,9 +896,7 @@ gnt_tree_clicked(GntWidget *widget, GntMouseEvent event, G_GNUC_UNUSED int x,
 	} else if (event == GNT_LEFT_MOUSE_DOWN) {
 		GntTreeRow *row;
 		GntTree *tree = GNT_TREE(widget);
-		int pos = 1;
-		if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER))
-			pos = 0;
+		int pos = gnt_widget_get_has_border(widget) ? 1 : 0;
 		if (tree->show_title)
 			pos += 2;
 		pos = y - widget->priv.y - pos;
@@ -1173,16 +1171,18 @@ void gnt_tree_set_visible_rows(GntTree *tree, int rows)
 {
 	GntWidget *widget = GNT_WIDGET(tree);
 	widget->priv.height = rows;
-	if (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER))
+	if (gnt_widget_get_has_border(widget)) {
 		widget->priv.height += 2;
+	}
 }
 
 int gnt_tree_get_visible_rows(GntTree *tree)
 {
 	GntWidget *widget = GNT_WIDGET(tree);
 	int ret = widget->priv.height;
-	if (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER))
+	if (gnt_widget_get_has_border(widget)) {
 		ret -= 2;
+	}
 	return ret;
 }
 
@@ -1522,7 +1522,7 @@ void gnt_tree_remove_all(GntTree *tree)
 int gnt_tree_get_selection_visible_line(GntTree *tree)
 {
 	return get_distance(tree->top, tree->current) +
-			!!(GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(tree), GNT_WIDGET_NO_BORDER));
+	       !gnt_widget_get_has_border(GNT_WIDGET(tree));
 }
 
 void gnt_tree_change_text(GntTree *tree, gpointer key, int colno, const char *text)
@@ -1543,9 +1543,11 @@ void gnt_tree_change_text(GntTree *tree, gpointer key, int colno, const char *te
 			col->text = g_strdup(text ? text : "");
 		}
 
-		if (GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(tree), GNT_WIDGET_MAPPED) &&
-			get_distance(tree->top, row) >= 0 && get_distance(row, tree->bottom) >= 0)
+		if (gnt_widget_get_mapped(GNT_WIDGET(tree)) &&
+		    get_distance(tree->top, row) >= 0 &&
+		    get_distance(row, tree->bottom) >= 0) {
 			redraw_tree(tree);
+		}
 	}
 }
 
@@ -1791,7 +1793,7 @@ void gnt_tree_adjust_columns(GntTree *tree)
 		row = get_next(row);
 	}
 
-	twidth = 1 + 2 * (!GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(tree), GNT_WIDGET_NO_BORDER));
+	twidth = gnt_widget_get_has_border(GNT_WIDGET(tree)) ? 3 : 1;
 	for (i = 0; i < tree->ncol; i++) {
 		if (tree->columns[i].flags & GNT_TREE_COLUMN_FIXED_SIZE)
 			widths[i] = tree->columns[i].width;
@@ -1838,7 +1840,7 @@ void gnt_tree_set_column_visible(GntTree *tree, int col, gboolean vis)
 					break;
 			}
 	}
-	if (GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(tree), GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(GNT_WIDGET(tree)))
 		readjust_columns(tree);
 }
 

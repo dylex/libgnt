@@ -337,6 +337,18 @@ void gnt_widget_queue_update(GntWidget *widget);
 void gnt_widget_set_take_focus(GntWidget *widget, gboolean set);
 
 /**
+ * gnt_widget_get_take_focus:
+ * @widget:   The widget.
+ *
+ * Get whether a widget can take focus or not.
+ *
+ * Returns:   %TRUE if the widget can take focus.
+ *
+ * Since: 2.9.0
+ */
+gboolean gnt_widget_get_take_focus(GntWidget *widget);
+
+/**
  * gnt_widget_set_visible:
  * @widget:  The widget.
  * @set:     Whether the widget is visible or not.
@@ -344,6 +356,18 @@ void gnt_widget_set_take_focus(GntWidget *widget, gboolean set);
  * Set the visibility of a widget.
  */
 void gnt_widget_set_visible(GntWidget *widget, gboolean set);
+
+/**
+ * gnt_widget_get_visible:
+ * @widget:  The widget.
+ *
+ * Get the visibility of a widget.
+ *
+ * Returns:  Whether the widget is visible or not.
+ *
+ * Since: 2.9.0
+ */
+gboolean gnt_widget_get_visible(GntWidget *widget);
 
 /**
  * gnt_widget_has_shadow:
