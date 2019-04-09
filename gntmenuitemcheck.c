@@ -23,6 +23,13 @@
 #include "gntinternal.h"
 #include "gntmenuitemcheck.h"
 
+struct _GntMenuItemCheck
+{
+	GntMenuItem parent;
+
+	gboolean checked;
+};
+
 G_DEFINE_TYPE(GntMenuItemCheck, gnt_menuitem_check, GNT_TYPE_MENU_ITEM)
 
 /******************************************************************************
