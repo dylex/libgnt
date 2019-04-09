@@ -34,34 +34,7 @@
 #include "gnt.h"
 #include "gntwidget.h"
 
-#define GNT_TYPE_BUTTON				(gnt_button_get_type())
-#define GNT_BUTTON(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_BUTTON, GntButton))
-#define GNT_BUTTON_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_BUTTON, GntButtonClass))
-#define GNT_IS_BUTTON(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_BUTTON))
-#define GNT_IS_BUTTON_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_BUTTON))
-#define GNT_BUTTON_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_BUTTON, GntButtonClass))
-
-typedef struct _GntButton			GntButton;
-typedef struct _GntButtonPriv		GntButtonPriv;
-typedef struct _GntButtonClass		GntButtonClass;
-
-struct _GntButtonPriv
-{
-	char *text;
-};
-
-struct _GntButton
-{
-	GntWidget parent;
-
-	GntButtonPriv *priv;
-
-	/*< private >*/
-    void *res1;
-    void *res2;
-    void *res3;
-    void *res4;
-};
+#define GNT_TYPE_BUTTON gnt_button_get_type()
 
 struct _GntButtonClass
 {
@@ -81,7 +54,7 @@ G_BEGIN_DECLS
  *
  * Returns:  GType for Gntbutton
  */
-GType gnt_button_get_type(void);
+G_DECLARE_DERIVABLE_TYPE(GntButton, gnt_button, GNT, BUTTON, GntWidget)
 
 /**
  * gnt_button_new:
@@ -91,7 +64,7 @@ GType gnt_button_get_type(void);
  *
  * Returns:  The newly created button.
  */
-GntWidget * gnt_button_new(const char *text);
+GntWidget *gnt_button_new(const gchar *text);
 
 /**
  * gnt_button_set_text:

@@ -23,6 +23,11 @@
 #include "gntinternal.h"
 #include "gntcheckbox.h"
 
+typedef struct
+{
+	gboolean checked;
+} GntCheckBoxPrivate;
+
 enum
 {
 	SIG_TOGGLED = 1,
@@ -31,12 +36,13 @@ enum
 
 static guint signals[SIGS] = { 0 };
 
-G_DEFINE_TYPE(GntCheckBox, gnt_check_box, GNT_TYPE_BUTTON)
+G_DEFINE_TYPE_WITH_PRIVATE(GntCheckBox, gnt_check_box, GNT_TYPE_BUTTON)
 
 static void
 gnt_check_box_draw(GntWidget *widget)
 {
 	GntCheckBox *cb = GNT_CHECK_BOX(widget);
+	GntCheckBoxPrivate *priv = gnt_check_box_get_instance_private(cb);
 	GntColorType type;
 	gboolean focus = gnt_widget_has_focus(widget);
 
@@ -48,7 +54,9 @@ gnt_check_box_draw(GntWidget *widget)
 	wbkgdset(widget->window, '\0' | gnt_color_pair(type));
 
 	mvwaddch(widget->window, 0, 0, '[');
-	mvwaddch(widget->window, 0, 1, (cb->checked ? 'X' : ' ') | (focus ? A_UNDERLINE : A_NORMAL));
+	mvwaddch(widget->window, 0, 1,
+	         (priv->checked ? 'X' : ' ') |
+	                 (focus ? A_UNDERLINE : A_NORMAL));
 	mvwaddch(widget->window, 0, 2, ']');
 
 	wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_NORMAL));
@@ -62,7 +70,9 @@ gnt_check_box_draw(GntWidget *widget)
 static void
 toggle_selection(GntWidget *widget)
 {
-	GNT_CHECK_BOX(widget)->checked = !GNT_CHECK_BOX(widget)->checked;
+	GntCheckBoxPrivate *priv =
+	        gnt_check_box_get_instance_private(GNT_CHECK_BOX(widget));
+	priv->checked = !priv->checked;
 	g_signal_emit(widget, signals[SIG_TOGGLED], 0);
 	gnt_widget_draw(widget);
 }
@@ -134,16 +144,19 @@ GntWidget *gnt_check_box_new(const char *text)
 
 void gnt_check_box_set_checked(GntCheckBox *box, gboolean set)
 {
-	if (set != box->checked)
-	{
-		box->checked = set;
+	GntCheckBoxPrivate *priv = gnt_check_box_get_instance_private(box);
+
+	if (set != priv->checked) {
+		priv->checked = set;
 		g_signal_emit(box, signals[SIG_TOGGLED], 0);
 	}
 }
 
 gboolean gnt_check_box_get_checked(GntCheckBox *box)
 {
-	return box->checked;
+	GntCheckBoxPrivate *priv = gnt_check_box_get_instance_private(box);
+
+	return priv->checked;
 }
 
 
