@@ -50,7 +50,7 @@ typedef struct _GntMenuItemCheckClass		GntMenuItemCheckClass;
 struct _GntMenuItemCheck
 {
 	GntMenuItem parent;
-	gboolean checked;
+	gboolean GNTSEAL(checked);
 };
 
 struct _GntMenuItemCheckClass

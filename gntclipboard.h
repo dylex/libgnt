@@ -31,6 +31,14 @@
 #include <glib.h>
 #include <glib-object.h>
 
+#ifndef GNTSEAL
+#  if defined(GNTSEAL_ENABLE)
+#    define GNTSEAL(ident)      _gnt_sealed__ ## ident
+#  else
+#    define GNTSEAL(ident)      ident
+#  endif
+#endif /* !GNTSEAL */
+
 #define GNT_TYPE_CLIPBOARD				(gnt_clipboard_get_gtype())
 #define GNT_CLIPBOARD(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_CLIPBOARD, GntClipboard))
 #define GNT_CLIPBOARD_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_CLIPBOARD, GntClipboardClass))
@@ -44,7 +52,7 @@ typedef struct _GntClipboardClass		GntClipboardClass;
 struct _GntClipboard
 {
 	GObject inherit;
-	gchar *string;
+	gchar *GNTSEAL(string);
 };
 
 struct _GntClipboardClass

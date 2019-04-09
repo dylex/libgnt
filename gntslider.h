@@ -27,9 +27,9 @@
 #ifndef GNT_SLIDER_H
 #define GNT_SLIDER_H
 
-#include "gntwidget.h"
 #include "gnt.h"
 #include "gntlabel.h"
+#include "gntwidget.h"
 
 #define GNT_TYPE_SLIDER             (gnt_slider_get_gtype())
 #define GNT_SLIDER(obj)             (G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_SLIDER, GntSlider))
@@ -50,14 +50,14 @@ struct _GntSlider
 {
 	GntWidget parent;
 
-	gboolean vertical;
+	gboolean GNTSEAL(vertical);
 
-	int max;        /* maximum value */
-	int min;        /* minimum value */
-	int step;       /* amount to change at each step */
-	int current;    /* current value */
-	int smallstep;
-	int largestep;
+	int GNTSEAL(max);        /* maximum value */
+	int GNTSEAL(min);        /* minimum value */
+	int GNTSEAL(step);       /* amount to change at each step */
+	int GNTSEAL(current);    /* current value */
+	int GNTSEAL(smallstep);
+	int GNTSEAL(largestep);
 };
 
 struct _GntSliderClass

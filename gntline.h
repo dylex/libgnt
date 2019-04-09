@@ -27,10 +27,10 @@
 #ifndef GNT_LINE_H
 #define GNT_LINE_H
 
-#include "gntwidget.h"
 #include "gnt.h"
 #include "gntcolors.h"
 #include "gntkeys.h"
+#include "gntwidget.h"
 
 #define GNT_TYPE_LINE				(gnt_line_get_gtype())
 #define GNT_LINE(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_LINE, GntLine))
@@ -51,7 +51,7 @@ struct _GntLine
 {
 	GntWidget parent;
 
-	gboolean vertical;
+	gboolean GNTSEAL(vertical);
 };
 
 struct _GntLineClass

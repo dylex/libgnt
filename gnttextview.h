@@ -27,10 +27,10 @@
 #ifndef GNT_TEXT_VIEW_H
 #define GNT_TEXT_VIEW_H
 
-#include "gntwidget.h"
 #include "gnt.h"
 #include "gntcolors.h"
 #include "gntkeys.h"
+#include "gntwidget.h"
 
 #define GNT_TYPE_TEXT_VIEW				(gnt_text_view_get_gtype())
 #define GNT_TEXT_VIEW(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_TEXT_VIEW, GntTextView))
@@ -58,11 +58,11 @@ struct _GntTextView
 {
 	GntWidget parent;
 
-	GString *string;
-	GList *list;        /* List of GntTextLine */
+	GString *GNTSEAL(string);
+	GList *GNTSEAL(list);        /* List of GntTextLine */
 
-	GList *tags;       /* A list of tags */
-	GntTextViewFlag flags;
+	GList *GNTSEAL(tags);       /* A list of tags */
+	GntTextViewFlag GNTSEAL(flags);
 };
 
 typedef enum

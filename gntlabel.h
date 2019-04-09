@@ -45,8 +45,8 @@ struct _GntLabel
 {
 	GntWidget parent;
 
-	char *text;
-	GntTextFormatFlags flags;
+	char *GNTSEAL(text);
+	GntTextFormatFlags GNTSEAL(flags);
 
     void (*gnt_reserved1)(void);
     void (*gnt_reserved2)(void);

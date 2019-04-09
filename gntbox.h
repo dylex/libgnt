@@ -57,17 +57,17 @@ struct _GntBox
 {
 	GntWidget parent;
 
-	gboolean vertical;
-	gboolean homogeneous;
-	gboolean fill;
-	GList *list;		/* List of widgets */
+	gboolean GNTSEAL(vertical);
+	gboolean GNTSEAL(homogeneous);
+	gboolean GNTSEAL(fill);
+	GList *GNTSEAL(list);		/* List of widgets */
 
-	GntWidget *active;
-	int pad;			/* Number of spaces to use between widgets */
-	GntAlignment alignment;  /* How are the widgets going to be aligned? */
+	GntWidget *GNTSEAL(active);
+	int GNTSEAL(pad);			/* Number of spaces to use between widgets */
+	GntAlignment GNTSEAL(alignment);  /* How are the widgets going to be aligned? */
 
-	char *title;
-	GList *focus;		/* List of widgets to cycle focus (only valid for parent boxes) */
+	char *GNTSEAL(title);
+	GList *GNTSEAL(focus);		/* List of widgets to cycle focus (only valid for parent boxes) */
 
     void (*gnt_reserved1)(void);
     void (*gnt_reserved2)(void);

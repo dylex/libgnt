@@ -27,11 +27,11 @@
 #ifndef GNT_TREE_H
 #define GNT_TREE_H
 
-#include "gntwidget.h"
 #include "gnt.h"
 #include "gntcolors.h"
 #include "gntkeys.h"
 #include "gnttextview.h"
+#include "gntwidget.h"
 
 #define GNT_TYPE_TREE				(gnt_tree_get_gtype())
 #define GNT_TREE(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_TREE, GntTree))
@@ -58,32 +58,32 @@ struct _GntTree
 {
 	GntWidget parent;
 
-	GntTreeRow *current;    /* current selection */
+	GntTreeRow *GNTSEAL(current);    /* current selection */
 
-	GntTreeRow *top;        /* The topmost visible item */
-	GntTreeRow *bottom;     /* The bottommost visible item */
+	GntTreeRow *GNTSEAL(top);        /* The topmost visible item */
+	GntTreeRow *GNTSEAL(bottom);     /* The bottommost visible item */
 
-	GntTreeRow *root;       /* The root of all evil */
+	GntTreeRow *GNTSEAL(root);       /* The root of all evil */
 
-	GList *list;            /* List of GntTreeRow s */
-	GHashTable *hash;       /* We need this for quickly referencing the rows */
-	guint (*hash_func)(gconstpointer);
-	gboolean (*hash_eq_func)(gconstpointer, gconstpointer);
-	GDestroyNotify key_destroy;
-	GDestroyNotify value_destroy;
+	GList *GNTSEAL(list);            /* List of GntTreeRow s */
+	GHashTable *GNTSEAL(hash);       /* We need this for quickly referencing the rows */
+	guint (*GNTSEAL(hash_func))(gconstpointer);
+	gboolean (*GNTSEAL(hash_eq_func))(gconstpointer, gconstpointer);
+	GDestroyNotify GNTSEAL(key_destroy);
+	GDestroyNotify GNTSEAL(value_destroy);
 
-	int ncol;               /* No. of columns */
+	int GNTSEAL(ncol);               /* No. of columns */
 	struct _GntTreeColInfo
 	{
-		int width;
-		char *title;
-		int width_ratio;
-		GntTreeColumnFlag flags;
-	} *columns;             /* Would a GList be better? */
-	gboolean show_title;
-	gboolean show_separator; /* Whether to show column separators */
+		int GNTSEAL(width);
+		char *GNTSEAL(title);
+		int GNTSEAL(width_ratio);
+		GntTreeColumnFlag GNTSEAL(flags);
+	} *GNTSEAL(columns);             /* Would a GList be better? */
+	gboolean GNTSEAL(show_title);
+	gboolean GNTSEAL(show_separator); /* Whether to show column separators */
 
-	GntTreePriv *priv;
+	GntTreePriv *GNTSEAL(priv);
 };
 
 struct _GntTreeClass

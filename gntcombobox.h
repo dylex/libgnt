@@ -51,9 +51,9 @@ struct _GntComboBox
 {
 	GntWidget parent;
 
-	GntWidget *dropdown;   /* This is a GntTree */
+	GntWidget *GNTSEAL(dropdown);   /* This is a GntTree */
 
-	void *selected;        /* Currently selected key */
+	void *GNTSEAL(selected);        /* Currently selected key */
 };
 
 struct _GntComboBoxClass

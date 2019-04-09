@@ -27,6 +27,7 @@
 #ifndef GNTWS_H
 #define GNTWS_H
 
+#include "gnt.h"
 #include "gntwidget.h"
 
 #include <panel.h>
@@ -42,15 +43,15 @@ typedef struct _GntWS GntWS;
 struct _GntWS
 {
 	GntBindable inherit;
-	char *name;
-	GList *list;
-	GList *ordered;
-	gpointer ui_data;
+	char *GNTSEAL(name);
+	GList *GNTSEAL(list);
+	GList *GNTSEAL(ordered);
+	gpointer GNTSEAL(ui_data);
 
-	void *res1;
-	void *res2;
-	void *res3;
-	void *res4;
+	void *GNTSEAL(res1);
+	void *GNTSEAL(res2);
+	void *GNTSEAL(res3);
+	void *GNTSEAL(res4);
 };
 
 typedef struct _GntWSClass GntWSClass;

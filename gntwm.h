@@ -27,6 +27,7 @@
 #ifndef GNTWM_H
 #define GNTWM_H
 
+#include "gnt.h"
 #include "gntwidget.h"
 #include "gntmenu.h"
 #include "gntws.h"
@@ -80,24 +81,24 @@ struct _GntWM
 {
 	GntBindable inherit;
 
-	GMainLoop *loop;
+	GMainLoop *GNTSEAL(loop);
 
-	GList *workspaces;
-	GList *tagged; /* tagged windows */
-	GntWS *cws;
+	GList *GNTSEAL(workspaces);
+	GList *GNTSEAL(tagged); /* tagged windows */
+	GntWS *GNTSEAL(cws);
 
 	struct {
-		GntWidget *window;
-		GntWidget *tree;
-	} _list,
-		*windows,         /* Window-list window */
-		*actions;         /* Action-list window */
+		GntWidget *GNTSEAL(window);
+		GntWidget *GNTSEAL(tree);
+	} GNTSEAL(_list),
+		*GNTSEAL(windows),         /* Window-list window */
+		*GNTSEAL(actions);         /* Action-list window */
 
-	GHashTable *nodes;    /* GntWidget -> GntNode */
-	GHashTable *name_places;    /* window name -> ws*/
-	GHashTable *title_places;    /* window title -> ws */
+	GHashTable *GNTSEAL(nodes);    /* GntWidget -> GntNode */
+	GHashTable *GNTSEAL(name_places);    /* window name -> ws*/
+	GHashTable *GNTSEAL(title_places);    /* window title -> ws */
 
-	GList *acts;          /* List of actions */
+	GList *GNTSEAL(acts);          /* List of actions */
 
 	/**
 	 * There can be at most one menu at a time on the screen.
@@ -105,23 +106,23 @@ struct _GntWM
 	 * the menu until it is closed, either when the user activates a menuitem, or
 	 * presses Escape to cancel the menu.
 	 */
-	GntMenu *menu;        /* Currently active menu */
+	GntMenu *GNTSEAL(menu);        /* Currently active menu */
 
 	/**
 	 * 'event_stack' will be set to TRUE when a user-event, ie. a mouse-click
 	 * or a key-press is being processed. This variable will be used to determine
 	 * whether to give focus to a new window.
 	 */
-	gboolean event_stack;
+	gboolean GNTSEAL(event_stack);
 
-	GntKeyPressMode mode;
+	GntKeyPressMode GNTSEAL(mode);
 
-	GHashTable *positions;
+	GHashTable *GNTSEAL(positions);
 
-	void *res1;
-	void *res2;
-	void *res3;
-	void *res4;
+	void *GNTSEAL(res1);
+	void *GNTSEAL(res2);
+	void *GNTSEAL(res3);
+	void *GNTSEAL(res4);
 };
 
 typedef struct _GntWMClass GntWMClass;

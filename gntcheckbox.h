@@ -27,8 +27,8 @@
 #ifndef GNT_CHECK_BOX_H
 #define GNT_CHECK_BOX_H
 
-#include "gntbutton.h"
 #include "gnt.h"
+#include "gntbutton.h"
 #include "gntcolors.h"
 #include "gntkeys.h"
 
@@ -50,7 +50,7 @@ typedef struct _GntCheckBoxClass		GntCheckBoxClass;
 struct _GntCheckBox
 {
 	GntButton parent;
-	gboolean checked;
+	gboolean GNTSEAL(checked);
 };
 
 struct _GntCheckBoxClass

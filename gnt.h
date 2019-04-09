@@ -34,6 +34,15 @@
 #define GNT_H
 
 #include <glib.h>
+
+#ifndef GNTSEAL
+#  if defined(GNTSEAL_ENABLE)
+#    define GNTSEAL(ident)      _gnt_sealed__ ## ident
+#  else
+#    define GNTSEAL(ident)      ident
+#  endif
+#endif /* !GNTSEAL */
+
 #include "gntwidget.h"
 #include "gntclipboard.h"
 #include "gntcolors.h"

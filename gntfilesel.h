@@ -27,10 +27,10 @@
 #ifndef GNT_FILE_SEL_H
 #define GNT_FILE_SEL_H
 
-#include "gntwindow.h"
 #include "gnt.h"
 #include "gntcolors.h"
 #include "gntkeys.h"
+#include "gntwindow.h"
 
 #define GNT_TYPE_FILE_SEL				(gnt_file_sel_get_gtype())
 #define GNT_FILE_SEL(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_FILE_SEL, GntFileSel))
@@ -52,22 +52,22 @@ struct _GntFileSel
 {
 	GntWindow parent;
 
-	GntWidget *dirs;     /* list of files */
-	GntWidget *files;    /* list of directories */
-	GntWidget *location; /* location entry */
+	GntWidget *GNTSEAL(dirs);     /* list of files */
+	GntWidget *GNTSEAL(files);    /* list of directories */
+	GntWidget *GNTSEAL(location); /* location entry */
 
-	GntWidget *select;   /* select button */
-	GntWidget *cancel;   /* cancel button */
+	GntWidget *GNTSEAL(select);   /* select button */
+	GntWidget *GNTSEAL(cancel);   /* cancel button */
 
-	char *current; /* Full path of the current location */
-	char *suggest; /* Suggested filename */
+	char *GNTSEAL(current); /* Full path of the current location */
+	char *GNTSEAL(suggest); /* Suggested filename */
 	/* XXX: someone should make these useful */
-	gboolean must_exist; /* Make sure the selected file (the name entered in 'location') exists */
-	gboolean dirsonly;   /* Show only directories */
-    gboolean multiselect;
-    GList *tags;         /* List of tagged files when multiselect is set */
+	gboolean GNTSEAL(must_exist); /* Make sure the selected file (the name entered in 'location') exists */
+	gboolean GNTSEAL(dirsonly);   /* Show only directories */
+	gboolean GNTSEAL(multiselect);
+	GList *GNTSEAL(tags);         /* List of tagged files when multiselect is set */
 
-	gboolean (*read_fn)(const char *path, GList **files, GError **error);
+	gboolean (*GNTSEAL(read_fn))(const char *path, GList **files, GError **error);
 };
 
 struct _GntFileSelClass

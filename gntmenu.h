@@ -27,6 +27,7 @@
 #ifndef GNT_MENU_H
 #define GNT_MENU_H
 
+#include "gnt.h"
 #include "gnttree.h"
 #include "gntcolors.h"
 #include "gntkeys.h"
@@ -62,15 +63,15 @@ typedef enum
 struct _GntMenu
 {
 	GntTree parent;
-	GntMenuType type;
+	GntMenuType GNTSEAL(type);
 
-	GList *list;
-	int selected;
+	GList *GNTSEAL(list);
+	int GNTSEAL(selected);
 
 	/* This will keep track of its immediate submenu which is visible so that
 	 * keystrokes can be passed to it. */
-	GntMenu *submenu;
-	GntMenu *parentmenu;
+	GntMenu *GNTSEAL(submenu);
+	GntMenu *GNTSEAL(parentmenu);
 };
 
 struct _GntMenuClass

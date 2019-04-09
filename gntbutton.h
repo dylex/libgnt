@@ -52,7 +52,7 @@ struct _GntButton
 {
 	GntWidget parent;
 
-	GntButtonPriv *priv;
+	GntButtonPriv *GNTSEAL(priv);
 
     void (*gnt_reserved1)(void);
     void (*gnt_reserved2)(void);

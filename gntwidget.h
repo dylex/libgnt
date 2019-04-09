@@ -31,6 +31,14 @@
 #include <glib.h>
 #include <ncurses.h>
 
+#ifndef GNTSEAL
+#  if defined(GNTSEAL_ENABLE)
+#    define GNTSEAL(ident)      _gnt_sealed__ ## ident
+#  else
+#    define GNTSEAL(ident)      ident
+#  endif
+#endif /* !GNTSEAL */
+
 #include "gntbindable.h"
 
 #define GNT_TYPE_WIDGET				(gnt_widget_get_gtype())
@@ -87,22 +95,22 @@ typedef enum _GntParamFlags
 
 struct _GntWidgetPriv
 {
-	int x, y;
-	int width, height;
-	GntWidgetFlags flags;
-	char *name;
+	int GNTSEAL(x), GNTSEAL(y);
+	int GNTSEAL(width), GNTSEAL(height);
+	GntWidgetFlags GNTSEAL(flags);
+	char *GNTSEAL(name);
 
-	int minw, minh;    /* Minimum size for the widget */
+	int GNTSEAL(minw), GNTSEAL(minh);    /* Minimum size for the widget */
 };
 
 struct _GntWidget
 {
 	GntBindable inherit;
 
-	GntWidget *parent;
+	GntWidget *GNTSEAL(parent);
 
-	GntWidgetPriv priv;
-	WINDOW *window;
+	GntWidgetPriv GNTSEAL(priv);
+	WINDOW *GNTSEAL(window);
 
     void (*gnt_reserved1)(void);
     void (*gnt_reserved2)(void);

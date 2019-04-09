@@ -57,8 +57,8 @@ typedef enum
 struct _GntWindow
 {
 	GntBox parent;
-	GntMenu *menu;
-	GntWindowPriv *priv;
+	GntMenu *GNTSEAL(menu);
+	GntWindowPriv *GNTSEAL(priv);
 };
 
 struct _GntWindowClass

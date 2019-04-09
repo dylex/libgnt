@@ -30,6 +30,8 @@
 #include <glib.h>
 #include <glib-object.h>
 
+#include "gnt.h"
+
 #define GNT_TYPE_MENU_ITEM				(gnt_menuitem_get_gtype())
 #define GNT_MENU_ITEM(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_MENU_ITEM, GntMenuItem))
 #define GNT_MENU_ITEM_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_MENU_ITEM, GntMenuItemClass))
@@ -50,10 +52,10 @@ typedef struct _GntMenuItemClass		GntMenuItemClass;
 struct _GntMenuItemPriv
 {
 	/* These will be used to determine the position of the submenu */
-	int x;
-	int y;
-	char trigger;
-	char *id;
+	int GNTSEAL(x);
+	int GNTSEAL(y);
+	char GNTSEAL(trigger);
+	char *GNTSEAL(id);
 };
 
 typedef void (*GntMenuItemCallback)(GntMenuItem *item, gpointer data);
@@ -61,17 +63,17 @@ typedef void (*GntMenuItemCallback)(GntMenuItem *item, gpointer data);
 struct _GntMenuItem
 {
 	GObject parent;
-	GntMenuItemPriv priv;
+	GntMenuItemPriv GNTSEAL(priv);
 
-	char *text;
+	char *GNTSEAL(text);
 
 	/* A GntMenuItem can have a callback associated with it.
 	 * The callback will be activated whenever the suer selects it and presses enter (or clicks).
 	 * However, if the GntMenuItem has some child, then the callback and callbackdata will be ignored. */
-	gpointer callbackdata;
-	GntMenuItemCallback callback;
+	gpointer GNTSEAL(callbackdata);
+	GntMenuItemCallback GNTSEAL(callback);
 
-	GntMenu *submenu;
+	GntMenu *GNTSEAL(submenu);
 };
 
 struct _GntMenuItemClass
