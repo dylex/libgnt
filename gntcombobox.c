@@ -357,6 +357,14 @@ GntWidget *gnt_combo_box_new()
 	return widget;
 }
 
+GntWidget *
+gnt_combo_box_get_dropdown(GntComboBox *box)
+{
+	g_return_val_if_fail(GNT_IS_BOX(box), NULL);
+
+	return box->dropdown;
+}
+
 void gnt_combo_box_add_data(GntComboBox *box, gpointer key, const char *text)
 {
 	gnt_tree_add_row_last(GNT_TREE(box->dropdown), key,
@@ -387,4 +395,3 @@ void gnt_combo_box_remove_all(GntComboBox *box)
 	gnt_tree_remove_all(GNT_TREE(box->dropdown));
 	set_selection(box, NULL);
 }
-

@@ -53,9 +53,9 @@ struct _GntComboBox
 {
 	GntWidget parent;
 
-	GntWidget *GNTSEAL(dropdown);   /* This is a GntTree */
+	GntWidget *GNTSEAL(dropdown);   /* Deprecated. Use gnt_combo_box_get_dropdown. */
 
-	void *GNTSEAL(selected);        /* Currently selected key */
+	void *GNTSEAL(selected);        /* Deprecated. Use gnt_combo_box_get_selected_data. */
 };
 
 struct _GntComboBoxClass
@@ -86,6 +86,18 @@ GType gnt_combo_box_get_gtype(void);
  * Returns: A new GntComboBox
  */
 GntWidget * gnt_combo_box_new(void);
+
+/**
+ * gnt_combo_box_get_dropdown:
+ * @box: The GntComboBox
+ *
+ * Get the dropdown GntTree that is shown when opened
+ *
+ * Returns: (transfer none): The dropdown for the combo box
+ *
+ * Since: 2.14.0
+ */
+GntWidget *gnt_combo_box_get_dropdown(GntComboBox *box);
 
 /**
  * gnt_combo_box_add_data:
