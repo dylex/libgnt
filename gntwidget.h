@@ -162,7 +162,7 @@ struct _GntWidget
 {
 	GntBindable inherit;
 
-	GntWidget *GNTSEAL(parent);
+	GntWidget *GNTSEAL(parent); /* Deprecated. Use gnt_widget_get_parent. */
 
 	GntWidgetPriv GNTSEAL(priv);
 	WINDOW *GNTSEAL(window);
@@ -255,6 +255,18 @@ void gnt_widget_expose(GntWidget *widget, int x, int y, int width, int height);
  * Hide a widget.
  */
 void gnt_widget_hide(GntWidget *widget);
+
+/**
+ * gnt_widget_get_parent:
+ * @widget:  The widget.
+ *
+ * Get the parent of a widget.
+ *
+ * Returns: (transfer none) (nullable): The parent widget.
+ *
+ * Since: 2.14.0
+ */
+GntWidget *gnt_widget_get_parent(GntWidget *widget);
 
 /**
  * gnt_widget_get_position:
