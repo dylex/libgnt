@@ -1133,7 +1133,9 @@ refresh_screen(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 
 	gnt_ws_draw_taskbar(wm->cws, TRUE);
 	update_screen(wm);
+
 	curs_set(0);   /* endwin resets the cursor to normal */
+	keypad(stdscr, 1);
 
 	return TRUE;
 }

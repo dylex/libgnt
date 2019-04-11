@@ -310,14 +310,27 @@ refresh_window(GntWidget *widget, G_GNUC_UNUSED GntNode *node,
 	name = gnt_widget_get_name(widget);
 	if (name && strstr(name, "conversation-window")) {
 		int cx, cy, cw, ch;
+
 		gnt_widget_get_position(widget, &cx, &cy);
 		gnt_widget_get_size(widget, &cw, &ch);
+
 		find_window_position(irssi, widget, &hor, &vert);
 		get_xywh_for_frame(irssi, hor, vert, &x, &y, &w, &h);
-		if (x != cx || y != cy)
-			gnt_wm_move_window(GNT_WM(irssi), widget, x, y);
+
+		/*
+		 * Refreshing the windows on terminal resize, without breaking the layout, depends
+		 * currently on the order of the following calls:
+		 *
+		 * gnt_wm_move_window() emits the "window_moved" signal which will eventually get to
+		 * refresh_node(), which asks sanitize_position() to give maximum space to a widget
+		 * that extends out of screen, and this process may change the widget's position,
+		 * which breaks the irssi layout. To prevent that we first resize the conversation
+		 * widget to fit on the screen.
+		 */
 		if (w != cw || h != ch)
 			gnt_wm_resize_window(GNT_WM(irssi), widget, w, h);
+		if (x != cx || y != cy)
+			gnt_wm_move_window(GNT_WM(irssi), widget, x, y);
 	}
 }
 
