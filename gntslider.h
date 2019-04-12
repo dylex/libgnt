@@ -33,9 +33,18 @@
 #include "gnt.h"
 #include "gntlabel.h"
 
+G_BEGIN_DECLS
+
 #define GNT_TYPE_SLIDER gnt_slider_get_type()
 
-typedef struct _GntSlider GntSlider;
+/**
+ * gnt_slider_get_type:
+ *
+ * Returns: The GType for GntSlider
+ *
+ * Since: 2.0.0
+ */
+G_DECLARE_DERIVABLE_TYPE(GntSlider, gnt_slider, GNT, SLIDER, GntWidget)
 
 struct _GntSliderClass
 {
@@ -49,17 +58,6 @@ struct _GntSliderClass
 	void (*gnt_reserved3)(void);
 	void (*gnt_reserved4)(void);
 };
-
-G_BEGIN_DECLS
-
-/**
- * gnt_slider_get_type:
- *
- * Returns: The GType for GntSlider
- *
- * Since: 2.0.0
- */
-G_DECLARE_DERIVABLE_TYPE(GntSlider, gnt_slider, GNT, SLIDER, GntWidget)
 
 #define gnt_hslider_new(max, min) gnt_slider_new(FALSE, max, min)
 #define gnt_vslider_new(max, min) gnt_slider_new(TRUE, max, min)
