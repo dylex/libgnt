@@ -1,1 +1,1 @@
-@GNT_VERSION@
+<!ENTITY version @GNT_VERSION@>
