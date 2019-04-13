@@ -25,8 +25,8 @@
 /**
  * SECTION:gntbox
  * @section_id: libgnt-gntbox
- * @short_description: <filename>gntbox.h</filename>
- * @title: Box
+ * @title: GntBox
+ * @short_description: A box for packing widgets in a single row or column
  */
 
 #include "gnt.h"

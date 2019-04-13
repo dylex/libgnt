@@ -25,8 +25,8 @@
 /**
  * SECTION:gntclipboard
  * @section_id: libgnt-gntclipboard
- * @short_description: <filename>gntclipboard.h</filename>
- * @title: Clipboard
+ * @title: GntClipboard
+ * @short_description: A short-term text storage buffer
  */
 
 #include <stdio.h>

@@ -25,8 +25,8 @@
 /**
  * SECTION:gntwidget
  * @section_id: libgnt-gntwidget
- * @short_description: <filename>gntwidget.h</filename>
- * @title: Widget
+ * @title: GntWidget
+ * @short_description: A general widget
  */
 
 #include <stdio.h>

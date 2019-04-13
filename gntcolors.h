@@ -25,8 +25,8 @@
 /**
  * SECTION:gntcolors
  * @section_id: libgnt-gntcolors
- * @short_description: <filename>gntcolors.h</filename>
  * @title: Colors
+ * @short_description: Managing and parsing colors
  */
 
 #include <glib.h>

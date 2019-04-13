@@ -25,8 +25,8 @@
 /**
  * SECTION:gntbindable
  * @section_id: libgnt-gntbindable
- * @short_description: <filename>gntbindable.h</filename>
- * @title: Bindable
+ * @title: GntBindable
+ * @short_description: Key-bindable GObjects
  */
 
 #include <stdio.h>

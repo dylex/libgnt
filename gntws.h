@@ -25,8 +25,8 @@
 /**
  * SECTION:gntws
  * @section_id: libgnt-gntws
- * @short_description: <filename>gntws.h</filename>
- * @title: Workspace API
+ * @title: GntWS
+ * @short_description: Workspace API
  */
 
 #include "gnt.h"

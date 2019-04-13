@@ -25,8 +25,8 @@
 /**
  * SECTION:gntwm
  * @section_id: libgnt-gntwm
- * @short_description: <filename>gntwm.h</filename>
- * @title: Window-manager API
+ * @title: GntWM
+ * @short_description: A window manager
  */
 
 #include "gnt.h"

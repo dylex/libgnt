@@ -25,8 +25,9 @@
 /**
  * SECTION:gntmenuitem
  * @section_id: libgnt-gntmenuitem
- * @short_description: <filename>gntmenuitem.h</filename>
- * @title: Menuitem
+ * @title: GntMenuItem
+ * @short_description: An item within a menu
+ * @see_also: #GntMenu #GntMenuItem
  */
 
 #include <glib.h>

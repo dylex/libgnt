@@ -25,8 +25,8 @@
 /**
  * SECTION:gntprogressbar
  * @section_id: libgnt-gntprogressbar
- * @short_description: <filename>gntprogressbar.h</filename>
- * @title: Progress Bar
+ * @title: GntProgressBar
+ * @short_description: A widget that shows progress visually
  */
 
 #include "gnt.h"

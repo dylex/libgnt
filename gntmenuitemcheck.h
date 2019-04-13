@@ -25,8 +25,9 @@
 /**
  * SECTION:gntmenuitemcheck
  * @section_id: libgnt-gntmenuitemcheck
- * @short_description: <filename>gntmenuitemcheck.h</filename>
- * @title: Check Menuitem
+ * @title: GntMenuItemCheck
+ * @short_description: A menu item with a check box
+ * @see_also: #GntMenu #GntMenuItem
  */
 
 #include "gnt.h"

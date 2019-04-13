@@ -25,8 +25,8 @@
 /**
  * SECTION:gntslider
  * @section_id: libgnt-gntslider
- * @short_description: <filename>gntslider.h</filename>
- * @title: Slider
+ * @title: GntSlider
+ * @short_description: A widget for selecting from a range of values
  */
 
 #include "gnt.h"
