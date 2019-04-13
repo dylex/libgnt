@@ -25,8 +25,8 @@
 /**
  * SECTION:gntline
  * @section_id: libgnt-gntline
- * @short_description: <filename>gntline.h</filename>
- * @title: Line
+ * @title: GntLine
+ * @short_description: A widget that draws a horizontal or vertical line
  */
 
 #include "gntwidget.h"

@@ -25,8 +25,8 @@
 /*
  * SECTION:gnt-skel
  * @section_id: libgnt-gnt-skel
- * @short_description: <filename>gnt-skel.h</filename>
- * @title: Skel API
+ * @title: GntSkel
+ * @short_description: A skeleton of an example widget
  */
 
 #include "gntwidget.h"

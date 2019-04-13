@@ -23,10 +23,10 @@
 #ifndef GNT_VERSION_H
 #define GNT_VERSION_H
 /**
- * SECTION:gnt
- * @section_id: libgnt-gnt
- * @short_description: <filename>gntversion.h</filename>
- * @title: GNT Versioning
+ * SECTION:gntversion
+ * @section_id: libgnt-gntversion
+ * @title: Version Information
+ * @short_description: Variables to check the GNT version
  */
 
 #mesondefine GNT_VERSION

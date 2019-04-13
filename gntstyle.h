@@ -25,8 +25,8 @@
 /**
  * SECTION:gntstyle
  * @section_id: libgnt-gntstyle
- * @short_description: <filename>gntstyle.h</filename>
- * @title: Style API
+ * @title: Styles
+ * @short_description: Styling from a configuration file
  */
 
 #include "gnt.h"

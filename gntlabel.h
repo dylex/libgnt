@@ -25,8 +25,8 @@
 /**
  * SECTION:gntlabel
  * @section_id: libgnt-gntlabel
- * @short_description: <filename>gntlabel.h</filename>
- * @title: Label
+ * @title: GntLabel
+ * @short_description: A widget that displays text
  */
 
 #include "gnt.h"

@@ -25,8 +25,8 @@
 /**
  * SECTION:gntwindow
  * @section_id: libgnt-gntwindow
- * @short_description: <filename>gntwindow.h</filename>
- * @title: Window
+ * @title: GntWindow
+ * @short_description: A toplevel window
  */
 
 #include "gnt.h"

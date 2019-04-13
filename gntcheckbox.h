@@ -25,8 +25,9 @@
 /**
  * SECTION:gntcheckbox
  * @section_id: libgnt-gntcheckbox
- * @short_description: <filename>gntcheckbox.h</filename>
- * @title: Checkbox
+ * @title: GntCheckbox
+ * @short_description: A widget that can be toggled
+ * @see_also: #GntButton
  */
 
 #include "gntbutton.h"

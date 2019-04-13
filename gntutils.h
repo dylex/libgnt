@@ -25,8 +25,8 @@
 /**
  * SECTION:gntutils
  * @section_id: libgnt-gntutils
- * @short_description: <filename>gntutils.h</filename>
  * @title: Utility functions
+ * @short_description: Various internal utility functions
  */
 
 #include <glib.h>

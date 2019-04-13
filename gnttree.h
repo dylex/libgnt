@@ -25,8 +25,8 @@
 /**
  * SECTION:gnttree
  * @section_id: libgnt-gnttree
- * @short_description: <filename>gnttree.h</filename>
- * @title: Tree
+ * @title: GntTree
+ * @short_description: A widget that shows a tree of items
  */
 
 #include "gntwidget.h"

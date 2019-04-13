@@ -25,8 +25,9 @@
 /**
  * SECTION:gntmenu
  * @section_id: libgnt-gntmenu
- * @short_description: <filename>gntmenu.h</filename>
- * @title: Menu
+ * @title: GntMenu
+ * @short_description: A widget for a toplevel or popup menu
+ * @see_also: #GntMenuItem #GntMenuItemCheck
  */
 
 #include "gnttree.h"

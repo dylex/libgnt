@@ -25,8 +25,8 @@
 /**
  * SECTION:gntkeys
  * @section_id: libgnt-gntkeys
- * @short_description: <filename>gntkeys.h</filename>
- * @title: Keys API
+ * @title: Keys
+ * @short_description: Key value lookup and transformation
  */
 
 #include <term.h>

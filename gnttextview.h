@@ -25,8 +25,8 @@
 /**
  * SECTION:gnttextview
  * @section_id: libgnt-gnttextview
- * @short_description: <filename>gnttextview.h</filename>
- * @title: Textview
+ * @title: GntTextView
+ * @short_description: A widget for displaying larger bodies of formatted text
  */
 
 #include "gntwidget.h"

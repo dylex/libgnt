@@ -25,8 +25,9 @@
 /**
  * SECTION:gntbutton
  * @section_id: libgnt-gntbutton
- * @short_description: <filename>gntbutton.h</filename>
- * @title: Button
+ * @title: GntButton
+ * @short_description: A widget that can be activated
+ * @see_also: #GntCheckBox
  */
 
 #include <glib.h>

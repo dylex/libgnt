@@ -25,8 +25,8 @@
 /**
  * SECTION:gntentry
  * @section_id: libgnt-gntentry
- * @short_description: <filename>gntentry.h</filename>
- * @title: Entry
+ * @title: GntEntry
+ * @short_description: A widget for entering text
  */
 
 #include "gntwidget.h"

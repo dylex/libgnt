@@ -25,8 +25,8 @@
 /**
  * SECTION:gntfilesel
  * @section_id: libgnt-gntfilesel
- * @short_description: <filename>gntfilesel.h</filename>
- * @title: File Selector
+ * @title: GntFileSel
+ * @short_description: A widget for selecting a file or directory
  */
 
 #include "gntwindow.h"

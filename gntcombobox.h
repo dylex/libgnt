@@ -25,8 +25,8 @@
 /**
  * SECTION:gntcombobox
  * @section_id: libgnt-gntcombobox
- * @short_description: <filename>gntcombobox.h</filename>
- * @title: Combobox
+ * @title: GntComboBox
+ * @short_description: A widget for selecting between multiple choices
  */
 
 #include "gnt.h"

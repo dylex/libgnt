@@ -25,8 +25,8 @@
 /**
  * SECTION:gnt
  * @section_id: libgnt-gnt
- * @short_description: <filename>gnt.h</filename>
- * @title: GNT API
+ * @title: General
+ * @short_description: General API for managing GNT
  */
 
 #include <glib.h>
