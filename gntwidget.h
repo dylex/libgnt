@@ -450,7 +450,7 @@ gboolean gnt_widget_get_mapped(GntWidget *widget);
  * @widget:     The widget
  * @has_border: Whether or not the widget has a border
  *
- * Sets the has-border property on widget to has_border.
+ * Sets the has-border property on widget to @has_border.
  *
  * Since: 2.14.0
  */
@@ -487,8 +487,8 @@ void gnt_widget_set_has_shadow(GntWidget *widget, gboolean has_shadow);
  *
  * Returns the has-shadow property on widget. Note, this is a property of the
  * widget, but does not necessarily mean the widget will have a shadow as that
- * depends on its styling. Use @gnt_widget_set_has_shadow to determine
- * whether the widget will actually have a shadow.
+ * depends on its styling. Use gnt_widget_has_shadow() to determine whether the
+ * widget will actually have a shadow.
  *
  * Returns: Whether the widget has a shadow set or not.
  *
@@ -505,7 +505,7 @@ gboolean gnt_widget_get_has_shadow(GntWidget *widget);
  * necessarily mean the widget will have focus.
  *
  * This is mostly for internal use; you probably want to use
- * @gnt_widget_set_focus instead.
+ * gnt_widget_set_focus() instead.
  *
  * Since: 2.14.0
  */
@@ -518,7 +518,7 @@ void gnt_widget_set_has_focus(GntWidget *widget, gboolean has_focus);
  * Check whether a widget has the focus flag.
  *
  * This is mostly for internal use; you probably want to use
- * @gnt_widget_has_focus instead.
+ * gnt_widget_has_focus() instead.
  *
  * Returns:  %TRUE if the widget's focus flag is set, %FALSE otherwise.
  */
