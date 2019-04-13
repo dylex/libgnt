@@ -123,7 +123,7 @@ void gnt_window_set_menu(GntWindow *window, GntMenu *menu);
  *
  * Returns: (transfer none) (nullable):  The menu for the window.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 GntMenu *gnt_window_get_menu(GntWindow *window);
 

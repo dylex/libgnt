@@ -100,7 +100,7 @@ GntWidget * gnt_button_new(const char *text);
  *
  * Set the text of a button.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 void gnt_button_set_text(GntButton *button, const gchar *text);
 
@@ -112,7 +112,7 @@ void gnt_button_set_text(GntButton *button, const gchar *text);
  *
  * Returns:  The text for the button.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 const gchar *gnt_button_get_text(GntButton *button);
 

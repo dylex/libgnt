@@ -353,7 +353,7 @@ void gnt_widget_set_take_focus(GntWidget *widget, gboolean set);
  *
  * Returns:   %TRUE if the widget can take focus.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 gboolean gnt_widget_get_take_focus(GntWidget *widget);
 
@@ -374,7 +374,7 @@ void gnt_widget_set_visible(GntWidget *widget, gboolean set);
  *
  * Returns:  Whether the widget is visible or not.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 gboolean gnt_widget_get_visible(GntWidget *widget);
 
@@ -399,7 +399,7 @@ gboolean gnt_widget_has_shadow(GntWidget *widget);
  *
  * Returns:  %TRUE if the widget is being destroyed.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 gboolean gnt_widget_in_destruction(GntWidget *widget);
 
@@ -410,7 +410,7 @@ gboolean gnt_widget_in_destruction(GntWidget *widget);
  *
  * Marks the widget as being drawn (or not).
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 void gnt_widget_set_drawing(GntWidget *widget, gboolean drawing);
 
@@ -424,7 +424,7 @@ void gnt_widget_set_drawing(GntWidget *widget, gboolean drawing);
  *
  * Returns:  %TRUE if the widget is being drawn.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 gboolean gnt_widget_get_drawing(GntWidget *widget);
 
@@ -438,7 +438,7 @@ gboolean gnt_widget_get_drawing(GntWidget *widget);
  * This should generally only be called from the widget's "map" or "unmap"
  * implementation.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 void gnt_widget_set_mapped(GntWidget *widget, gboolean mapped);
 
@@ -450,7 +450,7 @@ void gnt_widget_set_mapped(GntWidget *widget, gboolean mapped);
  *
  * Returns: Whether the widget is mapped or not.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 gboolean gnt_widget_get_mapped(GntWidget *widget);
 
@@ -461,7 +461,7 @@ gboolean gnt_widget_get_mapped(GntWidget *widget);
  *
  * Sets the has-border property on widget to has_border.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 void gnt_widget_set_has_border(GntWidget *widget, gboolean has_border);
 
@@ -473,7 +473,7 @@ void gnt_widget_set_has_border(GntWidget *widget, gboolean has_border);
  *
  * Returns: Whether the widget has a border or not.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 gboolean gnt_widget_get_has_border(GntWidget *widget);
 
@@ -486,7 +486,7 @@ gboolean gnt_widget_get_has_border(GntWidget *widget);
  * property does not necessarily mean the widget will have a shadow, depending
  * on its styling.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 void gnt_widget_set_has_shadow(GntWidget *widget, gboolean has_shadow);
 
@@ -501,7 +501,7 @@ void gnt_widget_set_has_shadow(GntWidget *widget, gboolean has_shadow);
  *
  * Returns: Whether the widget has a shadow set or not.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 gboolean gnt_widget_get_has_shadow(GntWidget *widget);
 
@@ -516,7 +516,7 @@ gboolean gnt_widget_get_has_shadow(GntWidget *widget);
  * This is mostly for internal use; you probably want to use
  * @gnt_widget_set_focus instead.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 void gnt_widget_set_has_focus(GntWidget *widget, gboolean has_focus);
 
@@ -540,7 +540,7 @@ gboolean gnt_widget_get_has_focus(GntWidget *widget);
  *
  * Set the URGENT hint for a widget.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 void gnt_widget_set_is_urgent(GntWidget *widget, gboolean urgent);
 
@@ -552,7 +552,7 @@ void gnt_widget_set_is_urgent(GntWidget *widget, gboolean urgent);
  *
  * Returns: Whether the URGENT hint is set or not.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 gboolean gnt_widget_get_is_urgent(GntWidget *widget);
 
@@ -563,7 +563,7 @@ gboolean gnt_widget_get_is_urgent(GntWidget *widget);
  *
  * Whether widget should grow in the x direction.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 void gnt_widget_set_grow_x(GntWidget *widget, gboolean grow_x);
 
@@ -575,7 +575,7 @@ void gnt_widget_set_grow_x(GntWidget *widget, gboolean grow_x);
  *
  * Returns: Whether widget should grow in the x direction.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 gboolean gnt_widget_get_grow_x(GntWidget *widget);
 
@@ -586,7 +586,7 @@ gboolean gnt_widget_get_grow_x(GntWidget *widget);
  *
  * Whether widget should grow in the y direction.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 void gnt_widget_set_grow_y(GntWidget *widget, gboolean grow_y);
 
@@ -598,7 +598,7 @@ void gnt_widget_set_grow_y(GntWidget *widget, gboolean grow_y);
  *
  * Returns: Whether widget should grow in the y direction.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 gboolean gnt_widget_get_grow_y(GntWidget *widget);
 
@@ -609,7 +609,7 @@ gboolean gnt_widget_get_grow_y(GntWidget *widget);
  *
  * Whether the widget should be transient.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 void gnt_widget_set_transient(GntWidget *widget, gboolean transient);
 
@@ -621,7 +621,7 @@ void gnt_widget_set_transient(GntWidget *widget, gboolean transient);
  *
  * Returns: Whether the widget should be transient.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 gboolean gnt_widget_get_transient(GntWidget *widget);
 
@@ -632,7 +632,7 @@ gboolean gnt_widget_get_transient(GntWidget *widget);
  *
  * Whether widget actions should be disabled.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 void gnt_widget_set_disable_actions(GntWidget *widget,
                                     gboolean disable_actions);
@@ -645,7 +645,7 @@ void gnt_widget_set_disable_actions(GntWidget *widget,
  *
  * Returns: Whether the widget actions are disabled.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 gboolean gnt_widget_get_disable_actions(GntWidget *widget);
 

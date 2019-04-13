@@ -111,7 +111,7 @@ GntWidget * gnt_slider_new(gboolean orient, int max, int min);
  *
  * Returns:  Whether the slider is vertical.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 gboolean gnt_slider_get_vertical(GntSlider *slider);
 
@@ -135,7 +135,7 @@ void gnt_slider_set_range(GntSlider *slider, int max, int min);
  *
  * Get the range of the slider.
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 void gnt_slider_get_range(GntSlider *slider, int *max, int *min);
 
@@ -158,7 +158,7 @@ void gnt_slider_set_step(GntSlider *slider, int step);
  *
  * Returns:  The amount for each step
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 int gnt_slider_get_step(GntSlider *slider);
 
@@ -181,7 +181,7 @@ void gnt_slider_set_small_step(GntSlider *slider, int step);
  *
  * Returns:  The amount for a small step (of the slider)
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 int gnt_slider_get_small_step(GntSlider *slider);
 
@@ -204,7 +204,7 @@ void gnt_slider_set_large_step(GntSlider *slider, int step);
  *
  * Returns:  The amount for a large step (of the slider)
  *
- * Since: 2.9.0
+ * Since: 2.14.0
  */
 int gnt_slider_get_large_step(GntSlider *slider);
 
