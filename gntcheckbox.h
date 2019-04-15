@@ -34,22 +34,7 @@
 #include "gntcolors.h"
 #include "gntkeys.h"
 
-#define GNT_TYPE_CHECK_BOX				(gnt_check_box_get_type())
-#define GNT_CHECK_BOX(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_CHECK_BOX, GntCheckBox))
-#define GNT_CHECK_BOX_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_CHECK_BOX, GntCheckBoxClass))
-#define GNT_IS_CHECK_BOX(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_CHECK_BOX))
-#define GNT_IS_CHECK_BOX_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_CHECK_BOX))
-#define GNT_CHECK_BOX_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_CHECK_BOX, GntCheckBoxClass))
-
-typedef struct _GntCheckBox			GntCheckBox;
-typedef struct _GntCheckBoxPriv		GntCheckBoxPriv;
-typedef struct _GntCheckBoxClass		GntCheckBoxClass;
-
-struct _GntCheckBox
-{
-	GntButton parent;
-	gboolean checked;
-};
+#define GNT_TYPE_CHECK_BOX gnt_check_box_get_type()
 
 struct _GntCheckBoxClass
 {
@@ -71,7 +56,7 @@ G_BEGIN_DECLS
  *
  * Returns: GType for GntCheckBox
  */
-GType gnt_check_box_get_type(void);
+G_DECLARE_DERIVABLE_TYPE(GntCheckBox, gnt_check_box, GNT, CHECK_BOX, GntButton)
 
 /**
  * gnt_check_box_new:

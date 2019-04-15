@@ -41,7 +41,6 @@
 #define GNT_MENU_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_MENU, GntMenuClass))
 
 typedef struct _GntMenu			GntMenu;
-typedef struct _GntMenuPriv		GntMenuPriv;
 typedef struct _GntMenuClass		GntMenuClass;
 
 #include "gntmenuitem.h"

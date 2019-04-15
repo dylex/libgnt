@@ -28,6 +28,11 @@
 #include "gntstyle.h"
 #include "gntutils.h"
 
+typedef struct
+{
+	gchar *text;
+} GntButtonPrivate;
+
 enum
 {
 	SIGS = 1,
@@ -35,12 +40,13 @@ enum
 
 static gboolean small_button = FALSE;
 
-G_DEFINE_TYPE(GntButton, gnt_button, GNT_TYPE_WIDGET)
+G_DEFINE_TYPE_WITH_PRIVATE(GntButton, gnt_button, GNT_TYPE_WIDGET)
 
 static void
 gnt_button_draw(GntWidget *widget)
 {
 	GntButton *button = GNT_BUTTON(widget);
+	GntButtonPrivate *priv = gnt_button_get_instance_private(button);
 	GntColorType type;
 	gboolean focus;
 
@@ -50,7 +56,7 @@ gnt_button_draw(GntWidget *widget)
 		type = GNT_COLOR_NORMAL;
 
 	wbkgdset(widget->window, '\0' | gnt_color_pair(type));
-	mvwaddstr(widget->window, (small_button) ? 0 : 1, 2, C_(button->priv->text));
+	mvwaddstr(widget->window, (small_button) ? 0 : 1, 2, C_(priv->text));
 	if (small_button) {
 		type = GNT_COLOR_HIGHLIGHT;
 		mvwchgat(widget->window, 0, 0, widget->priv.width, focus ? A_BOLD : A_REVERSE, type, NULL);
@@ -63,8 +69,10 @@ static void
 gnt_button_size_request(GntWidget *widget)
 {
 	GntButton *button = GNT_BUTTON(widget);
-	gnt_util_get_text_bound(button->priv->text,
-			&widget->priv.width, &widget->priv.height);
+	GntButtonPrivate *priv = gnt_button_get_instance_private(button);
+
+	gnt_util_get_text_bound(priv->text, &widget->priv.width,
+	                        &widget->priv.height);
 	widget->priv.width += 4;
 	if (gnt_widget_get_has_border(widget)) {
 		widget->priv.height += 2;
@@ -94,8 +102,9 @@ static void
 gnt_button_destroy(GntWidget *widget)
 {
 	GntButton *button = GNT_BUTTON(widget);
-	g_free(button->priv->text);
-	g_free(button->priv);
+	GntButtonPrivate *priv = gnt_button_get_instance_private(button);
+
+	g_free(priv->text);
 }
 
 static gboolean
@@ -133,8 +142,6 @@ gnt_button_init(GntButton *button)
 {
 	GntWidget *widget = GNT_WIDGET(button);
 
-	button->priv = g_new0(GntButtonPriv, 1);
-
 	widget->priv.minw = 4;
 	widget->priv.minh = small_button ? 1 : 3;
 	if (small_button) {
@@ -152,10 +159,31 @@ GntWidget *gnt_button_new(const char *text)
 {
 	GntWidget *widget = g_object_new(GNT_TYPE_BUTTON, NULL);
 	GntButton *button = GNT_BUTTON(widget);
+	GntButtonPrivate *priv = gnt_button_get_instance_private(button);
 
-	button->priv->text = gnt_util_onscreen_fit_string(text, -1);
+	priv->text = gnt_util_onscreen_fit_string(text, -1);
 	gnt_widget_set_take_focus(widget, TRUE);
 
 	return widget;
 }
 
+const gchar *
+gnt_button_get_text(GntButton *button)
+{
+	GntButtonPrivate *priv = gnt_button_get_instance_private(button);
+
+	g_return_val_if_fail(GNT_IS_BUTTON(button), NULL);
+
+	return priv->text;
+}
+
+void
+gnt_button_set_text(GntButton *button, const gchar *text)
+{
+	GntButtonPrivate *priv = gnt_button_get_instance_private(button);
+
+	g_return_if_fail(GNT_IS_BUTTON(button));
+
+	g_free(priv->text);
+	priv->text = g_strdup(text);
+}

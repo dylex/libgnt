@@ -32,9 +32,15 @@
 #include <string.h>
 #include <unistd.h>
 
-enum
+struct _GntTextView
 {
-	SIGS = 1,
+	GntWidget parent;
+
+	GString *string;
+	GList *list; /* List of GntTextLine */
+
+	GList *tags; /* A list of tags */
+	GntTextViewFlag flags;
 };
 
 typedef struct

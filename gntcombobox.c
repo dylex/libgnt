@@ -29,6 +29,14 @@
 
 #include <string.h>
 
+struct _GntComboBox
+{
+	GntWidget parent;
+
+	GntWidget *dropdown; /* This is a GntTree */
+	gpointer selected;   /* Currently selected key */
+};
+
 enum
 {
 	SIG_SELECTION_CHANGED,

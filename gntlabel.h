@@ -33,40 +33,7 @@
 #include "gntwidget.h"
 #include "gnttextview.h"
 
-#define GNT_TYPE_LABEL				(gnt_label_get_type())
-#define GNT_LABEL(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_LABEL, GntLabel))
-#define GNT_LABEL_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_LABEL, GntLabelClass))
-#define GNT_IS_LABEL(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_LABEL))
-#define GNT_IS_LABEL_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_LABEL))
-#define GNT_LABEL_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_LABEL, GntLabelClass))
-
-typedef struct _GntLabel			GntLabel;
-typedef struct _GntLabelClass	GntLabelClass;
-
-struct _GntLabel
-{
-	GntWidget parent;
-
-	char *text;
-	GntTextFormatFlags flags;
-
-	/*< private >*/
-    void *res1;
-    void *res2;
-    void *res3;
-    void *res4;
-};
-
-struct _GntLabelClass
-{
-	GntWidgetClass parent;
-
-	/*< private >*/
-	void (*gnt_reserved1)(void);
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
-};
+#define GNT_TYPE_LABEL gnt_label_get_type()
 
 G_BEGIN_DECLS
 
@@ -75,7 +42,7 @@ G_BEGIN_DECLS
  *
  * Returns: GType for GntLabel.
  */
-GType gnt_label_get_type(void);
+G_DECLARE_FINAL_TYPE(GntLabel, gnt_label, GNT, LABEL, GntWidget)
 
 /**
  * gnt_label_new:

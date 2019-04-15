@@ -23,6 +23,13 @@
 #include "gntinternal.h"
 #include "gntline.h"
 
+struct _GntLine
+{
+	GntWidget parent;
+
+	gboolean vertical;
+};
+
 enum
 {
 	PROP_0,

@@ -22,6 +22,12 @@
 
 #include "gntclipboard.h"
 
+struct _GntClipboard
+{
+	GObject parent;
+	gchar *string;
+};
+
 enum {
 	SIG_CLIPBOARD = 0,
 	SIGS

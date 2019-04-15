@@ -34,12 +34,6 @@
 
 #define GNT_TYPE_CLIPBOARD  gnt_clipboard_get_type()
 
-struct _GntClipboard
-{
-	GObject inherit;
-	gchar *string;
-};
-
 G_BEGIN_DECLS
 
 /**

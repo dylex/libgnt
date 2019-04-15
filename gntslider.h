@@ -33,30 +33,18 @@
 #include "gnt.h"
 #include "gntlabel.h"
 
-#define GNT_TYPE_SLIDER             (gnt_slider_get_type())
-#define GNT_SLIDER(obj)             (G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_SLIDER, GntSlider))
-#define GNT_SLIDER_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_SLIDER, GntSliderClass))
-#define GNT_IS_SLIDER(obj)          (G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_SLIDER))
-#define GNT_IS_SLIDER_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_SLIDER))
-#define GNT_SLIDER_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_SLIDER, GntSliderClass))
+G_BEGIN_DECLS
 
-typedef struct _GntSlider			GntSlider;
-typedef struct _GntSliderPriv		GntSliderPriv;
-typedef struct _GntSliderClass		GntSliderClass;
+#define GNT_TYPE_SLIDER gnt_slider_get_type()
 
-struct _GntSlider
-{
-	GntWidget parent;
-
-	gboolean vertical;
-
-	int max;        /* maximum value */
-	int min;        /* minimum value */
-	int step;       /* amount to change at each step */
-	int current;    /* current value */
-	int smallstep;
-	int largestep;
-};
+/**
+ * gnt_slider_get_type:
+ *
+ * Returns: The GType for GntSlider
+ *
+ * Since: 2.0.0
+ */
+G_DECLARE_DERIVABLE_TYPE(GntSlider, gnt_slider, GNT, SLIDER, GntWidget)
 
 struct _GntSliderClass
 {
@@ -70,17 +58,6 @@ struct _GntSliderClass
 	void (*gnt_reserved3)(void);
 	void (*gnt_reserved4)(void);
 };
-
-G_BEGIN_DECLS
-
-/**
- * gnt_slider_get_type:
- *
- * Returns: The GType for GntSlider
- *
- * Since: 2.0.0
- */
-GType gnt_slider_get_type(void);
 
 #define gnt_hslider_new(max, min) gnt_slider_new(FALSE, max, min)
 #define gnt_vslider_new(max, min) gnt_slider_new(TRUE, max, min)
@@ -100,6 +77,18 @@ GType gnt_slider_get_type(void);
 GntWidget * gnt_slider_new(gboolean orient, int max, int min);
 
 /**
+ * gnt_slider_get_vertical:
+ * @slider:  The slider
+ *
+ * Get whether the slider is vertical or not.
+ *
+ * Returns:  Whether the slider is vertical.
+ *
+ * Since: 2.14.0
+ */
+gboolean gnt_slider_get_vertical(GntSlider *slider);
+
+/**
  * gnt_slider_set_range:
  * @slider:  The slider
  * @max:     The maximum value
@@ -110,6 +99,18 @@ GntWidget * gnt_slider_new(gboolean orient, int max, int min);
  * Since: 2.0.0
  */
 void gnt_slider_set_range(GntSlider *slider, int max, int min);
+
+/**
+ * gnt_slider_get_range:
+ * @slider:     The slider
+ * @max: (out): The maximum value
+ * @min: (out): The minimum value
+ *
+ * Get the range of the slider.
+ *
+ * Since: 2.14.0
+ */
+void gnt_slider_get_range(GntSlider *slider, int *max, int *min);
 
 /**
  * gnt_slider_set_step:
@@ -123,6 +124,18 @@ void gnt_slider_set_range(GntSlider *slider, int max, int min);
 void gnt_slider_set_step(GntSlider *slider, int step);
 
 /**
+ * gnt_slider_get_step:
+ * @slider:  The slider
+ *
+ * Gets the amount of change at each step.
+ *
+ * Returns:  The amount for each step
+ *
+ * Since: 2.14.0
+ */
+int gnt_slider_get_step(GntSlider *slider);
+
+/**
  * gnt_slider_set_small_step:
  * @slider:  The slider
  * @step:    The amount for a small step (for the slider)
@@ -134,6 +147,18 @@ void gnt_slider_set_step(GntSlider *slider, int step);
 void gnt_slider_set_small_step(GntSlider *slider, int step);
 
 /**
+ * gnt_slider_get_small_step:
+ * @slider:  The slider
+ *
+ * Gets the amount of change for a small step.
+ *
+ * Returns:  The amount for a small step (of the slider)
+ *
+ * Since: 2.14.0
+ */
+int gnt_slider_get_small_step(GntSlider *slider);
+
+/**
  * gnt_slider_set_large_step:
  * @slider:  The slider
  * @step:    The amount for a large step (for the slider)
@@ -143,6 +168,18 @@ void gnt_slider_set_small_step(GntSlider *slider, int step);
  * Since: 2.2.0
  */
 void gnt_slider_set_large_step(GntSlider *slider, int step);
+
+/**
+ * gnt_slider_get_large_step:
+ * @slider:  The slider
+ *
+ * Gets the amount of change for a large step.
+ *
+ * Returns:  The amount for a large step (of the slider)
+ *
+ * Since: 2.14.0
+ */
+int gnt_slider_get_large_step(GntSlider *slider);
 
 /**
  * gnt_slider_advance_step:

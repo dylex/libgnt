@@ -34,33 +34,7 @@
 #include "gntkeys.h"
 #include "gntmenuitem.h"
 
-#define GNT_TYPE_MENU_ITEM_CHECK				(gnt_menuitem_check_get_type())
-#define GNT_MENU_ITEM_CHECK(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_MENU_ITEM_CHECK, GntMenuItemCheck))
-#define GNT_MENU_ITEM_CHECK_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_MENU_ITEM_CHECK, GntMenuItemCheckClass))
-#define GNT_IS_MENU_ITEM_CHECK(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_MENU_ITEM_CHECK))
-#define GNT_IS_MENU_ITEM_CHECK_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_MENU_ITEM_CHECK))
-#define GNT_MENU_ITEM_CHECK_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_MENU_ITEM_CHECK, GntMenuItemCheckClass))
-
-typedef struct _GntMenuItemCheck			GntMenuItemCheck;
-typedef struct _GntMenuItemCheckPriv		GntMenuItemCheckPriv;
-typedef struct _GntMenuItemCheckClass		GntMenuItemCheckClass;
-
-struct _GntMenuItemCheck
-{
-	GntMenuItem parent;
-	gboolean checked;
-};
-
-struct _GntMenuItemCheckClass
-{
-	GntMenuItemClass parent;
-
-	/*< private >*/
-	void (*gnt_reserved1)(void);
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
-};
+#define GNT_TYPE_MENU_ITEM_CHECK gnt_menuitem_check_get_type()
 
 G_BEGIN_DECLS
 
@@ -69,7 +43,8 @@ G_BEGIN_DECLS
  *
  * Returns: GType for GntMenuItemCheck.
  */
-GType gnt_menuitem_check_get_type(void);
+G_DECLARE_FINAL_TYPE(GntMenuItemCheck, gnt_menuitem_check, GNT, MENU_ITEM_CHECK,
+                     GntMenuItem)
 
 /**
  * gnt_menuitem_check_new:

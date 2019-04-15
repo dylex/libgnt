@@ -36,28 +36,12 @@
 #include "gntmenu.h"
 
 #define GNT_TYPE_WINDOW				(gnt_window_get_type())
-#define GNT_WINDOW(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_WINDOW, GntWindow))
-#define GNT_WINDOW_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_WINDOW, GntWindowClass))
-#define GNT_IS_WINDOW(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_WINDOW))
-#define GNT_IS_WINDOW_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_WINDOW))
-#define GNT_WINDOW_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_WINDOW, GntWindowClass))
-
-typedef struct _GntWindow			GntWindow;
-typedef struct _GntWindowPriv		GntWindowPriv;
-typedef struct _GntWindowClass		GntWindowClass;
 
 typedef enum
 {
 	GNT_WINDOW_MAXIMIZE_X = 1 << 0,
 	GNT_WINDOW_MAXIMIZE_Y = 1 << 1,
 } GntWindowFlags;
-
-struct _GntWindow
-{
-	GntBox parent;
-	GntMenu *menu;
-	GntWindowPriv *priv;
-};
 
 struct _GntWindowClass
 {
@@ -77,7 +61,7 @@ G_BEGIN_DECLS
  *
  * Returns:  GType for GntWindow.
  */
-GType gnt_window_get_type(void);
+G_DECLARE_DERIVABLE_TYPE(GntWindow, gnt_window, GNT, WINDOW, GntBox)
 
 #define gnt_vwindow_new(homo) gnt_window_box_new(homo, TRUE)
 #define gnt_hwindow_new(homo) gnt_window_box_new(homo, FALSE)
@@ -110,6 +94,18 @@ GntWidget * gnt_window_box_new(gboolean homo, gboolean vert);
  * Set the menu for a window.
  */
 void gnt_window_set_menu(GntWindow *window, GntMenu *menu);
+
+/**
+ * gnt_window_get_menu:
+ * @window:  The window.
+ *
+ * Get the menu for a window.
+ *
+ * Returns: (transfer none) (nullable):  The menu for the window.
+ *
+ * Since: 2.14.0
+ */
+GntMenu *gnt_window_get_menu(GntWindow *window);
 
 /**
  * gnt_window_get_accel_item:

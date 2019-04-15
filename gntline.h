@@ -34,34 +34,7 @@
 #include "gntcolors.h"
 #include "gntkeys.h"
 
-#define GNT_TYPE_LINE				(gnt_line_get_type())
-#define GNT_LINE(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_LINE, GntLine))
-#define GNT_LINE_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_LINE, GntLineClass))
-#define GNT_IS_LINE(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_LINE))
-#define GNT_IS_LINE_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_LINE))
-#define GNT_LINE_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_LINE, GntLineClass))
-
-typedef struct _GntLine			GntLine;
-typedef struct _GntLinePriv		GntLinePriv;
-typedef struct _GntLineClass		GntLineClass;
-
-struct _GntLine
-{
-	GntWidget parent;
-
-	gboolean vertical;
-};
-
-struct _GntLineClass
-{
-	GntWidgetClass parent;
-
-	/*< private >*/
-	void (*gnt_reserved1)(void);
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
-};
+#define GNT_TYPE_LINE gnt_line_get_type()
 
 G_BEGIN_DECLS
 
@@ -70,7 +43,7 @@ G_BEGIN_DECLS
  *
  * Returns: GType for GntLine.
  */
-GType gnt_line_get_type(void);
+G_DECLARE_FINAL_TYPE(GntLine, gnt_line, GNT, LINE, GntWidget)
 
 #define gnt_hline_new() gnt_line_new(FALSE)
 #define gnt_vline_new() gnt_line_new(TRUE)

@@ -26,6 +26,14 @@
 
 #include <string.h>
 
+struct _GntLabel
+{
+	GntWidget parent;
+
+	gchar *text;
+	GntTextFormatFlags flags;
+};
+
 enum
 {
 	PROP_0,
