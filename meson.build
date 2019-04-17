@@ -231,3 +231,4 @@ pkgconfig.generate(
 
 subdir('wms')
 subdir('test')
+subdir('doc')
