@@ -17,6 +17,11 @@ tasks:
     type: docker/logout
     server: docker.io
 
+  clean:
+    type: convey/clean
+    files:
+      - build-convey
+
   build-docs:
     type: docker/run
     image: libgnt/builders:debian-buster-amd64
@@ -57,4 +62,8 @@ plans:
         run: always
         tasks:
           - logout
+
+  clean:
+    stages:
+      - tasks: clean
 
