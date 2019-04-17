@@ -27,6 +27,13 @@
 #include "gntstyle.h"
 #include "gntutils.h"
 
+/* Yes, there are two "private" types; we should migrate contents of
+ * GntWidgetPriv here when we break ABI. */
+typedef struct
+{
+	guint queue_update;
+} GntWidgetPrivate;
+
 enum
 {
 	SIG_DESTROY,
@@ -51,7 +58,7 @@ static guint signals[SIGS] = { 0 };
 
 static void init_widget(GntWidget *widget);
 
-G_DEFINE_TYPE(GntWidget, gnt_widget, GNT_TYPE_BINDABLE)
+G_DEFINE_TYPE_WITH_PRIVATE(GntWidget, gnt_widget, GNT_TYPE_BINDABLE)
 
 /******************************************************************************
  * GObject Implementation
@@ -75,7 +82,11 @@ static void
 gnt_widget_dispose(GObject *obj)
 {
 	GntWidget *self = GNT_WIDGET(obj);
+	GntWidgetPrivate *priv = gnt_widget_get_instance_private(self);
+
 	g_signal_emit(self, signals[SIG_DESTROY], 0);
+	g_source_remove(priv->queue_update);
+
 	G_OBJECT_CLASS(gnt_widget_parent_class)->dispose(obj);
 }
 
@@ -529,28 +540,33 @@ static gboolean
 update_queue_callback(gpointer data)
 {
 	GntWidget *widget = GNT_WIDGET(data);
+	GntWidgetPrivate *priv = gnt_widget_get_instance_private(widget);
 
-	if (!g_object_get_data(G_OBJECT(widget), "gnt:queue_update"))
+	if (priv->queue_update == 0) {
 		return FALSE;
+	}
 	if (gnt_widget_get_mapped(widget)) {
 		gnt_screen_update(widget);
 	}
-	g_object_set_data(G_OBJECT(widget), "gnt:queue_update", NULL);
+	priv->queue_update = 0;
 	return FALSE;
 }
 
 void gnt_widget_queue_update(GntWidget *widget)
 {
+	GntWidgetPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
 	if (widget->window == NULL)
 		return;
 	while (widget->parent)
 		widget = widget->parent;
 
-	if (!g_object_get_data(G_OBJECT(widget), "gnt:queue_update"))
-	{
-		int id = g_timeout_add(0, update_queue_callback, widget);
-		g_object_set_data_full(G_OBJECT(widget), "gnt:queue_update", GINT_TO_POINTER(id),
-				(GDestroyNotify)g_source_remove);
+	priv = gnt_widget_get_instance_private(widget);
+	if (priv->queue_update == 0) {
+		priv->queue_update =
+		        g_timeout_add(0, update_queue_callback, widget);
 	}
 }
 
