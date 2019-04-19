@@ -60,7 +60,7 @@ struct _GntTextView
 {
 	GntWidget parent;
 
-	GString *GNTSEAL(string);
+	GString *GNTSEAL(string);    /* Deprecated. Use gnt_text_view_get_text. */
 	GList *GNTSEAL(list);        /* List of GntTextLine */
 
 	GList *GNTSEAL(tags);       /* A list of tags */
@@ -135,6 +135,18 @@ void gnt_text_view_append_text_with_flags(GntTextView *view, const char *text, G
  * Append text in the textview, with some identifier (tag) for the added text.
  */
 void gnt_text_view_append_text_with_tag(GntTextView *view, const char *text, GntTextFormatFlags flags, const char *tag);
+
+/**
+ * gnt_text_view_get_text:
+ * @view:   The textview.
+ *
+ * Get the text of the textview.
+ *
+ * Returns: The text.
+ *
+ * Since: 2.14.0
+ */
+const gchar *gnt_text_view_get_text(GntTextView *view);
 
 /**
  * gnt_text_view_next_line:
