@@ -44,6 +44,7 @@
 enum
 {
 	SIG_FILE_SELECTED,
+	SIG_CANCELLED,
 	SIGS
 };
 
@@ -53,6 +54,7 @@ static void (*orig_map)(GntWidget *widget);
 static void (*orig_size_request)(GntWidget *widget);
 
 static void select_activated_cb(GntWidget *button, GntFileSel *sel);
+static void cancel_activated_cb(GntWidget *button, GntFileSel *sel);
 
 static void
 gnt_file_sel_destroy(GntWidget *widget)
@@ -508,6 +510,24 @@ gnt_file_sel_class_init(GntFileSelClass *klass)
 					 gnt_closure_marshal_VOID__STRING_STRING,
 					 G_TYPE_NONE, 2, G_TYPE_STRING, G_TYPE_STRING);
 
+	/**
+	 * GntFileSel::cancelled
+	 * @widget: The file selection window that received the signal
+	 *
+	 * The ::cancelled signal is emitted when the Cancel button on a
+	 * #GntFileSel is activated.
+	 *
+	 * Since: 2.14.0
+	 */
+	signals[SIG_CANCELLED] =
+		g_signal_new("cancelled",
+				G_TYPE_FROM_CLASS(klass),
+				G_SIGNAL_RUN_LAST,
+				G_STRUCT_OFFSET(GntFileSelClass, cancelled),
+				NULL, NULL,
+				g_cclosure_marshal_VOID__VOID,
+				G_TYPE_NONE, 0);
+
 	gnt_bindable_class_register_action(bindable, "toggle-tag", toggle_tag_selection, "t", NULL);
 	gnt_bindable_class_register_action(bindable, "clear-tags", clear_tags, "c", NULL);
 	gnt_bindable_class_register_action(bindable, "up-directory", up_directory, GNT_KEY_BACKSPACE, NULL);
@@ -544,6 +564,8 @@ gnt_file_sel_init(GTypeInstance *instance, gpointer class)
 	g_signal_connect(G_OBJECT(sel->location), "key_pressed", G_CALLBACK(location_key_pressed), sel);
 
 	sel->cancel = gnt_button_new("Cancel");
+	g_signal_connect(G_OBJECT(sel->cancel), "activate", G_CALLBACK(cancel_activated_cb), sel);
+
 	sel->select = gnt_button_new("Select");
 
 	g_signal_connect_swapped(G_OBJECT(sel->files), "activate", G_CALLBACK(gnt_widget_activate), sel->select);
@@ -589,6 +611,12 @@ select_activated_cb(GntWidget *button, GntFileSel *sel)
 	g_signal_emit(sel, signals[SIG_FILE_SELECTED], 0, path, file);
 	g_free(file);
 	g_free(path);
+}
+
+static void
+cancel_activated_cb(GntWidget *button, GntFileSel *sel)
+{
+	g_signal_emit(sel, signals[SIG_CANCELLED], 0);
 }
 
 GntWidget *gnt_file_sel_new(void)
