@@ -501,6 +501,16 @@ gnt_file_sel_class_init(GntFileSelClass *klass)
 	orig_size_request = kl->size_request;
 	kl->size_request = gnt_file_sel_size_request;
 
+	/**
+	 * GntFileSel::file-selected
+	 * @widget: The file selection window that received the signal
+	 * @path: The full path to the selected file
+	 * @file: The name of the file only
+	 *
+	 * The ::file-selected signal is emitted when the Select button or the
+	 * file tree on a #GntFileSel is activated.
+	 *
+	 */
 	signals[SIG_FILE_SELECTED] =
 		g_signal_new("file_selected",
 					 G_TYPE_FROM_CLASS(klass),
