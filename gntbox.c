@@ -710,6 +710,14 @@ void gnt_box_set_toplevel(GntBox *box, gboolean set)
 	gnt_widget_set_take_focus(widget, set);
 }
 
+GList *
+gnt_box_get_children(GntBox *box)
+{
+	g_return_val_if_fail(GNT_IS_BOX(box), NULL);
+
+	return g_list_copy(box->list);
+}
+
 void gnt_box_sync_children(GntBox *box)
 {
 	GList *iter;

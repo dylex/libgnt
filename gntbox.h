@@ -62,7 +62,7 @@ struct _GntBox
 	gboolean GNTSEAL(vertical);
 	gboolean GNTSEAL(homogeneous);
 	gboolean GNTSEAL(fill);
-	GList *GNTSEAL(list);		/* List of widgets */
+	GList *GNTSEAL(list);		/* Deprecated. Use gnt_box_get_children. */
 
 	GntWidget *GNTSEAL(active);
 	int GNTSEAL(pad);			/* Number of spaces to use between widgets */
@@ -114,6 +114,19 @@ GType gnt_box_get_gtype(void);
  * Returns: The new GntBox.
  */
 GntWidget * gnt_box_new(gboolean homo, gboolean vert);
+
+/**
+ * gnt_box_get_children:
+ * @box: The box
+ *
+ * Returns a list of the children of the widget.
+ *
+ * Returns: (element-type GntWidget) (transfer container): A new list
+ *          containing the children of the box.
+ *
+ * Since: 2.14.0
+ */
+GList *gnt_box_get_children(GntBox *box);
 
 /**
  * gnt_box_add_widget:
