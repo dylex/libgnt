@@ -64,6 +64,11 @@ typedef enum
 
 #define GNT_ENTRY_FLAG_ALL    (GNT_ENTRY_FLAG_ALPHA | GNT_ENTRY_FLAG_INT)
 
+/**
+ * GntEntry:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntEntry
 {
 	GntWidget parent;

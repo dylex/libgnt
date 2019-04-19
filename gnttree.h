@@ -56,6 +56,11 @@ typedef enum _GntTreeColumnFlag {
 	GNT_TREE_COLUMN_RIGHT_ALIGNED = 1 << 3,
 } GntTreeColumnFlag;
 
+/**
+ * GntTree:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntTree
 {
 	GntWidget parent;

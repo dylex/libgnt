@@ -52,6 +52,11 @@ typedef struct _GntMenuItemClass		GntMenuItemClass;
 
 #include "gntmenu.h"
 
+/**
+ * GntMenuItemPriv:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntMenuItemPriv
 {
 	/* These will be used to determine the position of the submenu */
@@ -63,6 +68,11 @@ struct _GntMenuItemPriv
 
 typedef void (*GntMenuItemCallback)(GntMenuItem *item, gpointer data);
 
+/**
+ * GntMenuItem:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntMenuItem
 {
 	GObject parent;

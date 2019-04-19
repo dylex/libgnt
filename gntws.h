@@ -42,6 +42,11 @@
 
 typedef struct _GntWS GntWS;
 
+/**
+ * GntWS:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntWS
 {
 	GntBindable inherit;

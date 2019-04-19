@@ -51,6 +51,11 @@
 typedef struct _GntClipboard			GntClipboard;
 typedef struct _GntClipboardClass		GntClipboardClass;
 
+/**
+ * GntClipboard:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntClipboard
 {
 	GObject inherit;

@@ -49,6 +49,11 @@ typedef struct _GntComboBox			GntComboBox;
 typedef struct _GntComboBoxPriv		GntComboBoxPriv;
 typedef struct _GntComboBoxClass		GntComboBoxClass;
 
+/**
+ * GntComboBox:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntComboBox
 {
 	GntWidget parent;

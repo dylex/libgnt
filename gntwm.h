@@ -91,6 +91,9 @@ typedef struct _GntAction
  * @event_stack: Will be set to %TRUE when a user-event, ie. a mouse-click or a
  *               key-press is being processed. This variable will be used to
  *               determine whether to give focus to a new window.
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ *
  */
 struct _GntWM
 {

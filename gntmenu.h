@@ -67,6 +67,11 @@ typedef enum
 	GNT_MENU_POPUP,
 } GntMenuType;
 
+/**
+ * GntMenu:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntMenu
 {
 	GntTree parent;
