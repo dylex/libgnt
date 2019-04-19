@@ -269,6 +269,19 @@ void gnt_widget_hide(GntWidget *widget);
 GntWidget *gnt_widget_get_parent(GntWidget *widget);
 
 /**
+ * gnt_widget_get_toplevel:
+ * @widget:  The widget.
+ *
+ * Get the toplevel parent of a widget in the container hierarchy. If widget
+ * has no parent widgets, it will be returned as the topmost widget.
+ *
+ * Returns: (transfer none) (nullable): The toplevel parent widget.
+ *
+ * Since: 2.14.0
+ */
+GntWidget *gnt_widget_get_toplevel(GntWidget *widget);
+
+/**
  * gnt_widget_get_position:
  * @widget:  The widget.
  * @x:       Location to store the x-coordinate of the widget.

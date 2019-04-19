@@ -455,6 +455,18 @@ gnt_widget_get_parent(GntWidget *widget)
 	return widget->parent;
 }
 
+GntWidget *
+gnt_widget_get_toplevel(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), NULL);
+
+	while (widget->parent) {
+		widget = widget->parent;
+	}
+
+	return widget;
+}
+
 void
 gnt_widget_set_position(GntWidget *wid, int x, int y)
 {
