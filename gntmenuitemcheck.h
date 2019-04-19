@@ -50,6 +50,11 @@ typedef struct _GntMenuItemCheck			GntMenuItemCheck;
 typedef struct _GntMenuItemCheckPriv		GntMenuItemCheckPriv;
 typedef struct _GntMenuItemCheckClass		GntMenuItemCheckClass;
 
+/**
+ * GntMenuItemCheck:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntMenuItemCheck
 {
 	GntMenuItem parent;

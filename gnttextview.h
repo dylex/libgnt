@@ -56,6 +56,11 @@ typedef enum
 	GNT_TEXT_VIEW_TOP_ALIGN     = 1 << 2,
 } GntTextViewFlag;
 
+/**
+ * GntTextView:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntTextView
 {
 	GntWidget parent;

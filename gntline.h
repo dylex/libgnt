@@ -49,6 +49,11 @@ typedef struct _GntLine			GntLine;
 typedef struct _GntLinePriv		GntLinePriv;
 typedef struct _GntLineClass		GntLineClass;
 
+/**
+ * GntLine:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntLine
 {
 	GntWidget parent;

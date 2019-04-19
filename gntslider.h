@@ -48,6 +48,11 @@ typedef struct _GntSlider			GntSlider;
 typedef struct _GntSliderPriv		GntSliderPriv;
 typedef struct _GntSliderClass		GntSliderClass;
 
+/**
+ * GntSlider:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntSlider
 {
 	GntWidget parent;

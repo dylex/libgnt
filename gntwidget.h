@@ -148,6 +148,11 @@ typedef enum _GntParamFlags
 	GNT_PARAM_SERIALIZABLE	= 1 << G_PARAM_USER_SHIFT
 } GntParamFlags;
 
+/**
+ * GntWidgetPriv:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntWidgetPriv
 {
 	int GNTSEAL(x), GNTSEAL(y);
@@ -158,6 +163,11 @@ struct _GntWidgetPriv
 	int GNTSEAL(minw), GNTSEAL(minh);    /* Minimum size for the widget */
 };
 
+/**
+ * GntWidget:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntWidget
 {
 	GntBindable inherit;

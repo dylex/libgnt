@@ -51,6 +51,11 @@ struct _GntButtonPriv
 	char *text;
 };
 
+/**
+ * GntButton:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntButton
 {
 	GntWidget parent;

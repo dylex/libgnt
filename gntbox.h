@@ -55,6 +55,11 @@ typedef enum
 	GNT_ALIGN_BOTTOM
 } GntAlignment;
 
+/**
+ * GntBox:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntBox
 {
 	GntWidget parent;

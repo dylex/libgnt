@@ -50,6 +50,11 @@ typedef struct _GntFileSelPriv		GntFileSelPriv;
 typedef struct _GntFileSelClass		GntFileSelClass;
 typedef struct _GntFile             GntFile;
 
+/**
+ * GntFileSel:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntFileSel
 {
 	GntWindow parent;

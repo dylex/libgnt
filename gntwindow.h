@@ -56,6 +56,11 @@ typedef enum
 	GNT_WINDOW_MAXIMIZE_Y = 1 << 1,
 } GntWindowFlags;
 
+/**
+ * GntWindow:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntWindow
 {
 	GntBox parent;

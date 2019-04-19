@@ -50,6 +50,11 @@ typedef struct _GntCheckBox			GntCheckBox;
 typedef struct _GntCheckBoxPriv		GntCheckBoxPriv;
 typedef struct _GntCheckBoxClass		GntCheckBoxClass;
 
+/**
+ * GntCheckBox:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntCheckBox
 {
 	GntButton parent;

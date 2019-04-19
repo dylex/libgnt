@@ -43,6 +43,11 @@
 typedef struct _GntLabel			GntLabel;
 typedef struct _GntLabelClass	GntLabelClass;
 
+/**
+ * GntLabel:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntLabel
 {
 	GntWidget parent;
