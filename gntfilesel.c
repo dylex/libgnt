@@ -636,7 +636,7 @@ select_activated_cb(G_GNUC_UNUSED GntWidget *button, GntFileSel *sel)
 }
 
 static void
-cancel_activated_cb(GntWidget *button, GntFileSel *sel)
+cancel_activated_cb(G_GNUC_UNUSED GntWidget *button, GntFileSel *sel)
 {
 	g_signal_emit(sel, signals[SIG_CANCELLED], 0);
 }
@@ -649,10 +649,13 @@ GntWidget *gnt_file_sel_new(void)
 
 gboolean gnt_file_sel_set_current_location(GntFileSel *sel, const char *path)
 {
-	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+	GntFileSelPrivate *priv = NULL;
 	char *old;
 	GError *error = NULL;
 	gboolean ret = TRUE;
+
+	g_return_val_if_fail(GNT_IS_FILE_SEL(sel), FALSE);
+	priv = gnt_file_sel_get_instance_private(sel);
 
 	old = priv->current;
 	priv->current = process_path(path);
@@ -672,27 +675,43 @@ gboolean gnt_file_sel_set_current_location(GntFileSel *sel, const char *path)
 
 void gnt_file_sel_set_dirs_only(GntFileSel *sel, gboolean dirs)
 {
-	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+	GntFileSelPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_FILE_SEL(sel));
+	priv = gnt_file_sel_get_instance_private(sel);
+
 	priv->dirsonly = dirs;
 }
 
 gboolean gnt_file_sel_get_dirs_only(GntFileSel *sel)
 {
-	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+	GntFileSelPrivate *priv = NULL;
+
+	g_return_val_if_fail(GNT_IS_FILE_SEL(sel), FALSE);
+	priv = gnt_file_sel_get_instance_private(sel);
+
 	return priv->dirsonly;
 }
 
 void gnt_file_sel_set_suggested_filename(GntFileSel *sel, const char *suggest)
 {
-	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+	GntFileSelPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_FILE_SEL(sel));
+	priv = gnt_file_sel_get_instance_private(sel);
+
 	g_free(priv->suggest);
 	priv->suggest = g_strdup(suggest);
 }
 
 char *gnt_file_sel_get_selected_file(GntFileSel *sel)
 {
-	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+	GntFileSelPrivate *priv = NULL;
 	char *ret;
+
+	g_return_val_if_fail(GNT_IS_FILE_SEL(sel), NULL);
+	priv = gnt_file_sel_get_instance_private(sel);
+
 	if (priv->dirsonly) {
 		ret = g_path_get_dirname(
 		        gnt_entry_get_text(GNT_ENTRY(priv->location)));
@@ -704,28 +723,45 @@ char *gnt_file_sel_get_selected_file(GntFileSel *sel)
 
 void gnt_file_sel_set_must_exist(GntFileSel *sel, gboolean must)
 {
-	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+	GntFileSelPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_FILE_SEL(sel));
+	priv = gnt_file_sel_get_instance_private(sel);
+
 	/*XXX: What do I do with this? */
 	priv->must_exist = must;
 }
 
 gboolean gnt_file_sel_get_must_exist(GntFileSel *sel)
 {
-	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+	GntFileSelPrivate *priv = NULL;
+
+	g_return_val_if_fail(GNT_IS_FILE_SEL(sel), FALSE);
+	priv = gnt_file_sel_get_instance_private(sel);
+
 	return priv->must_exist;
 }
 
 void gnt_file_sel_set_multi_select(GntFileSel *sel, gboolean set)
 {
-	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+	GntFileSelPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_FILE_SEL(sel));
+	priv = gnt_file_sel_get_instance_private(sel);
+
 	priv->multiselect = set;
 }
 
 GList *gnt_file_sel_get_selected_multi_files(GntFileSel *sel)
 {
-	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+	GntFileSelPrivate *priv = NULL;
 	GList *list = NULL, *iter;
-	char *str = gnt_file_sel_get_selected_file(sel);
+	char *str = NULL;
+
+	g_return_val_if_fail(GNT_IS_FILE_SEL(sel), NULL);
+	priv = gnt_file_sel_get_instance_private(sel);
+
+	str = gnt_file_sel_get_selected_file(sel);
 
 	for (iter = priv->tags; iter; iter = iter->next) {
 		list = g_list_prepend(list, g_strdup(iter->data));
@@ -742,7 +778,11 @@ GList *gnt_file_sel_get_selected_multi_files(GntFileSel *sel)
 
 void gnt_file_sel_set_read_fn(GntFileSel *sel, gboolean (*read_fn)(const char *path, GList **files, GError **error))
 {
-	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+	GntFileSelPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_FILE_SEL(sel));
+	priv = gnt_file_sel_get_instance_private(sel);
+
 	priv->read_fn = read_fn;
 }
 
