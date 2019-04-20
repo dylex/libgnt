@@ -622,7 +622,7 @@ gnt_text_view_get_text(GntTextView *view)
 {
 	g_return_val_if_fail(GNT_IS_TEXT_VIEW(view), NULL);
 
-	return g_strdup(view->string->str);
+	return view->string->str;
 }
 
 void gnt_text_view_scroll(GntTextView *view, int scroll)
