@@ -34,19 +34,9 @@
 #include "gntkeys.h"
 #include "gntwidget.h"
 
-#define GNT_TYPE_ENTRY				(gnt_entry_get_type())
-#define GNT_ENTRY(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_ENTRY, GntEntry))
-#define GNT_ENTRY_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_ENTRY, GntEntryClass))
-#define GNT_IS_ENTRY(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_ENTRY))
-#define GNT_IS_ENTRY_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_ENTRY))
-#define GNT_ENTRY_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_ENTRY, GntEntryClass))
+#define GNT_TYPE_ENTRY gnt_entry_get_type()
 
 #define	GNT_ENTRY_CHAR		'_'			/* The character to use to fill in the blank places */
-
-typedef struct _GntEntry			GntEntry;
-typedef struct _GntEntryClass	GntEntryClass;
-typedef struct _GntEntryKillRing    GntEntryKillRing;
-typedef struct _GntEntrySearch		GntEntrySearch;
 
 typedef enum
 {
@@ -59,38 +49,14 @@ typedef enum
 
 #define GNT_ENTRY_FLAG_ALL    (GNT_ENTRY_FLAG_ALPHA | GNT_ENTRY_FLAG_INT)
 
+G_BEGIN_DECLS
+
 /**
- * GntEntry:
+ * gnt_entry_get_type:
  *
- * Access to any fields is deprecated. See inline comments for replacements.
+ * Returns: GType for GntEntry.
  */
-struct _GntEntry
-{
-	GntWidget parent;
-
-	GntEntryFlag GNTSEAL(flag);
-
-	char *GNTSEAL(start);
-	char *GNTSEAL(end);
-	char *GNTSEAL(scroll);   /* Current scrolling position */
-	char *GNTSEAL(cursor);   /* Cursor location */
-	                         /* 0 <= cursor - scroll < widget-width */
-
-	size_t GNTSEAL(buffer);  /* Size of the buffer */
-
-	int GNTSEAL(max);        /* 0 means infinite */
-	gboolean GNTSEAL(masked);
-
-	GList *GNTSEAL(history); /* History of the strings. User can use this by pressing ctrl+up/down */
-	int GNTSEAL(histlength); /* How long can the history be? */
-
-	GList *GNTSEAL(suggests);    /* List of suggestions */
-	gboolean GNTSEAL(word);      /* Are the suggestions for only a word, or for the whole thing? */
-	gboolean GNTSEAL(always);    /* Should the list of suggestions show at all times, or only on tab-press? */
-	GntWidget *GNTSEAL(ddown);   /* The dropdown with the suggested list */
-	GntEntryKillRing *GNTSEAL(killring); /* Since: 2.3.0 */
-	GntEntrySearch *GNTSEAL(search);     /* Since: 2.7.0 */
-};
+G_DECLARE_DERIVABLE_TYPE(GntEntry, gnt_entry, GNT, ENTRY, GntWidget)
 
 struct _GntEntryClass
 {
@@ -104,15 +70,6 @@ struct _GntEntryClass
 	void (*gnt_reserved3)(void);
 	void (*gnt_reserved4)(void);
 };
-
-G_BEGIN_DECLS
-
-/**
- * gnt_entry_get_type:
- *
- * Returns: GType for GntEntry.
- */
-GType gnt_entry_get_type(void);
 
 /**
  * gnt_entry_new:

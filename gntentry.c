@@ -48,29 +48,60 @@ typedef enum
 	ENTRY_DEL_BOL,
 } GntEntryAction;
 
-struct _GntEntryKillRing
+typedef struct
 {
 	GString *buffer;
 	GntEntryAction last;
-};
+} GntEntryKillRing;
 
-struct _GntEntrySearch
+typedef struct
 {
 	char *needle;
-};
+} GntEntrySearch;
+
+typedef struct
+{
+	GntEntryFlag flag;
+
+	char *start;
+	char *end;
+	char *scroll; /* Current scrolling position */
+	char *cursor; /* Cursor location */
+	              /* 0 <= cursor - scroll < widget-width */
+
+	size_t buffer; /* Size of the buffer */
+
+	int max; /* 0 means infinite */
+	gboolean masked;
+
+	GList *history; /* History of the strings. User can use this by pressing
+	                   ctrl+up/down */
+	int histlength; /* How long can the history be? */
+
+	GList *suggests; /* List of suggestions */
+	gboolean word; /* Are the suggestions for only a word, or for the whole
+	                  thing? */
+	gboolean always; /* Should the list of suggestions show at all times, or
+	                    only on tab-press? */
+	GntWidget *ddown; /* The dropdown with the suggested list */
+	GntEntryKillRing *killring;
+	GntEntrySearch *search;
+} GntEntryPrivate;
 
 static guint signals[SIGS] = { 0 };
 
 static gboolean gnt_entry_key_pressed(GntWidget *widget, const char *text);
 static void gnt_entry_set_text_internal(GntEntry *entry, const char *text);
 
-G_DEFINE_TYPE(GntEntry, gnt_entry, GNT_TYPE_WIDGET)
+G_DEFINE_TYPE_WITH_PRIVATE(GntEntry, gnt_entry, GNT_TYPE_WIDGET)
 
 static gboolean
 update_kill_ring(GntEntry *entry, GntEntryAction action, const char *text, int len)
 {
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+
 	if (action < 0) {
-		entry->killring->last = action;
+		priv->killring->last = action;
 		return FALSE;
 	}
 
@@ -81,7 +112,7 @@ update_kill_ring(GntEntry *entry, GntEntryAction action, const char *text, int l
 		len = -len;
 	}
 
-	if (action != entry->killring->last) {
+	if (action != priv->killring->last) {
 		struct {
 			GntEntryAction one;
 			GntEntryAction two;
@@ -94,26 +125,28 @@ update_kill_ring(GntEntry *entry, GntEntryAction action, const char *text, int l
 		int i;
 
 		for (i = 0; merges[i].one != ENTRY_JAIL; i++) {
-			if (merges[i].one == entry->killring->last &&
-					merges[i].two == action) {
-				g_string_append_len(entry->killring->buffer, text, len);
+			if (merges[i].one == priv->killring->last &&
+			    merges[i].two == action) {
+				g_string_append_len(priv->killring->buffer,
+				                    text, len);
 				break;
 			} else if (merges[i].one == action &&
-					merges[i].two == entry->killring->last) {
-				g_string_prepend_len(entry->killring->buffer, text, len);
+			           merges[i].two == priv->killring->last) {
+				g_string_prepend_len(priv->killring->buffer,
+				                     text, len);
 				break;
 			}
 		}
 		if (merges[i].one == ENTRY_JAIL) {
-			g_string_assign(entry->killring->buffer, text);
-			g_string_truncate(entry->killring->buffer, len);
+			g_string_assign(priv->killring->buffer, text);
+			g_string_truncate(priv->killring->buffer, len);
 		}
-		entry->killring->last = action;
+		priv->killring->last = action;
 	} else {
 		if (action == ENTRY_DEL_BWD_CHAR || action == ENTRY_DEL_BWD_WORD)
-			g_string_prepend_len(entry->killring->buffer, text, len);
+			g_string_prepend_len(priv->killring->buffer, text, len);
 		else
-			g_string_append_len(entry->killring->buffer, text, len);
+			g_string_append_len(priv->killring->buffer, text, len);
 	}
 	return TRUE;
 }
@@ -121,20 +154,20 @@ update_kill_ring(GntEntry *entry, GntEntryAction action, const char *text, int l
 static void
 destroy_suggest(GntEntry *entry)
 {
-	if (entry->ddown)
-	{
-		gnt_widget_destroy(entry->ddown->parent);
-		entry->ddown = NULL;
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+	if (priv->ddown) {
+		gnt_widget_destroy(priv->ddown->parent);
+		priv->ddown = NULL;
 	}
 }
 
 static char *
 get_beginning_of_word(GntEntry *entry)
 {
-	char *s = entry->cursor;
-	while (s > entry->start)
-	{
-		char *t = g_utf8_find_prev_char(entry->start, s);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+	char *s = priv->cursor;
+	while (s > priv->start) {
+		char *t = g_utf8_find_prev_char(priv->start, s);
 		if (isspace(*t))
 			break;
 		s = t;
@@ -145,19 +178,20 @@ get_beginning_of_word(GntEntry *entry)
 static gboolean
 complete_suggest(GntEntry *entry, const char *text)
 {
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
 	int offstart = 0, offend = 0;
 
-	if (entry->word) {
+	if (priv->word) {
 		char *s = get_beginning_of_word(entry);
 		const char *iter = text;
-		offstart = g_utf8_pointer_to_offset(entry->start, s);
+		offstart = g_utf8_pointer_to_offset(priv->start, s);
 		while (*iter && toupper(*s) == toupper(*iter)) {
 			*s++ = *iter++;
 		}
 		if (*iter) {
 			gnt_entry_key_pressed(GNT_WIDGET(entry), iter);
 		}
-		offend = g_utf8_pointer_to_offset(entry->start, entry->cursor);
+		offend = g_utf8_pointer_to_offset(priv->start, priv->cursor);
 	} else {
 		offstart = 0;
 		gnt_entry_set_text_internal(entry, text);
@@ -165,7 +199,7 @@ complete_suggest(GntEntry *entry, const char *text)
 	}
 
 	g_signal_emit(G_OBJECT(entry), signals[SIG_COMPLETION], 0,
-			entry->start + offstart, entry->start + offend);
+	              priv->start + offstart, priv->start + offend);
 	update_kill_ring(entry, ENTRY_JAIL, NULL, 0);
 	return TRUE;
 }
@@ -182,6 +216,7 @@ max_common_prefix(const char *s, const char *t)
 static gboolean
 show_suggest_dropdown(GntEntry *entry)
 {
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
 	char *suggest = NULL;
 	gsize len;
 	int offset = 0, x, y;
@@ -191,23 +226,23 @@ show_suggest_dropdown(GntEntry *entry)
 	const char *sgst = NULL;
 	int max = -1;
 
-	if (entry->word)
-	{
+	if (priv->word) {
 		char *s = get_beginning_of_word(entry);
-		suggest = g_strndup(s, entry->cursor - s);
-		if (entry->scroll < s)
-			offset = gnt_util_onscreen_width(entry->scroll, s);
+		suggest = g_strndup(s, priv->cursor - s);
+		if (priv->scroll < s) {
+			offset = gnt_util_onscreen_width(priv->scroll, s);
+		}
+	} else {
+		suggest = g_strdup(priv->start);
 	}
-	else
-		suggest = g_strdup(entry->start);
 	len = strlen(suggest);  /* Don't need to use the utf8-function here */
 
-	if (entry->ddown == NULL)
-	{
+	if (priv->ddown == NULL) {
 		GntWidget *box = gnt_vbox_new(FALSE);
-		entry->ddown = gnt_tree_new();
-		gnt_tree_set_compare_func(GNT_TREE(entry->ddown), (GCompareFunc)g_utf8_collate);
-		gnt_box_add_widget(GNT_BOX(box), entry->ddown);
+		priv->ddown = gnt_tree_new();
+		gnt_tree_set_compare_func(GNT_TREE(priv->ddown),
+		                          (GCompareFunc)g_utf8_collate);
+		gnt_box_add_widget(GNT_BOX(box), priv->ddown);
 
 		gnt_widget_set_transient(box, TRUE);
 
@@ -217,18 +252,19 @@ show_suggest_dropdown(GntEntry *entry)
 		if (y + 10 >= getmaxy(stdscr))
 			y -= 11;
 		gnt_widget_set_position(box, x, y);
+	} else {
+		gnt_tree_remove_all(GNT_TREE(priv->ddown));
 	}
-	else
-		gnt_tree_remove_all(GNT_TREE(entry->ddown));
 
-	for (count = 0, iter = entry->suggests; iter; iter = iter->next)
-	{
+	for (count = 0, iter = priv->suggests; iter; iter = iter->next) {
 		text = iter->data;
 		if (g_ascii_strncasecmp(suggest, text, len) == 0 && strlen(text) >= len)
 		{
-			gnt_tree_add_row_after(GNT_TREE(entry->ddown), (gpointer)text,
-					gnt_tree_create_row(GNT_TREE(entry->ddown), text),
-					NULL, NULL);
+			gnt_tree_add_row_after(
+			        GNT_TREE(priv->ddown), (gpointer)text,
+			        gnt_tree_create_row(GNT_TREE(priv->ddown),
+			                            text),
+			        NULL, NULL);
 			count++;
 			if (max == -1)
 				max = strlen(text) - len;
@@ -243,28 +279,30 @@ show_suggest_dropdown(GntEntry *entry)
 		destroy_suggest(entry);
 		return FALSE;
 	} else if (count == 1) {
-		char *store = g_strndup(entry->start, entry->end - entry->start);
+		char *store = g_strndup(priv->start, priv->end - priv->start);
 		gboolean ret;
 
 		destroy_suggest(entry);
 		complete_suggest(entry, sgst);
 
-		ret = (strncmp(store, entry->start, entry->end - entry->start) != 0);
+		ret = (strncmp(store, priv->start, priv->end - priv->start) !=
+		       0);
 		g_free(store);
 		return ret;
 	} else {
 		if (max > 0) {
-			GntWidget *ddown = entry->ddown;
+			GntWidget *ddown = priv->ddown;
 			char *match = g_strndup(sgst + len, max);
-			entry->ddown = NULL;
+			priv->ddown = NULL;
 			gnt_entry_key_pressed(GNT_WIDGET(entry), match);
 			g_free(match);
-			if (entry->ddown)
+			if (priv->ddown) {
 				gnt_widget_destroy(ddown);
-			else
-				entry->ddown = ddown;
+			} else {
+				priv->ddown = ddown;
+			}
 		}
-		gnt_widget_draw(entry->ddown->parent);
+		gnt_widget_draw(priv->ddown->parent);
 	}
 
 	return TRUE;
@@ -274,6 +312,7 @@ static void
 gnt_entry_draw(GntWidget *widget)
 {
 	GntEntry *entry = GNT_ENTRY(widget);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
 	int stop;
 	gboolean focus;
 	int curpos;
@@ -283,19 +322,19 @@ gnt_entry_draw(GntWidget *widget)
 	else
 		wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_HIGHLIGHT_D));
 
-	if (entry->masked)
-	{
-		mvwhline(widget->window, 0, 0, gnt_ascii_only() ? '*' : ACS_BULLET,
-				g_utf8_pointer_to_offset(entry->scroll, entry->end));
-	}
-	else
-		mvwprintw(widget->window, 0, 0, "%s", C_(entry->scroll));
+	if (priv->masked) {
+		mvwhline(widget->window, 0, 0,
+		         gnt_ascii_only() ? '*' : ACS_BULLET,
+		         g_utf8_pointer_to_offset(priv->scroll, priv->end));
+	} else
+		mvwprintw(widget->window, 0, 0, "%s", C_(priv->scroll));
 
-	stop = gnt_util_onscreen_width(entry->scroll, entry->end);
-	if (stop < widget->priv.width)
+	stop = gnt_util_onscreen_width(priv->scroll, priv->end);
+	if (stop < widget->priv.width) {
 		mvwhline(widget->window, 0, stop, GNT_ENTRY_CHAR, widget->priv.width - stop);
+	}
 
-	curpos = gnt_util_onscreen_width(entry->scroll, entry->cursor);
+	curpos = gnt_util_onscreen_width(priv->scroll, priv->cursor);
 	if (focus)
 		mvwchgat(widget->window, 0, curpos, 1, A_REVERSE, GNT_COLOR_TEXT_NORMAL, NULL);
 	(void)wmove(widget->window, 0, curpos);
@@ -337,11 +376,17 @@ static gboolean
 move_back(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
-	if (entry->cursor <= entry->start)
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+
+	if (priv->cursor <= priv->start) {
 		return FALSE;
-	entry->cursor = g_utf8_find_prev_char(entry->start, entry->cursor);
-	if (entry->cursor < entry->scroll)
-		entry->scroll = entry->cursor;
+	}
+
+	priv->cursor = g_utf8_find_prev_char(priv->start, priv->cursor);
+	if (priv->cursor < priv->scroll) {
+		priv->scroll = priv->cursor;
+	}
+
 	update_kill_ring(entry, ENTRY_JAIL, NULL, 0);
 	entry_redraw(GNT_WIDGET(entry));
 	return TRUE;
@@ -351,11 +396,18 @@ static gboolean
 move_forward(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
-	if (entry->cursor >= entry->end)
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+
+	if (priv->cursor >= priv->end) {
 		return FALSE;
-	entry->cursor = g_utf8_find_next_char(entry->cursor, NULL);
-	while (gnt_util_onscreen_width(entry->scroll, entry->cursor) >= GNT_WIDGET(entry)->priv.width)
-		entry->scroll = g_utf8_find_next_char(entry->scroll, NULL);
+	}
+
+	priv->cursor = g_utf8_find_next_char(priv->cursor, NULL);
+	while (gnt_util_onscreen_width(priv->scroll, priv->cursor) >=
+	       GNT_WIDGET(entry)->priv.width) {
+		priv->scroll = g_utf8_find_next_char(priv->scroll, NULL);
+	}
+
 	update_kill_ring(entry, ENTRY_JAIL, NULL, 0);
 	entry_redraw(GNT_WIDGET(entry));
 	return TRUE;
@@ -366,23 +418,28 @@ backspace(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	int len;
 	GntEntry *entry = GNT_ENTRY(bind);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
 
-	if (entry->cursor <= entry->start)
+	if (priv->cursor <= priv->start) {
 		return TRUE;
+	}
 
-	len = entry->cursor - g_utf8_find_prev_char(entry->start, entry->cursor);
-	update_kill_ring(entry, ENTRY_JAIL, entry->cursor, -len);
-	entry->cursor -= len;
+	len = priv->cursor - g_utf8_find_prev_char(priv->start, priv->cursor);
+	update_kill_ring(entry, ENTRY_JAIL, priv->cursor, -len);
+	priv->cursor -= len;
 
-	memmove(entry->cursor, entry->cursor + len, entry->end - entry->cursor);
-	entry->end -= len;
+	memmove(priv->cursor, priv->cursor + len, priv->end - priv->cursor);
+	priv->end -= len;
 
-	if (entry->scroll > entry->start)
-		entry->scroll = g_utf8_find_prev_char(entry->start, entry->scroll);
+	if (priv->scroll > priv->start) {
+		priv->scroll = g_utf8_find_prev_char(priv->start, priv->scroll);
+	}
 
 	entry_redraw(GNT_WIDGET(entry));
-	if (entry->ddown)
+	if (priv->ddown) {
 		show_suggest_dropdown(entry);
+	}
+
 	entry_text_changed(entry);
 	return TRUE;
 }
@@ -392,18 +449,23 @@ delkey(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	int len;
 	GntEntry *entry = GNT_ENTRY(bind);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
 
-	if (entry->cursor >= entry->end)
+	if (priv->cursor >= priv->end) {
 		return FALSE;
+	}
 
-	len = g_utf8_find_next_char(entry->cursor, NULL) - entry->cursor;
-	update_kill_ring(entry, ENTRY_JAIL, entry->cursor, len);
-	memmove(entry->cursor, entry->cursor + len, entry->end - entry->cursor - len + 1);
-	entry->end -= len;
+	len = g_utf8_find_next_char(priv->cursor, NULL) - priv->cursor;
+	update_kill_ring(entry, ENTRY_JAIL, priv->cursor, len);
+	memmove(priv->cursor, priv->cursor + len,
+	        priv->end - priv->cursor - len + 1);
+	priv->end -= len;
 	entry_redraw(GNT_WIDGET(entry));
 
-	if (entry->ddown)
+	if (priv->ddown) {
 		show_suggest_dropdown(entry);
+	}
+
 	entry_text_changed(entry);
 	return TRUE;
 }
@@ -412,7 +474,8 @@ static gboolean
 move_start(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
-	entry->scroll = entry->cursor = entry->start;
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+	priv->scroll = priv->cursor = priv->start;
 	entry_redraw(GNT_WIDGET(entry));
 	update_kill_ring(entry, ENTRY_JAIL, NULL, 0);
 	return TRUE;
@@ -422,10 +485,16 @@ static gboolean
 move_end(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
-	entry->cursor = entry->end;
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+
+	priv->cursor = priv->end;
+
 	/* This should be better than this */
-	while (gnt_util_onscreen_width(entry->scroll, entry->cursor) >= GNT_WIDGET(entry)->priv.width)
-		entry->scroll = g_utf8_find_next_char(entry->scroll, NULL);
+	while (gnt_util_onscreen_width(priv->scroll, priv->cursor) >=
+	       GNT_WIDGET(entry)->priv.width) {
+		priv->scroll = g_utf8_find_next_char(priv->scroll, NULL);
+	}
+
 	entry_redraw(GNT_WIDGET(entry));
 	update_kill_ring(entry, ENTRY_JAIL, NULL, 0);
 	return TRUE;
@@ -435,10 +504,10 @@ static gboolean
 history_next(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
-	if (entry->histlength && entry->history->prev)
-	{
-		entry->history = entry->history->prev;
-		gnt_entry_set_text_internal(entry, entry->history->data);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+	if (priv->histlength && priv->history->prev) {
+		priv->history = priv->history->prev;
+		gnt_entry_set_text_internal(entry, priv->history->data);
 		destroy_suggest(entry);
 		entry_text_changed(entry);
 
@@ -452,18 +521,17 @@ static gboolean
 history_prev(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
-	if (entry->histlength && entry->history->next)
-	{
-		if (entry->history->prev == NULL)
-		{
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+	if (priv->histlength && priv->history->next) {
+		if (priv->history->prev == NULL) {
 			/* Save the current contents */
 			char *text = g_strdup(gnt_entry_get_text(entry));
-			g_free(entry->history->data);
-			entry->history->data = text;
+			g_free(priv->history->data);
+			priv->history->data = text;
 		}
 
-		entry->history = entry->history->next;
-		gnt_entry_set_text_internal(entry, entry->history->data);
+		priv->history = priv->history->next;
+		gnt_entry_set_text_internal(entry, priv->history->data);
 		destroy_suggest(entry);
 		entry_text_changed(entry);
 
@@ -477,18 +545,21 @@ static gboolean
 history_search(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
 	GList *iter;
 	const char *current;
 
-	if (entry->history->prev && entry->search->needle)
-		current = entry->search->needle;
-	else
+	if (priv->history->prev && priv->search->needle) {
+		current = priv->search->needle;
+	} else {
 		current = gnt_entry_get_text(entry);
+	}
 
-	if (!entry->histlength || !entry->history->next || !*current)
+	if (!priv->histlength || !priv->history->next || !*current) {
 		return FALSE;
+	}
 
-	for (iter = entry->history->next; iter; iter = iter->next) {
+	for (iter = priv->history->next; iter; iter = iter->next) {
 		const char *str = iter->data;
 		/* A more utf8-friendly version of strstr would have been better, but
 		 * for now, this will have to do. */
@@ -499,19 +570,19 @@ history_search(GntBindable *bind, G_GNUC_UNUSED GList *params)
 	if (!iter)
 		return TRUE;
 
-	if (entry->history->prev == NULL) {
+	if (priv->history->prev == NULL) {
 		/* We are doing it for the first time. Save the current contents */
 		char *text = g_strdup(gnt_entry_get_text(entry));
 
-		g_free(entry->search->needle);
-		entry->search->needle = g_strdup(current);
+		g_free(priv->search->needle);
+		priv->search->needle = g_strdup(current);
 
-		g_free(entry->history->data);
-		entry->history->data = text;
+		g_free(priv->history->data);
+		priv->history->data = text;
 	}
 
-	entry->history = iter;
-	gnt_entry_set_text_internal(entry, entry->history->data);
+	priv->history = iter;
+	gnt_entry_set_text_internal(entry, priv->history->data);
 	destroy_suggest(entry);
 	entry_text_changed(entry);
 
@@ -523,6 +594,7 @@ static gboolean
 clipboard_paste(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
 	gchar *i, *text, *a, *all;
 	text = i = gnt_get_clipboard_string();
 	while (*i != '\0') {
@@ -530,8 +602,8 @@ clipboard_paste(GntBindable *bind, G_GNUC_UNUSED GList *params)
 		if (*i == '\r' || *i == '\n')
 			*i = ' ';
 	}
-	a = g_strndup(entry->start, entry->cursor - entry->start);
-	all = g_strconcat(a, text, entry->cursor, NULL);
+	a = g_strndup(priv->start, priv->cursor - priv->start);
+	all = g_strconcat(a, text, priv->cursor, NULL);
 	gnt_entry_set_text_internal(entry, all);
 	update_kill_ring(entry, ENTRY_JAIL, NULL, 0);
 	g_free(a);
@@ -544,8 +616,10 @@ static gboolean
 suggest_show(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
-	if (entry->ddown) {
-		gnt_bindable_perform_action_named(GNT_BINDABLE(entry->ddown), "move-down", NULL);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+	if (priv->ddown) {
+		gnt_bindable_perform_action_named(GNT_BINDABLE(priv->ddown),
+		                                  "move-down", NULL);
 		return TRUE;
 	}
 	return show_suggest_dropdown(entry);
@@ -555,8 +629,10 @@ static gboolean
 suggest_next(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
-	if (entry->ddown) {
-		gnt_bindable_perform_action_named(GNT_BINDABLE(entry->ddown), "move-down", NULL);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+	if (priv->ddown) {
+		gnt_bindable_perform_action_named(GNT_BINDABLE(priv->ddown),
+		                                  "move-down", NULL);
 		return TRUE;
 	}
 	return FALSE;
@@ -566,8 +642,10 @@ static gboolean
 suggest_prev(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
-	if (entry->ddown) {
-		gnt_bindable_perform_action_named(GNT_BINDABLE(entry->ddown), "move-up", NULL);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+	if (priv->ddown) {
+		gnt_bindable_perform_action_named(GNT_BINDABLE(priv->ddown),
+		                                  "move-up", NULL);
 		return TRUE;
 	}
 	return FALSE;
@@ -577,8 +655,10 @@ static gboolean
 suggest_next_page(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
-	if (entry->ddown) {
-		gnt_bindable_perform_action_named(GNT_BINDABLE(entry->ddown), "page-down", NULL);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+	if (priv->ddown) {
+		gnt_bindable_perform_action_named(GNT_BINDABLE(priv->ddown),
+		                                  "page-down", NULL);
 		return TRUE;
 	}
 	return FALSE;
@@ -588,8 +668,10 @@ static gboolean
 suggest_prev_page(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
-	if (entry->ddown) {
-		gnt_bindable_perform_action_named(GNT_BINDABLE(entry->ddown), "page-up", NULL);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+	if (priv->ddown) {
+		gnt_bindable_perform_action_named(GNT_BINDABLE(priv->ddown),
+		                                  "page-up", NULL);
 		return TRUE;
 	}
 	return FALSE;
@@ -599,13 +681,18 @@ static gboolean
 del_to_home(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
-	if (entry->cursor <= entry->start)
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+
+	if (priv->cursor <= priv->start) {
 		return TRUE;
-	update_kill_ring(entry, ENTRY_DEL_BOL, entry->start, entry->cursor - entry->start);
-	memmove(entry->start, entry->cursor, entry->end - entry->cursor);
-	entry->end -= (entry->cursor - entry->start);
-	entry->cursor = entry->scroll = entry->start;
-	memset(entry->end, '\0', entry->buffer - (entry->end - entry->start));
+	}
+
+	update_kill_ring(entry, ENTRY_DEL_BOL, priv->start,
+	                 priv->cursor - priv->start);
+	memmove(priv->start, priv->cursor, priv->end - priv->cursor);
+	priv->end -= (priv->cursor - priv->start);
+	priv->cursor = priv->scroll = priv->start;
+	memset(priv->end, '\0', priv->buffer - (priv->end - priv->start));
 	entry_redraw(GNT_WIDGET(bind));
 	entry_text_changed(entry);
 	return TRUE;
@@ -615,11 +702,16 @@ static gboolean
 del_to_end(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
-	if (entry->end <= entry->cursor)
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+
+	if (priv->end <= priv->cursor) {
 		return TRUE;
-	update_kill_ring(entry, ENTRY_DEL_EOL, entry->cursor, entry->end - entry->cursor);
-	entry->end = entry->cursor;
-	memset(entry->end, '\0', entry->buffer - (entry->end - entry->start));
+	}
+
+	update_kill_ring(entry, ENTRY_DEL_EOL, priv->cursor,
+	                 priv->end - priv->cursor);
+	priv->end = priv->cursor;
+	memset(priv->end, '\0', priv->buffer - (priv->end - priv->start));
 	entry_redraw(GNT_WIDGET(bind));
 	entry_text_changed(entry);
 	return TRUE;
@@ -670,14 +762,18 @@ static gboolean
 move_back_word(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
-	const char *iter = g_utf8_find_prev_char(entry->start, entry->cursor);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+	const char *iter = g_utf8_find_prev_char(priv->start, priv->cursor);
 
-	if (iter < entry->start)
+	if (iter < priv->start) {
 		return TRUE;
-	iter = begin_word(iter, entry->start);
-	entry->cursor = (char*)iter;
-	if (entry->cursor < entry->scroll)
-		entry->scroll = entry->cursor;
+	}
+
+	iter = begin_word(iter, priv->start);
+	priv->cursor = (char *)iter;
+	if (priv->cursor < priv->scroll) {
+		priv->scroll = priv->cursor;
+	}
 	update_kill_ring(entry, ENTRY_JAIL, NULL, 0);
 	entry_redraw(GNT_WIDGET(bind));
 	return TRUE;
@@ -688,23 +784,27 @@ del_prev_word(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntWidget *widget = GNT_WIDGET(bind);
 	GntEntry *entry = GNT_ENTRY(bind);
-	char *iter = g_utf8_find_prev_char(entry->start, entry->cursor);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+	char *iter = g_utf8_find_prev_char(priv->start, priv->cursor);
 	int count;
 
-	if (iter < entry->start)
+	if (iter < priv->start) {
 		return TRUE;
-	iter = (char*)begin_word(iter, entry->start);
-	count = entry->cursor - iter;
-	update_kill_ring(entry, ENTRY_DEL_BWD_WORD, iter, count);
-	memmove(iter, entry->cursor, entry->end - entry->cursor);
-	entry->end -= count;
-	entry->cursor = iter;
-	if (entry->cursor <= entry->scroll) {
-		entry->scroll = entry->cursor - widget->priv.width + 2;
-		if (entry->scroll < entry->start)
-			entry->scroll = entry->start;
 	}
-	memset(entry->end, '\0', entry->buffer - (entry->end - entry->start));
+
+	iter = (char *)begin_word(iter, priv->start);
+	count = priv->cursor - iter;
+	update_kill_ring(entry, ENTRY_DEL_BWD_WORD, iter, count);
+	memmove(iter, priv->cursor, priv->end - priv->cursor);
+	priv->end -= count;
+	priv->cursor = iter;
+	if (priv->cursor <= priv->scroll) {
+		priv->scroll = priv->cursor - widget->priv.width + 2;
+		if (priv->scroll < priv->start) {
+			priv->scroll = priv->start;
+		}
+	}
+	memset(priv->end, '\0', priv->buffer - (priv->end - priv->start));
 	entry_redraw(widget);
 	entry_text_changed(entry);
 
@@ -715,10 +815,12 @@ static gboolean
 move_forward_word(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
 	GntWidget *widget = GNT_WIDGET(bind);
-	entry->cursor = (char *)next_begin_word(entry->cursor, entry->end);
-	while (gnt_util_onscreen_width(entry->scroll, entry->cursor) >= widget->priv.width) {
-		entry->scroll = g_utf8_find_next_char(entry->scroll, NULL);
+	priv->cursor = (char *)next_begin_word(priv->cursor, priv->end);
+	while (gnt_util_onscreen_width(priv->scroll, priv->cursor) >=
+	       widget->priv.width) {
+		priv->scroll = g_utf8_find_next_char(priv->scroll, NULL);
 	}
 	update_kill_ring(entry, ENTRY_JAIL, NULL, 0);
 	entry_redraw(widget);
@@ -729,16 +831,18 @@ static gboolean
 delete_forward_word(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
 	GntWidget *widget = GNT_WIDGET(bind);
-	char *iter = (char *)next_begin_word(entry->cursor, entry->end);
-	int len = entry->end - iter + 1;
+	char *iter = (char *)next_begin_word(priv->cursor, priv->end);
+	int len = priv->end - iter + 1;
 	if (len <= 0)
 		return TRUE;
-	update_kill_ring(entry, ENTRY_DEL_FWD_WORD, entry->cursor, iter - entry->cursor);
-	memmove(entry->cursor, iter, len);
-	len = iter - entry->cursor;
-	entry->end -= len;
-	memset(entry->end, '\0', len);
+	update_kill_ring(entry, ENTRY_DEL_FWD_WORD, priv->cursor,
+	                 iter - priv->cursor);
+	memmove(priv->cursor, iter, len);
+	len = iter - priv->cursor;
+	priv->end -= len;
+	memset(priv->end, '\0', len);
 	entry_redraw(widget);
 	entry_text_changed(entry);
 	return TRUE;
@@ -748,23 +852,26 @@ static gboolean
 transpose_chars(GntBindable *bind, GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
 	char *current, *prev;
 	char hold[8];  /* that's right */
 
-	if (entry->cursor <= entry->start)
+	if (priv->cursor <= priv->start) {
 		return FALSE;
+	}
 
-	if (!*entry->cursor)
-		entry->cursor = g_utf8_find_prev_char(entry->start, entry->cursor);
+	if (!*priv->cursor) {
+		priv->cursor = g_utf8_find_prev_char(priv->start, priv->cursor);
+	}
 
-	current = entry->cursor;
-	prev = g_utf8_find_prev_char(entry->start, entry->cursor);
+	current = priv->cursor;
+	prev = g_utf8_find_prev_char(priv->start, priv->cursor);
 	move_forward(bind, params);
 
 	/* Let's do this dance! */
 	memcpy(hold, prev, current - prev);
-	memmove(prev, current, entry->cursor - current);
-	memcpy(prev + (entry->cursor - current), hold, current - prev);
+	memmove(prev, current, priv->cursor - current);
+	memcpy(prev + (priv->cursor - current), hold, current - prev);
 
 	update_kill_ring(entry, ENTRY_JAIL, NULL, 0);
 	entry_redraw(GNT_WIDGET(entry));
@@ -776,7 +883,8 @@ static gboolean
 entry_yank(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntEntry *entry = GNT_ENTRY(bind);
-	gnt_entry_key_pressed(GNT_WIDGET(entry), entry->killring->buffer->str);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+	gnt_entry_key_pressed(GNT_WIDGET(entry), priv->killring->buffer->str);
 	return TRUE;
 }
 
@@ -784,6 +892,7 @@ static gboolean
 gnt_entry_key_pressed(GntWidget *widget, const char *text)
 {
 	GntEntry *entry = GNT_ENTRY(widget);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
 
 	if (text[0] == 27)
 	{
@@ -796,9 +905,10 @@ gnt_entry_key_pressed(GntWidget *widget, const char *text)
 		return FALSE;
 	}
 
-	if ((text[0] == '\r' || text[0] == ' ' || text[0] == '\n') && entry->ddown)
-	{
-		char *text = g_strdup(gnt_tree_get_selection_data(GNT_TREE(entry->ddown)));
+	if ((text[0] == '\r' || text[0] == ' ' || text[0] == '\n') &&
+	    priv->ddown) {
+		char *text = g_strdup(
+		        gnt_tree_get_selection_data(GNT_TREE(priv->ddown)));
 		destroy_suggest(entry);
 		complete_suggest(entry, text);
 		g_free(text);
@@ -819,45 +929,62 @@ gnt_entry_key_pressed(GntWidget *widget, const char *text)
 
 			/* Valid input? */
 			/* XXX: Is it necessary to use _unichar_ variants here? */
-			if (ispunct(*str) && (entry->flag & GNT_ENTRY_FLAG_NO_PUNCT))
+			if (ispunct(*str) &&
+			    (priv->flag & GNT_ENTRY_FLAG_NO_PUNCT)) {
 				continue;
-			if (isspace(*str) && (entry->flag & GNT_ENTRY_FLAG_NO_SPACE))
+			}
+			if (isspace(*str) &&
+			    (priv->flag & GNT_ENTRY_FLAG_NO_SPACE)) {
 				continue;
-			if (isalpha(*str) && !(entry->flag & GNT_ENTRY_FLAG_ALPHA))
+			}
+			if (isalpha(*str) &&
+			    !(priv->flag & GNT_ENTRY_FLAG_ALPHA)) {
 				continue;
-			if (isdigit(*str) && !(entry->flag & GNT_ENTRY_FLAG_INT))
+			}
+			if (isdigit(*str) &&
+			    !(priv->flag & GNT_ENTRY_FLAG_INT)) {
 				continue;
+			}
 
 			/* Reached the max? */
-			if (entry->max && g_utf8_pointer_to_offset(entry->start, entry->end) >= entry->max)
+			if (priv->max &&
+			    g_utf8_pointer_to_offset(priv->start, priv->end) >=
+			            priv->max) {
 				continue;
+			}
 
-			if ((gsize)(entry->end + len - entry->start) >= entry->buffer)
-			{
+			if ((gsize)(priv->end + len - priv->start) >=
+			    priv->buffer) {
 				/* This will cause the buffer to grow */
-				char *tmp = g_strdup(entry->start);
+				char *tmp = g_strdup(priv->start);
 				gnt_entry_set_text_internal(entry, tmp);
 				g_free(tmp);
 			}
 
-			memmove(entry->cursor + len, entry->cursor, entry->end - entry->cursor + 1);
-			entry->end += len;
+			memmove(priv->cursor + len, priv->cursor,
+			        priv->end - priv->cursor + 1);
+			priv->end += len;
 
 			while (str < next)
 			{
 				if (*str == '\r' || *str == '\n')
-					*entry->cursor = ' ';
+					*priv->cursor = ' ';
 				else
-					*entry->cursor = *str;
-				entry->cursor++;
+					*priv->cursor = *str;
+				priv->cursor++;
 				str++;
 			}
 
-			while (gnt_util_onscreen_width(entry->scroll, entry->cursor) >= widget->priv.width)
-				entry->scroll = g_utf8_find_next_char(entry->scroll, NULL);
+			while (gnt_util_onscreen_width(priv->scroll,
+			                               priv->cursor) >=
+			       widget->priv.width) {
+				priv->scroll = g_utf8_find_next_char(
+				        priv->scroll, NULL);
+			}
 
-			if (entry->ddown)
+			if (priv->ddown) {
 				show_suggest_dropdown(entry);
+			}
 		}
 		update_kill_ring(entry, ENTRY_JAIL, NULL, 0);
 		entry_redraw(widget);
@@ -884,28 +1011,26 @@ static void
 gnt_entry_destroy(GntWidget *widget)
 {
 	GntEntry *entry = GNT_ENTRY(widget);
-	g_free(entry->start);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+	g_free(priv->start);
 
-	if (entry->history)
-	{
-		entry->history = g_list_first(entry->history);
-		g_list_free_full(entry->history, g_free);
+	if (priv->history) {
+		priv->history = g_list_first(priv->history);
+		g_list_free_full(priv->history, g_free);
 	}
 
-	if (entry->suggests)
-	{
-		g_list_free_full(entry->suggests, g_free);
+	if (priv->suggests) {
+		g_list_free_full(priv->suggests, g_free);
 	}
 
-	if (entry->ddown)
-	{
-		gnt_widget_destroy(entry->ddown->parent);
+	if (priv->ddown) {
+		gnt_widget_destroy(priv->ddown->parent);
 	}
 
-	g_free(entry->search->needle);
-	g_free(entry->search);
+	g_free(priv->search->needle);
+	g_free(priv->search);
 
-	jail_killring(entry->killring);
+	jail_killring(priv->killring);
 }
 
 static void
@@ -1031,18 +1156,19 @@ static void
 gnt_entry_init(GntEntry *entry)
 {
 	GntWidget *widget = GNT_WIDGET(entry);
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
 
-	entry->flag = GNT_ENTRY_FLAG_ALL;
-	entry->max = 0;
+	priv->flag = GNT_ENTRY_FLAG_ALL;
+	priv->max = 0;
 
-	entry->histlength = 0;
-	entry->history = NULL;
+	priv->histlength = 0;
+	priv->history = NULL;
 
-	entry->word = TRUE;
-	entry->always = FALSE;
-	entry->suggests = NULL;
-	entry->killring = new_killring();
-	entry->search = g_new0(GntEntrySearch, 1);
+	priv->word = TRUE;
+	priv->always = FALSE;
+	priv->suggests = NULL;
+	priv->killring = new_killring();
+	priv->search = g_new0(GntEntrySearch, 1);
 
 	gnt_widget_set_has_border(widget, FALSE);
 	gnt_widget_set_has_shadow(widget, FALSE);
@@ -1071,10 +1197,11 @@ GntWidget *gnt_entry_new(const char *text)
 static void
 gnt_entry_set_text_internal(GntEntry *entry, const char *text)
 {
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
 	int len;
 	int scroll, cursor;
 
-	g_free(entry->start);
+	g_free(priv->start);
 
 	if (text && text[0])
 	{
@@ -1085,21 +1212,24 @@ gnt_entry_set_text_internal(GntEntry *entry, const char *text)
 		len = 0;
 	}
 
-	entry->buffer = len + 128;
+	priv->buffer = len + 128;
 
-	scroll = entry->scroll - entry->start;
-	cursor = entry->end - entry->cursor;
+	scroll = priv->scroll - priv->start;
+	cursor = priv->end - priv->cursor;
 
-	entry->start = g_new0(char, entry->buffer);
-	if (text)
-		snprintf(entry->start, len + 1, "%s", text);
-	entry->end = entry->start + len;
+	priv->start = g_new0(char, priv->buffer);
+	if (text) {
+		snprintf(priv->start, len + 1, "%s", text);
+	}
+	priv->end = priv->start + len;
 
-	if ((entry->scroll = entry->start + scroll) > entry->end)
-		entry->scroll = entry->end;
+	if ((priv->scroll = priv->start + scroll) > priv->end) {
+		priv->scroll = priv->end;
+	}
 
-	if ((entry->cursor = entry->end - cursor) > entry->end)
-		entry->cursor = entry->end;
+	if ((priv->cursor = priv->end - cursor) > priv->end) {
+		priv->cursor = priv->end;
+	}
 
 	if (gnt_widget_get_mapped(GNT_WIDGET(entry)))
 		entry_redraw(GNT_WIDGET(entry));
@@ -1107,11 +1237,18 @@ gnt_entry_set_text_internal(GntEntry *entry, const char *text)
 
 void gnt_entry_set_text(GntEntry *entry, const char *text)
 {
+	GntEntryPrivate *priv = NULL;
 	gboolean changed = TRUE;
-	if (text == NULL && entry->start == NULL)
+
+	g_return_if_fail(GNT_IS_ENTRY(entry));
+	priv = gnt_entry_get_instance_private(entry);
+
+	if (text == NULL && priv->start == NULL) {
 		changed = FALSE;
-	if (text && entry->start && g_utf8_collate(text, entry->start) == 0)
+	}
+	if (text && priv->start && g_utf8_collate(text, priv->start) == 0) {
 		changed = FALSE;
+	}
 	gnt_entry_set_text_internal(entry, text);
 	if (changed)
 		entry_text_changed(entry);
@@ -1119,24 +1256,44 @@ void gnt_entry_set_text(GntEntry *entry, const char *text)
 
 void gnt_entry_set_max(GntEntry *entry, int max)
 {
-	entry->max = max;
+	GntEntryPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_ENTRY(entry));
+	priv = gnt_entry_get_instance_private(entry);
+
+	priv->max = max;
 }
 
 void gnt_entry_set_flag(GntEntry *entry, GntEntryFlag flag)
 {
-	entry->flag = flag;
+	GntEntryPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_ENTRY(entry));
+	priv = gnt_entry_get_instance_private(entry);
+
+	priv->flag = flag;
 	/* XXX: Check the existing string to make sure the flags are respected? */
 }
 
 const char *gnt_entry_get_text(GntEntry *entry)
 {
-	return entry->start;
+	GntEntryPrivate *priv = NULL;
+
+	g_return_val_if_fail(GNT_IS_ENTRY(entry), NULL);
+	priv = gnt_entry_get_instance_private(entry);
+
+	return priv->start;
 }
 
 void gnt_entry_clear(GntEntry *entry)
 {
+	GntEntryPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_ENTRY(entry));
+	priv = gnt_entry_get_instance_private(entry);
+
 	gnt_entry_set_text_internal(entry, NULL);
-	entry->scroll = entry->cursor = entry->end = entry->start;
+	priv->scroll = priv->cursor = priv->end = priv->start;
 	entry_redraw(GNT_WIDGET(entry));
 	destroy_suggest(entry);
 	entry_text_changed(entry);
@@ -1144,95 +1301,131 @@ void gnt_entry_clear(GntEntry *entry)
 
 void gnt_entry_set_masked(GntEntry *entry, gboolean set)
 {
-	entry->masked = set;
+	GntEntryPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_ENTRY(entry));
+	priv = gnt_entry_get_instance_private(entry);
+
+	priv->masked = set;
 }
 
 void gnt_entry_add_to_history(GntEntry *entry, const char *text)
 {
-	g_return_if_fail(entry->history != NULL);   /* Need to set_history_length first */
+	GntEntryPrivate *priv = NULL;
 
-	if (entry->histlength >= 0 &&
-		g_list_length(entry->history) >= (gsize)entry->histlength)
-	{
+	g_return_if_fail(GNT_IS_ENTRY(entry));
+	priv = gnt_entry_get_instance_private(entry);
+
+	/* Must have called set_history_length first */
+	g_return_if_fail(priv->history != NULL);
+
+	if (priv->histlength >= 0 &&
+	    g_list_length(priv->history) >= (gsize)priv->histlength) {
 		return;
 	}
 
-	entry->history = g_list_first(entry->history);
-	g_free(entry->history->data);
-	entry->history->data = g_strdup(text);
-	entry->history = g_list_prepend(entry->history, NULL);
+	priv->history = g_list_first(priv->history);
+	g_free(priv->history->data);
+	priv->history->data = g_strdup(text);
+	priv->history = g_list_prepend(priv->history, NULL);
 }
 
 void gnt_entry_set_history_length(GntEntry *entry, int num)
 {
+	GntEntryPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_ENTRY(entry));
+	priv = gnt_entry_get_instance_private(entry);
+
 	if (num == 0)
 	{
-		entry->histlength = num;
-		if (entry->history)
-		{
-			entry->history = g_list_first(entry->history);
-			g_list_free_full(entry->history, g_free);
-			entry->history = NULL;
+		priv->histlength = num;
+		if (priv->history) {
+			priv->history = g_list_first(priv->history);
+			g_list_free_full(priv->history, g_free);
+			priv->history = NULL;
 		}
 		return;
 	}
 
-	if (entry->histlength == 0)
-	{
-		entry->histlength = num;
-		entry->history = g_list_append(NULL, NULL);
+	if (priv->histlength == 0) {
+		priv->histlength = num;
+		priv->history = g_list_append(NULL, NULL);
 		return;
 	}
 
-	if (num > 0 && num < entry->histlength)
-	{
+	if (num > 0 && num < priv->histlength) {
 		GList *first, *iter;
 		int index = 0;
-		for (first = entry->history, index = 0; first->prev; first = first->prev, index++);
+		for (first = priv->history, index = 0; first->prev;
+		     first = first->prev, index++) {
+			/* Nothing. */
+		}
 		while ((iter = g_list_nth(first, num)) != NULL)
 		{
 			g_free(iter->data);
 			first = g_list_delete_link(first, iter);
 		}
-		entry->histlength = num;
+		priv->histlength = num;
 		if (index >= num)
-			entry->history = g_list_last(first);
+			priv->history = g_list_last(first);
 		return;
 	}
 
-	entry->histlength = num;
+	priv->histlength = num;
 }
 
 void gnt_entry_set_word_suggest(GntEntry *entry, gboolean word)
 {
-	entry->word = word;
+	GntEntryPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_ENTRY(entry));
+	priv = gnt_entry_get_instance_private(entry);
+
+	priv->word = word;
 }
 
 void gnt_entry_set_always_suggest(GntEntry *entry, gboolean always)
 {
-	entry->always = always;
+	GntEntryPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_ENTRY(entry));
+	priv = gnt_entry_get_instance_private(entry);
+
+	priv->always = always;
 }
 
 void gnt_entry_add_suggest(GntEntry *entry, const char *text)
 {
+	GntEntryPrivate *priv = NULL;
 	GList *find;
+
+	g_return_if_fail(GNT_IS_ENTRY(entry));
+	priv = gnt_entry_get_instance_private(entry);
 
 	if (!text || !*text)
 		return;
 
-	find = g_list_find_custom(entry->suggests, text, (GCompareFunc)g_utf8_collate);
+	find = g_list_find_custom(priv->suggests, text,
+	                          (GCompareFunc)g_utf8_collate);
 	if (find)
 		return;
-	entry->suggests = g_list_append(entry->suggests, g_strdup(text));
+	priv->suggests = g_list_append(priv->suggests, g_strdup(text));
 }
 
 void gnt_entry_remove_suggest(GntEntry *entry, const char *text)
 {
-	GList *find = g_list_find_custom(entry->suggests, text, (GCompareFunc)g_utf8_collate);
+	GntEntryPrivate *priv = NULL;
+	GList *find = NULL;
+
+	g_return_if_fail(GNT_IS_ENTRY(entry));
+	priv = gnt_entry_get_instance_private(entry);
+
+	find = g_list_find_custom(priv->suggests, text,
+	                          (GCompareFunc)g_utf8_collate);
 	if (find)
 	{
 		g_free(find->data);
-		entry->suggests = g_list_delete_link(entry->suggests, find);
+		priv->suggests = g_list_delete_link(priv->suggests, find);
 	}
 }
-
