@@ -34,59 +34,8 @@
 #include "gntkeys.h"
 #include "gntwindow.h"
 
-#define GNT_TYPE_FILE_SEL				(gnt_file_sel_get_type())
-#define GNT_FILE_SEL(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_FILE_SEL, GntFileSel))
-#define GNT_FILE_SEL_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_FILE_SEL, GntFileSelClass))
-#define GNT_IS_FILE_SEL(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_FILE_SEL))
-#define GNT_IS_FILE_SEL_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_FILE_SEL))
-#define GNT_FILE_SEL_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_FILE_SEL, GntFileSelClass))
-
-#define GNT_TYPE_FILE					(gnt_file_get_type())
-
-typedef struct _GntFileSel			GntFileSel;
-typedef struct _GntFileSelClass		GntFileSelClass;
-typedef struct _GntFile             GntFile;
-
-/**
- * GntFileSel:
- *
- * Access to any fields is deprecated. See inline comments for replacements.
- */
-struct _GntFileSel
-{
-	GntWindow parent;
-
-	GntWidget *GNTSEAL(dirs);     /* list of files */
-	GntWidget *GNTSEAL(files);    /* list of directories */
-	GntWidget *GNTSEAL(location); /* location entry */
-
-	GntWidget *GNTSEAL(select);   /* select button */
-	GntWidget *GNTSEAL(cancel);   /* cancel button */
-
-	char *GNTSEAL(current); /* Full path of the current location */
-	char *GNTSEAL(suggest); /* Suggested filename */
-	/* XXX: someone should make these useful */
-	gboolean GNTSEAL(must_exist); /* Make sure the selected file (the name entered in 'location') exists */
-	gboolean GNTSEAL(dirsonly);   /* Show only directories */
-	gboolean GNTSEAL(multiselect);
-	GList *GNTSEAL(tags);         /* List of tagged files when multiselect is set */
-
-	gboolean (*GNTSEAL(read_fn))(const char *path, GList **files, GError **error);
-};
-
-struct _GntFileSelClass
-{
-	GntWindowClass parent;
-
-	void (*file_selected)(GntFileSel *sel, const char *path, const char *filename);
-	void (*cancelled)(GntFileSel *sel);
-
-	/*< private >*/
-	void (*gnt_reserved1)(void);
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
-};
+#define GNT_TYPE_FILE_SEL gnt_file_sel_get_type()
+#define GNT_TYPE_FILE gnt_file_get_type()
 
 typedef enum
 {
@@ -94,13 +43,13 @@ typedef enum
 	GNT_FILE_DIR
 } GntFileType;
 
-struct _GntFile
+typedef struct
 {
 	char *fullpath;
 	char *basename;
 	GntFileType type;
 	unsigned long size;
-};
+} GntFile;
 
 G_BEGIN_DECLS
 
@@ -109,7 +58,22 @@ G_BEGIN_DECLS
  *
  * Returns: GType for GntFileSel.
  */
-GType gnt_file_sel_get_type(void);
+G_DECLARE_DERIVABLE_TYPE(GntFileSel, gnt_file_sel, GNT, FILE_SEL, GntWindow)
+
+struct _GntFileSelClass
+{
+	GntWindowClass parent;
+
+	void (*file_selected)(GntFileSel *sel, const char *path,
+	                      const char *filename);
+	void (*cancelled)(GntFileSel *sel);
+
+	/*< private >*/
+	void (*gnt_reserved1)(void);
+	void (*gnt_reserved2)(void);
+	void (*gnt_reserved3)(void);
+	void (*gnt_reserved4)(void);
+};
 
 /**
  * gnt_file_get_type:

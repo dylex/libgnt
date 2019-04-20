@@ -38,6 +38,29 @@
 
 #include <glib/gstdio.h>
 
+typedef struct
+{
+	GntWindow parent;
+
+	GntWidget *dirs;     /* list of files */
+	GntWidget *files;    /* list of directories */
+	GntWidget *location; /* location entry */
+
+	GntWidget *select; /* select button */
+	GntWidget *cancel; /* cancel button */
+
+	char *current; /* Full path of the current location */
+	char *suggest; /* Suggested filename */
+	/* XXX: someone should make these useful */
+	gboolean must_exist; /* Make sure the selected file (the name entered in
+	                        'location') exists */
+	gboolean dirsonly;   /* Show only directories */
+	gboolean multiselect;
+	GList *tags; /* List of tagged files when multiselect is set */
+
+	gboolean (*read_fn)(const char *path, GList **files, GError **error);
+} GntFileSelPrivate;
+
 enum
 {
 	SIG_FILE_SELECTED,
@@ -52,16 +75,18 @@ static void (*orig_size_request)(GntWidget *widget);
 static void select_activated_cb(GntWidget *button, GntFileSel *sel);
 static void cancel_activated_cb(GntWidget *button, GntFileSel *sel);
 
-G_DEFINE_TYPE(GntFileSel, gnt_file_sel, GNT_TYPE_WINDOW)
+G_DEFINE_TYPE_WITH_PRIVATE(GntFileSel, gnt_file_sel, GNT_TYPE_WINDOW)
 
 static void
 gnt_file_sel_destroy(GntWidget *widget)
 {
 	GntFileSel *sel = GNT_FILE_SEL(widget);
-	g_free(sel->current);
-	g_free(sel->suggest);
-	if (sel->tags) {
-		g_list_free_full(sel->tags, g_free);
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+
+	g_free(priv->current);
+	g_free(priv->suggest);
+	if (priv->tags) {
+		g_list_free_full(priv->tags, g_free);
 	}
 }
 
@@ -103,20 +128,30 @@ process_path(const char *path)
 static void
 update_location(GntFileSel *sel)
 {
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
 	char *old;
 	const char *tmp;
-	tmp = sel->suggest ? sel->suggest :
-		(const char*)gnt_tree_get_selection_data(sel->dirsonly ? GNT_TREE(sel->dirs) : GNT_TREE(sel->files));
-	old = g_strdup_printf("%s%s%s", SAFE(sel->current), SAFE(sel->current)[1] ? G_DIR_SEPARATOR_S : "", tmp ? tmp : "");
-	gnt_entry_set_text(GNT_ENTRY(sel->location), old);
+	tmp = priv->suggest ? priv->suggest
+	                    : (const char *)gnt_tree_get_selection_data(
+	                              priv->dirsonly ? GNT_TREE(priv->dirs)
+	                                             : GNT_TREE(priv->files));
+	old = g_strdup_printf("%s%s%s", SAFE(priv->current),
+	                      SAFE(priv->current)[1] ? G_DIR_SEPARATOR_S : "",
+	                      tmp ? tmp : "");
+	gnt_entry_set_text(GNT_ENTRY(priv->location), old);
 	g_free(old);
 }
 
 static gboolean
 is_tagged(GntFileSel *sel, const char *f)
 {
-	char *ret = g_strdup_printf("%s%s%s", sel->current, sel->current[1] ? G_DIR_SEPARATOR_S : "", f);
-	gboolean find = g_list_find_custom(sel->tags, ret, (GCompareFunc)g_utf8_collate) != NULL;
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+	char *ret =
+	        g_strdup_printf("%s%s%s", priv->current,
+	                        priv->current[1] ? G_DIR_SEPARATOR_S : "", f);
+	gboolean find =
+	        g_list_find_custom(priv->tags, ret,
+	                           (GCompareFunc)g_utf8_collate) != NULL;
 	g_free(ret);
 	return find;
 }
@@ -191,17 +226,20 @@ gnt_file_free(GntFile *file)
 static gboolean
 location_changed(GntFileSel *sel, GError **err)
 {
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
 	GList *files, *iter;
 	gboolean success;
 
-	if (!sel->dirs)
+	if (!priv->dirs) {
 		return TRUE;
+	}
 
-	gnt_tree_remove_all(GNT_TREE(sel->dirs));
-	if (sel->files)
-		gnt_tree_remove_all(GNT_TREE(sel->files));
-	gnt_entry_set_text(GNT_ENTRY(sel->location), NULL);
-	if (sel->current == NULL) {
+	gnt_tree_remove_all(GNT_TREE(priv->dirs));
+	if (priv->files) {
+		gnt_tree_remove_all(GNT_TREE(priv->files));
+	}
+	gnt_entry_set_text(GNT_ENTRY(priv->location), NULL);
+	if (priv->current == NULL) {
 		if (gnt_widget_get_mapped(GNT_WIDGET(sel))) {
 			gnt_widget_draw(GNT_WIDGET(sel));
 		}
@@ -213,14 +251,15 @@ location_changed(GntFileSel *sel, GError **err)
 	 * XXX:/
 	 */
 	files = NULL;
-	if (sel->read_fn)
-		success = sel->read_fn(sel->current, &files, err);
-	else
-		success = local_read_fn(sel->current, &files, err);
+	if (priv->read_fn) {
+		success = priv->read_fn(priv->current, &files, err);
+	} else {
+		success = local_read_fn(priv->current, &files, err);
+	}
 
 	if (!success || *err) {
-		gnt_warning("error opening location %s (%s)",
-			sel->current, *err ? (*err)->message : "reason unknown");
+		gnt_warning("error opening location %s (%s)", priv->current,
+		            *err ? (*err)->message : "reason unknown");
 		return FALSE;
 	}
 
@@ -228,18 +267,30 @@ location_changed(GntFileSel *sel, GError **err)
 		GntFile *file = iter->data;
 		char *str = file->basename;
 		if (file->type == GNT_FILE_DIR) {
-			gnt_tree_add_row_after(GNT_TREE(sel->dirs), g_strdup(str),
-					gnt_tree_create_row(GNT_TREE(sel->dirs), str), NULL, NULL);
-			if (sel->multiselect && sel->dirsonly && is_tagged(sel, str))
-				gnt_tree_set_row_flags(GNT_TREE(sel->dirs), (gpointer)str, GNT_TEXT_FLAG_BOLD);
-		} else if (!sel->dirsonly) {
+			gnt_tree_add_row_after(
+			        GNT_TREE(priv->dirs), g_strdup(str),
+			        gnt_tree_create_row(GNT_TREE(priv->dirs), str),
+			        NULL, NULL);
+			if (priv->multiselect && priv->dirsonly &&
+			    is_tagged(sel, str)) {
+				gnt_tree_set_row_flags(GNT_TREE(priv->dirs),
+				                       (gpointer)str,
+				                       GNT_TEXT_FLAG_BOLD);
+			}
+		} else if (!priv->dirsonly) {
 			char size[128];
 			snprintf(size, sizeof(size), "%ld", file->size);
 
-			gnt_tree_add_row_after(GNT_TREE(sel->files), g_strdup(str),
-					gnt_tree_create_row(GNT_TREE(sel->files), str, size, ""), NULL, NULL);
-			if (sel->multiselect && is_tagged(sel, str))
-				gnt_tree_set_row_flags(GNT_TREE(sel->files), (gpointer)str, GNT_TEXT_FLAG_BOLD);
+			gnt_tree_add_row_after(
+			        GNT_TREE(priv->files), g_strdup(str),
+			        gnt_tree_create_row(GNT_TREE(priv->files), str,
+			                            size, ""),
+			        NULL, NULL);
+			if (priv->multiselect && is_tagged(sel, str)) {
+				gnt_tree_set_row_flags(GNT_TREE(priv->files),
+				                       (gpointer)str,
+				                       GNT_TEXT_FLAG_BOLD);
+			}
 		}
 	}
 	g_list_free_full(files, (GDestroyNotify)gnt_file_free);
@@ -252,6 +303,7 @@ location_changed(GntFileSel *sel, GError **err)
 static gboolean
 dir_key_pressed(GntTree *tree, const char *key, GntFileSel *sel)
 {
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
 	if (strcmp(key, "\r") == 0 || strcmp(key, "\n") == 0) {
 		char *str = g_strdup(gnt_tree_get_selection_data(tree));
 		char *path, *dir;
@@ -259,8 +311,8 @@ dir_key_pressed(GntTree *tree, const char *key, GntFileSel *sel)
 		if (!str)
 			return TRUE;
 
-		path = g_build_filename(sel->current, str, NULL);
-		dir = g_path_get_basename(sel->current);
+		path = g_build_filename(priv->current, str, NULL);
+		dir = g_path_get_basename(priv->current);
 		if (!gnt_file_sel_set_current_location(sel, path)) {
 			gnt_tree_set_selected(tree, str);
 		} else if (strcmp(str, "..") == 0) {
@@ -279,17 +331,19 @@ static gboolean
 location_key_pressed(G_GNUC_UNUSED GntTree *tree, const char *key,
                      GntFileSel *sel)
 {
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
 	char *path;
 	char *str;
 
 	if (strcmp(key, "\r") && strcmp(key, "\n"))
 		return FALSE;
 
-	str = (char*)gnt_entry_get_text(GNT_ENTRY(sel->location));
+	str = (char *)gnt_entry_get_text(GNT_ENTRY(priv->location));
 	if (*str == G_DIR_SEPARATOR)
 		path = g_strdup(str);
 	else
-		path = g_strdup_printf("%s" G_DIR_SEPARATOR_S "%s", sel->current, str);
+		path = g_strdup_printf("%s" G_DIR_SEPARATOR_S "%s",
+		                       priv->current, str);
 	str = process_path(path);
 	g_free(path);
 	path = str;
@@ -316,9 +370,10 @@ static void
 file_sel_changed(GntWidget *widget, G_GNUC_UNUSED gpointer old,
                  G_GNUC_UNUSED gpointer current, GntFileSel *sel)
 {
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
 	if (gnt_widget_get_has_focus(widget)) {
-		g_free(sel->suggest);
-		sel->suggest = NULL;
+		g_free(priv->suggest);
+		priv->suggest = NULL;
 		update_location(sel);
 	}
 }
@@ -327,10 +382,12 @@ static void
 gnt_file_sel_map(GntWidget *widget)
 {
 	GntFileSel *sel = GNT_FILE_SEL(widget);
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
 	GntWidget *hbox, *vbox;
 
-	if (sel->current == NULL)
+	if (priv->current == NULL) {
 		gnt_file_sel_set_current_location(sel, g_get_home_dir());
+	}
 
 	vbox = gnt_vbox_new(FALSE);
 	gnt_box_set_pad(GNT_BOX(vbox), 0);
@@ -340,21 +397,22 @@ gnt_file_sel_map(GntWidget *widget)
 	hbox = gnt_hbox_new(FALSE);
 	gnt_box_set_pad(GNT_BOX(hbox), 0);
 
-	gnt_box_add_widget(GNT_BOX(hbox), sel->dirs);
+	gnt_box_add_widget(GNT_BOX(hbox), priv->dirs);
 
-	if (!sel->dirsonly) {
-		gnt_box_add_widget(GNT_BOX(hbox), sel->files);
+	if (!priv->dirsonly) {
+		gnt_box_add_widget(GNT_BOX(hbox), priv->files);
 	} else {
-		g_signal_connect(G_OBJECT(sel->dirs), "selection_changed", G_CALLBACK(file_sel_changed), sel);
+		g_signal_connect(G_OBJECT(priv->dirs), "selection_changed",
+		                 G_CALLBACK(file_sel_changed), sel);
 	}
 
 	gnt_box_add_widget(GNT_BOX(vbox), hbox);
-	gnt_box_add_widget(GNT_BOX(vbox), sel->location);
+	gnt_box_add_widget(GNT_BOX(vbox), priv->location);
 
 	/* The buttons */
 	hbox = gnt_hbox_new(FALSE);
-	gnt_box_add_widget(GNT_BOX(hbox), sel->cancel);
-	gnt_box_add_widget(GNT_BOX(hbox), sel->select);
+	gnt_box_add_widget(GNT_BOX(hbox), priv->cancel);
+	gnt_box_add_widget(GNT_BOX(hbox), priv->select);
 	gnt_box_add_widget(GNT_BOX(vbox), hbox);
 
 	gnt_box_add_widget(GNT_BOX(sel), vbox);
@@ -366,14 +424,16 @@ static gboolean
 toggle_tag_selection(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntFileSel *sel = GNT_FILE_SEL(bind);
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
 	char *str;
 	GList *find;
 	char *file;
 	GntWidget *tree;
 
-	if (!sel->multiselect)
+	if (!priv->multiselect) {
 		return FALSE;
-	tree = sel->dirsonly ? sel->dirs : sel->files;
+	}
+	tree = priv->dirsonly ? priv->dirs : priv->files;
 	if (!gnt_widget_has_focus(tree) ||
 			gnt_tree_is_searching(GNT_TREE(tree)))
 		return FALSE;
@@ -381,13 +441,14 @@ toggle_tag_selection(GntBindable *bind, G_GNUC_UNUSED GList *params)
 	file = gnt_tree_get_selection_data(GNT_TREE(tree));
 
 	str = gnt_file_sel_get_selected_file(sel);
-	if ((find = g_list_find_custom(sel->tags, str, (GCompareFunc)g_utf8_collate)) != NULL) {
+	if ((find = g_list_find_custom(priv->tags, str,
+	                               (GCompareFunc)g_utf8_collate)) != NULL) {
 		g_free(find->data);
-		sel->tags = g_list_delete_link(sel->tags, find);
+		priv->tags = g_list_delete_link(priv->tags, find);
 		gnt_tree_set_row_flags(GNT_TREE(tree), file, GNT_TEXT_FLAG_NORMAL);
 		g_free(str);
 	} else {
-		sel->tags = g_list_prepend(sel->tags, str);
+		priv->tags = g_list_prepend(priv->tags, str);
 		gnt_tree_set_row_flags(GNT_TREE(tree), file, GNT_TEXT_FLAG_BOLD);
 	}
 
@@ -400,18 +461,20 @@ static gboolean
 clear_tags(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	GntFileSel *sel = GNT_FILE_SEL(bind);
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
 	GntWidget *tree;
 	GList *iter;
 
-	if (!sel->multiselect)
+	if (!priv->multiselect) {
 		return FALSE;
-	tree = sel->dirsonly ? sel->dirs : sel->files;
+	}
+	tree = priv->dirsonly ? priv->dirs : priv->files;
 	if (!gnt_widget_has_focus(tree) ||
 			gnt_tree_is_searching(GNT_TREE(tree)))
 		return FALSE;
 
-	g_list_free_full(sel->tags, g_free);
-	sel->tags = NULL;
+	g_list_free_full(priv->tags, g_free);
+	priv->tags = NULL;
 
 	for (iter = GNT_TREE(tree)->list; iter; iter = iter->next)
 		gnt_tree_set_row_flags(GNT_TREE(tree), iter->data, GNT_TEXT_FLAG_NORMAL);
@@ -424,17 +487,21 @@ up_directory(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
 	char *path, *dir;
 	GntFileSel *sel = GNT_FILE_SEL(bind);
-	if (!gnt_widget_has_focus(sel->dirs) &&
-			!gnt_widget_has_focus(sel->files))
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+	if (!gnt_widget_has_focus(priv->dirs) &&
+	    !gnt_widget_has_focus(priv->files)) {
 		return FALSE;
-	if (gnt_tree_is_searching(GNT_TREE(sel->dirs)) ||
-			gnt_tree_is_searching(GNT_TREE(sel->files)))
+	}
+	if (gnt_tree_is_searching(GNT_TREE(priv->dirs)) ||
+	    gnt_tree_is_searching(GNT_TREE(priv->files))) {
 		return FALSE;
+	}
 
-	path = g_build_filename(sel->current, "..", NULL);
-	dir = g_path_get_basename(sel->current);
-	if (gnt_file_sel_set_current_location(sel, path))
-		gnt_tree_set_selected(GNT_TREE(sel->dirs), dir);
+	path = g_build_filename(priv->current, "..", NULL);
+	dir = g_path_get_basename(priv->current);
+	if (gnt_file_sel_set_current_location(sel, path)) {
+		gnt_tree_set_selected(GNT_TREE(priv->dirs), dir);
+	}
 	g_free(dir);
 	g_free(path);
 	return TRUE;
@@ -443,13 +510,14 @@ up_directory(GntBindable *bind, G_GNUC_UNUSED GList *params)
 static void
 gnt_file_sel_size_request(GntWidget *widget)
 {
-	GntFileSel *sel;
+	GntFileSelPrivate *priv = NULL;
+
 	if (widget->priv.height > 0)
 		return;
 
-	sel = GNT_FILE_SEL(widget);
-	sel->dirs->priv.height = 16;
-	sel->files->priv.height = 16;
+	priv = gnt_file_sel_get_instance_private(GNT_FILE_SEL(widget));
+	priv->dirs->priv.height = 16;
+	priv->files->priv.height = 16;
 	orig_size_request(widget);
 }
 
@@ -512,35 +580,46 @@ gnt_file_sel_class_init(GntFileSelClass *klass)
 static void
 gnt_file_sel_init(GntFileSel *sel)
 {
-	sel->dirs = gnt_tree_new();
-	gnt_tree_set_compare_func(GNT_TREE(sel->dirs), (GCompareFunc)g_utf8_collate);
-	gnt_tree_set_hash_fns(GNT_TREE(sel->dirs), g_str_hash, g_str_equal, g_free);
-	gnt_tree_set_column_titles(GNT_TREE(sel->dirs), "Directories");
-	gnt_tree_set_show_title(GNT_TREE(sel->dirs), TRUE);
-	gnt_tree_set_col_width(GNT_TREE(sel->dirs), 0, 20);
-	g_signal_connect(G_OBJECT(sel->dirs), "key_pressed", G_CALLBACK(dir_key_pressed), sel);
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+	priv->dirs = gnt_tree_new();
+	gnt_tree_set_compare_func(GNT_TREE(priv->dirs),
+	                          (GCompareFunc)g_utf8_collate);
+	gnt_tree_set_hash_fns(GNT_TREE(priv->dirs), g_str_hash, g_str_equal,
+	                      g_free);
+	gnt_tree_set_column_titles(GNT_TREE(priv->dirs), "Directories");
+	gnt_tree_set_show_title(GNT_TREE(priv->dirs), TRUE);
+	gnt_tree_set_col_width(GNT_TREE(priv->dirs), 0, 20);
+	g_signal_connect(G_OBJECT(priv->dirs), "key_pressed",
+	                 G_CALLBACK(dir_key_pressed), sel);
 
-	sel->files = gnt_tree_new_with_columns(2);  /* Name, Size */
-	gnt_tree_set_compare_func(GNT_TREE(sel->files), (GCompareFunc)g_utf8_collate);
-	gnt_tree_set_hash_fns(GNT_TREE(sel->files), g_str_hash, g_str_equal, g_free);
-	gnt_tree_set_column_titles(GNT_TREE(sel->files), "Filename", "Size");
-	gnt_tree_set_show_title(GNT_TREE(sel->files), TRUE);
-	gnt_tree_set_col_width(GNT_TREE(sel->files), 0, 25);
-	gnt_tree_set_col_width(GNT_TREE(sel->files), 1, 10);
-	gnt_tree_set_column_is_right_aligned(GNT_TREE(sel->files), 1, TRUE);
-	g_signal_connect(G_OBJECT(sel->files), "selection_changed", G_CALLBACK(file_sel_changed), sel);
+	priv->files = gnt_tree_new_with_columns(2); /* Name, Size */
+	gnt_tree_set_compare_func(GNT_TREE(priv->files),
+	                          (GCompareFunc)g_utf8_collate);
+	gnt_tree_set_hash_fns(GNT_TREE(priv->files), g_str_hash, g_str_equal,
+	                      g_free);
+	gnt_tree_set_column_titles(GNT_TREE(priv->files), "Filename", "Size");
+	gnt_tree_set_show_title(GNT_TREE(priv->files), TRUE);
+	gnt_tree_set_col_width(GNT_TREE(priv->files), 0, 25);
+	gnt_tree_set_col_width(GNT_TREE(priv->files), 1, 10);
+	gnt_tree_set_column_is_right_aligned(GNT_TREE(priv->files), 1, TRUE);
+	g_signal_connect(G_OBJECT(priv->files), "selection_changed",
+	                 G_CALLBACK(file_sel_changed), sel);
 
 	/* The location entry */
-	sel->location = gnt_entry_new(NULL);
-	g_signal_connect(G_OBJECT(sel->location), "key_pressed", G_CALLBACK(location_key_pressed), sel);
+	priv->location = gnt_entry_new(NULL);
+	g_signal_connect(G_OBJECT(priv->location), "key_pressed",
+	                 G_CALLBACK(location_key_pressed), sel);
 
-	sel->cancel = gnt_button_new("Cancel");
-	g_signal_connect(G_OBJECT(sel->cancel), "activate", G_CALLBACK(cancel_activated_cb), sel);
+	priv->cancel = gnt_button_new("Cancel");
+	g_signal_connect(G_OBJECT(priv->cancel), "activate",
+	                 G_CALLBACK(cancel_activated_cb), sel);
 
-	sel->select = gnt_button_new("Select");
+	priv->select = gnt_button_new("Select");
 
-	g_signal_connect_swapped(G_OBJECT(sel->files), "activate", G_CALLBACK(gnt_widget_activate), sel->select);
-	g_signal_connect(G_OBJECT(sel->select), "activate", G_CALLBACK(select_activated_cb), sel);
+	g_signal_connect_swapped(G_OBJECT(priv->files), "activate",
+	                         G_CALLBACK(gnt_widget_activate), priv->select);
+	g_signal_connect(G_OBJECT(priv->select), "activate",
+	                 G_CALLBACK(select_activated_cb), sel);
 }
 
 /******************************************************************************
@@ -570,17 +649,18 @@ GntWidget *gnt_file_sel_new(void)
 
 gboolean gnt_file_sel_set_current_location(GntFileSel *sel, const char *path)
 {
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
 	char *old;
 	GError *error = NULL;
 	gboolean ret = TRUE;
 
-	old = sel->current;
-	sel->current = process_path(path);
+	old = priv->current;
+	priv->current = process_path(path);
 	if (!location_changed(sel, &error)) {
 		g_error_free(error);
 		error = NULL;
-		g_free(sel->current);
-		sel->current = old;
+		g_free(priv->current);
+		priv->current = old;
 		location_changed(sel, &error);
 		ret = FALSE;
 	} else
@@ -592,53 +672,62 @@ gboolean gnt_file_sel_set_current_location(GntFileSel *sel, const char *path)
 
 void gnt_file_sel_set_dirs_only(GntFileSel *sel, gboolean dirs)
 {
-	sel->dirsonly = dirs;
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+	priv->dirsonly = dirs;
 }
 
 gboolean gnt_file_sel_get_dirs_only(GntFileSel *sel)
 {
-	return sel->dirsonly;
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+	return priv->dirsonly;
 }
 
 void gnt_file_sel_set_suggested_filename(GntFileSel *sel, const char *suggest)
 {
-	g_free(sel->suggest);
-	sel->suggest = g_strdup(suggest);
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+	g_free(priv->suggest);
+	priv->suggest = g_strdup(suggest);
 }
 
 char *gnt_file_sel_get_selected_file(GntFileSel *sel)
 {
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
 	char *ret;
-	if (sel->dirsonly) {
-		ret = g_path_get_dirname(gnt_entry_get_text(GNT_ENTRY(sel->location)));
+	if (priv->dirsonly) {
+		ret = g_path_get_dirname(
+		        gnt_entry_get_text(GNT_ENTRY(priv->location)));
 	} else {
-		ret = g_strdup(gnt_entry_get_text(GNT_ENTRY(sel->location)));
+		ret = g_strdup(gnt_entry_get_text(GNT_ENTRY(priv->location)));
 	}
 	return ret;
 }
 
 void gnt_file_sel_set_must_exist(GntFileSel *sel, gboolean must)
 {
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
 	/*XXX: What do I do with this? */
-	sel->must_exist = must;
+	priv->must_exist = must;
 }
 
 gboolean gnt_file_sel_get_must_exist(GntFileSel *sel)
 {
-	return sel->must_exist;
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+	return priv->must_exist;
 }
 
 void gnt_file_sel_set_multi_select(GntFileSel *sel, gboolean set)
 {
-	sel->multiselect = set;
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+	priv->multiselect = set;
 }
 
 GList *gnt_file_sel_get_selected_multi_files(GntFileSel *sel)
 {
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
 	GList *list = NULL, *iter;
 	char *str = gnt_file_sel_get_selected_file(sel);
 
-	for (iter = sel->tags; iter; iter = iter->next) {
+	for (iter = priv->tags; iter; iter = iter->next) {
 		list = g_list_prepend(list, g_strdup(iter->data));
 		if (g_utf8_collate(str, iter->data)) {
 			g_free(str);
@@ -653,7 +742,8 @@ GList *gnt_file_sel_get_selected_multi_files(GntFileSel *sel)
 
 void gnt_file_sel_set_read_fn(GntFileSel *sel, gboolean (*read_fn)(const char *path, GList **files, GError **error))
 {
-	sel->read_fn = read_fn;
+	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
+	priv->read_fn = read_fn;
 }
 
 /**************************************************************************

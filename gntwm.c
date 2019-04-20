@@ -844,12 +844,6 @@ dump_file_save(GntFileSel *fs, const char *path, G_GNUC_UNUSED const char *f,
 	fclose(file);
 }
 
-static void
-dump_file_cancel(G_GNUC_UNUSED GntWidget *w, GntFileSel *fs)
-{
-	gnt_widget_destroy(GNT_WIDGET(fs));
-}
-
 static gboolean
 dump_screen(G_GNUC_UNUSED GntBindable *b, G_GNUC_UNUSED GList *params)
 {
@@ -862,7 +856,8 @@ dump_screen(G_GNUC_UNUSED GntBindable *b, G_GNUC_UNUSED GList *params)
 
 	gnt_file_sel_set_suggested_filename(sel, "dump.html");
 	g_signal_connect(G_OBJECT(sel), "file_selected", G_CALLBACK(dump_file_save), NULL);
-	g_signal_connect(G_OBJECT(sel->cancel), "activate", G_CALLBACK(dump_file_cancel), sel);
+	g_signal_connect_swapped(G_OBJECT(sel), "cancelled",
+	                         G_CALLBACK(gnt_widget_destroy), sel);
 	gnt_widget_show(window);
 	return TRUE;
 }
@@ -1314,7 +1309,8 @@ run_python(G_GNUC_UNUSED GntBindable *bindable, G_GNUC_UNUSED GList *params)
 	gnt_box_set_title(GNT_BOX(window), "Select Python Script...");
 
 	g_signal_connect(G_OBJECT(sel), "file_selected", G_CALLBACK(python_script_selected), NULL);
-	g_signal_connect_swapped(G_OBJECT(sel->cancel), "activate", G_CALLBACK(gnt_widget_destroy), sel);
+	g_signal_connect_swapped(G_OBJECT(sel), "cancelled",
+	                         G_CALLBACK(gnt_widget_destroy), sel);
 	gnt_widget_show(window);
 	return TRUE;
 }
