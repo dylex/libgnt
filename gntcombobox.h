@@ -55,6 +55,18 @@ G_DECLARE_FINAL_TYPE(GntComboBox, gnt_combo_box, GNT, COMBO_BOX, GntWidget)
 GntWidget * gnt_combo_box_new(void);
 
 /**
+ * gnt_combo_box_get_dropdown:
+ * @box: The GntComboBox
+ *
+ * Get the dropdown GntTree that is shown when opened
+ *
+ * Returns: (transfer none): The dropdown for the combo box
+ *
+ * Since: 2.14.0
+ */
+GntWidget *gnt_combo_box_get_dropdown(GntComboBox *box);
+
+/**
  * gnt_combo_box_add_data:
  * @box: The GntComboBox
  * @key: The data

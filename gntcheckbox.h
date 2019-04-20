@@ -30,8 +30,8 @@
  * @see_also: #GntButton
  */
 
-#include "gntbutton.h"
 #include "gnt.h"
+#include "gntbutton.h"
 #include "gntcolors.h"
 #include "gntkeys.h"
 

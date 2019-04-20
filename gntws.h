@@ -29,6 +29,7 @@
  * @short_description: Workspace API
  */
 
+#include "gnt.h"
 #include "gntwidget.h"
 
 #include <panel.h>
@@ -41,18 +42,23 @@
 
 typedef struct _GntWS GntWS;
 
+/**
+ * GntWS:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntWS
 {
 	GntBindable inherit;
-	char *name;
-	GList *list;
-	GList *ordered;
-	gpointer ui_data;
+	char *GNTSEAL(name);
+	GList *GNTSEAL(list);
+	GList *GNTSEAL(ordered);
+	gpointer GNTSEAL(ui_data);
 
-	void *res1;
-	void *res2;
-	void *res3;
-	void *res4;
+	void *GNTSEAL(res1);
+	void *GNTSEAL(res2);
+	void *GNTSEAL(res3);
+	void *GNTSEAL(res4);
 };
 
 typedef struct _GntWSClass GntWSClass;
@@ -76,7 +82,7 @@ G_BEGIN_DECLS
  *
  * Returns: The GType for GntWS.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 GType gnt_ws_get_type(void);
 
@@ -88,7 +94,7 @@ GType gnt_ws_get_type(void);
  *
  * Returns: The newly created workspace.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 GntWS *gnt_ws_new(const char *name);
 
@@ -99,7 +105,7 @@ GntWS *gnt_ws_new(const char *name);
  *
  * Set the name of a workspace.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 void gnt_ws_set_name(GntWS *ws, const gchar *name);
 
@@ -110,7 +116,7 @@ void gnt_ws_set_name(GntWS *ws, const gchar *name);
  *
  * Add a widget to a workspace.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 void gnt_ws_add_widget(GntWS *ws, GntWidget *widget);
 
@@ -121,7 +127,7 @@ void gnt_ws_add_widget(GntWS *ws, GntWidget *widget);
  *
  * Remove a widget from a workspace.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 void gnt_ws_remove_widget(GntWS *ws, GntWidget *widget);
 
@@ -132,7 +138,7 @@ void gnt_ws_remove_widget(GntWS *ws, GntWidget *widget);
  *
  * Hide a widget in a workspace.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 void gnt_ws_widget_hide(GntWidget *widget, GHashTable *nodes);
 
@@ -143,7 +149,7 @@ void gnt_ws_widget_hide(GntWidget *widget, GHashTable *nodes);
  *
  * Show a widget in a workspace.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 void gnt_ws_widget_show(GntWidget *widget, GHashTable *nodes);
 
@@ -154,7 +160,7 @@ void gnt_ws_widget_show(GntWidget *widget, GHashTable *nodes);
  *
  * Draw the taskbar in a workspace.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 void gnt_ws_draw_taskbar(GntWS *ws, gboolean reposition);
 
@@ -165,7 +171,7 @@ void gnt_ws_draw_taskbar(GntWS *ws, gboolean reposition);
  *
  * Hide a workspace.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 void gnt_ws_hide(GntWS *ws, GHashTable *table);
 
@@ -176,7 +182,7 @@ void gnt_ws_hide(GntWS *ws, GHashTable *table);
  *
  * Show a workspace.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 void gnt_ws_show(GntWS *ws, GHashTable *table);
 
@@ -188,7 +194,7 @@ void gnt_ws_show(GntWS *ws, GHashTable *table);
  *
  * Returns:  The name of the workspace (can be %NULL).
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 const char * gnt_ws_get_name(GntWS *ws);
 

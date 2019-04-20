@@ -36,7 +36,6 @@
 #define MAX_WORKSPACES 99
 
 static GKeyFile *gkfile;
-
 static char * str_styles[GNT_STYLES];
 static int int_styles[GNT_STYLES];
 static int bool_styles[GNT_STYLES];

@@ -29,10 +29,10 @@
  * @short_description: A widget for displaying larger bodies of formatted text
  */
 
-#include "gntwidget.h"
 #include "gnt.h"
 #include "gntcolors.h"
 #include "gntkeys.h"
+#include "gntwidget.h"
 
 #define GNT_TYPE_TEXT_VIEW gnt_text_view_get_type()
 
@@ -100,6 +100,18 @@ void gnt_text_view_append_text_with_flags(GntTextView *view, const char *text, G
  * Append text in the textview, with some identifier (tag) for the added text.
  */
 void gnt_text_view_append_text_with_tag(GntTextView *view, const char *text, GntTextFormatFlags flags, const char *tag);
+
+/**
+ * gnt_text_view_get_text:
+ * @view:   The textview.
+ *
+ * Get the text of the textview.
+ *
+ * Returns: The text.
+ *
+ * Since: 2.14.0
+ */
+const gchar *gnt_text_view_get_text(GntTextView *view);
 
 /**
  * gnt_text_view_next_line:
@@ -219,7 +231,7 @@ void gnt_text_view_attach_editor_widget(GntTextView *view, GntWidget *widget);
  *
  * Set a GntTextViewFlag for the textview widget.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 void gnt_text_view_set_flag(GntTextView *view, GntTextViewFlag flag);
 

@@ -32,6 +32,14 @@
 #include <stdio.h>
 #include <glib.h>
 
+#ifndef GNTSEAL
+#  if defined(GNTSEAL_ENABLE)
+#    define GNTSEAL(ident)      _gnt_sealed__ ## ident
+#  else
+#    define GNTSEAL(ident)      ident
+#  endif
+#endif /* !GNTSEAL */
+
 #include "gntbindable.h"
 
 #define GNT_TYPE_WIDGET				(gnt_widget_get_type())
@@ -139,24 +147,34 @@ typedef enum
 	GNT_PARAM_SERIALIZABLE	= 1 << G_PARAM_USER_SHIFT
 } GntParamFlags;
 
+/**
+ * GntWidgetPriv:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntWidgetPriv
 {
-	int x, y;
-	int width, height;
-	GntWidgetFlags flags;
-	char *name;
+	int GNTSEAL(x), GNTSEAL(y);
+	int GNTSEAL(width), GNTSEAL(height);
+	GntWidgetFlags GNTSEAL(flags);
+	char *GNTSEAL(name);
 
-	int minw, minh;    /* Minimum size for the widget */
+	int GNTSEAL(minw), GNTSEAL(minh);    /* Minimum size for the widget */
 };
 
+/**
+ * GntWidget:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntWidget
 {
 	GntBindable inherit;
 
-	GntWidget *parent;
+	GntWidget *GNTSEAL(parent); /* Deprecated. Use gnt_widget_get_parent. */
 
-	GntWidgetPriv priv;
-	WINDOW *window;
+	GntWidgetPriv GNTSEAL(priv);
+	WINDOW *GNTSEAL(window);
 
 	/*< private >*/
 	void *res1;
@@ -246,6 +264,31 @@ void gnt_widget_expose(GntWidget *widget, int x, int y, int width, int height);
  * Hide a widget.
  */
 void gnt_widget_hide(GntWidget *widget);
+
+/**
+ * gnt_widget_get_parent:
+ * @widget:  The widget.
+ *
+ * Get the parent of a widget.
+ *
+ * Returns: (transfer none) (nullable): The parent widget.
+ *
+ * Since: 2.14.0
+ */
+GntWidget *gnt_widget_get_parent(GntWidget *widget);
+
+/**
+ * gnt_widget_get_toplevel:
+ * @widget:  The widget.
+ *
+ * Get the toplevel parent of a widget in the container hierarchy. If widget
+ * has no parent widgets, it will be returned as the topmost widget.
+ *
+ * Returns: (transfer none) (nullable): The toplevel parent widget.
+ *
+ * Since: 2.14.0
+ */
+GntWidget *gnt_widget_get_toplevel(GntWidget *widget);
 
 /**
  * gnt_widget_get_position:

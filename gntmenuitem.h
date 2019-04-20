@@ -46,34 +46,44 @@ typedef struct _GntMenuItemClass		GntMenuItemClass;
 
 #include "gntmenu.h"
 
+/**
+ * GntMenuItemPriv:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntMenuItemPriv
 {
 	/* These will be used to determine the position of the submenu */
-	int x;
-	int y;
-	char trigger;
-	char *id;
+	int GNTSEAL(x);
+	int GNTSEAL(y);
+	char GNTSEAL(trigger);
+	char *GNTSEAL(id);
 };
 
 typedef void (*GntMenuItemCallback)(GntMenuItem *item, gpointer data);
 
+/**
+ * GntMenuItem:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntMenuItem
 {
 	GObject parent;
-	GntMenuItemPriv priv;
+	GntMenuItemPriv GNTSEAL(priv);
 
-	char *text;
+	char *GNTSEAL(text);
 
 	/* A GntMenuItem can have a callback associated with it.
 	 * The callback will be activated whenever the suer selects it and presses enter (or clicks).
 	 * However, if the GntMenuItem has some child, then the callback and callbackdata will be ignored. */
-	gpointer callbackdata;
-	GntMenuItemCallback callback;
+	gpointer GNTSEAL(callbackdata);
+	GntMenuItemCallback GNTSEAL(callback);
 
-	GntMenu *submenu;
+	GntMenu *GNTSEAL(submenu);
 
 	/*< private >*/
-	gboolean visible;
+	gboolean GNTSEAL(visible);
 };
 
 struct _GntMenuItemClass

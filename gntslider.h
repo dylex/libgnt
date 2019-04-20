@@ -29,9 +29,9 @@
  * @short_description: A widget for selecting from a range of values
  */
 
-#include "gntwidget.h"
 #include "gnt.h"
 #include "gntlabel.h"
+#include "gntwidget.h"
 
 G_BEGIN_DECLS
 
@@ -72,7 +72,7 @@ struct _GntSliderClass
  *
  * Returns:  The newly created slider
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 GntWidget * gnt_slider_new(gboolean orient, int max, int min);
 
@@ -96,7 +96,7 @@ gboolean gnt_slider_get_vertical(GntSlider *slider);
  *
  * Set the range of the slider.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 void gnt_slider_set_range(GntSlider *slider, int max, int min);
 
@@ -119,7 +119,7 @@ void gnt_slider_get_range(GntSlider *slider, int *max, int *min);
  *
  * Sets the amount of change at each step.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 void gnt_slider_set_step(GntSlider *slider, int step);
 
@@ -183,15 +183,15 @@ int gnt_slider_get_large_step(GntSlider *slider);
 
 /**
  * gnt_slider_advance_step:
- * @slider:   The slider
- * @steps:    The number of amounts to change, positive to change
- *                 forward, negative to change backward
+ * @slider: The slider
+ * @steps:  The number of amounts to change, positive to change forward,
+ *          negative to change backward
  *
  * Advance the slider forward or backward.
  *
  * Returns:   The value of the slider after the change
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 int gnt_slider_advance_step(GntSlider *slider, int steps);
 
@@ -202,7 +202,7 @@ int gnt_slider_advance_step(GntSlider *slider, int steps);
  *
  * Set the current value for the slider.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 void gnt_slider_set_value(GntSlider *slider, int value);
 
@@ -212,7 +212,7 @@ void gnt_slider_set_value(GntSlider *slider, int value);
  *
  * Get the current value for the slider.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 int gnt_slider_get_value(GntSlider *slider);
 
@@ -223,7 +223,7 @@ int gnt_slider_get_value(GntSlider *slider);
  *
  * Update a label with the value of the slider whenever the value changes.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 void gnt_slider_reflect_label(GntSlider *slider, GntLabel *label);
 

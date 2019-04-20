@@ -29,11 +29,11 @@
  * @short_description: A widget that shows a tree of items
  */
 
-#include "gntwidget.h"
 #include "gnt.h"
 #include "gntcolors.h"
 #include "gntkeys.h"
 #include "gnttextview.h"
+#include "gntwidget.h"
 
 #define GNT_TYPE_TREE				(gnt_tree_get_type())
 #define GNT_TREE(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_TREE, GntTree))
@@ -70,30 +70,35 @@ struct _GntTreeColInfo
 	GntTreeColumnFlag flags;
 };
 
+/**
+ * GntTree:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntTree
 {
 	GntWidget parent;
 
-	GntTreeRow *current;    /* current selection */
+	GntTreeRow *GNTSEAL(current);    /* current selection */
 
-	GntTreeRow *top;        /* The topmost visible item */
-	GntTreeRow *bottom;     /* The bottommost visible item */
+	GntTreeRow *GNTSEAL(top);        /* The topmost visible item */
+	GntTreeRow *GNTSEAL(bottom);     /* The bottommost visible item */
 
-	GntTreeRow *root;       /* The root of all evil */
+	GntTreeRow *GNTSEAL(root);       /* The root of all evil */
 
-	GList *list;            /* List of GntTreeRow s */
-	GHashTable *hash;       /* We need this for quickly referencing the rows */
-	GntTreeHashFunc hash_func;
-	GntTreeHashEqualityFunc hash_eq_func;
-	GDestroyNotify key_destroy;
-	GDestroyNotify value_destroy;
+	GList *GNTSEAL(list);            /* List of GntTreeRow s */
+	GHashTable *GNTSEAL(hash);       /* We need this for quickly referencing the rows */
+	GntTreeHashFunc GNTSEAL(hash_func);
+	GntTreeHashEqualityFunc GNTSEAL(hash_eq_func);
+	GDestroyNotify GNTSEAL(key_destroy);
+	GDestroyNotify GNTSEAL(value_destroy);
 
-	int ncol;               /* No. of columns */
-	GntTreeColInfo *columns; /* Would a GList be better? */
-	gboolean show_title;
-	gboolean show_separator; /* Whether to show column separators */
+	int GNTSEAL(ncol);                /* No. of columns */
+	GntTreeColInfo *GNTSEAL(columns); /* Would a GList be better? */
+	gboolean GNTSEAL(show_title);
+	gboolean GNTSEAL(show_separator); /* Whether to show column separators */
 
-	GntTreePriv *priv;
+	GntTreePriv *GNTSEAL(priv);
 };
 
 struct _GntTreeClass
@@ -261,7 +266,7 @@ GList * gnt_tree_get_row_text_list(GntTree *tree, gpointer key);
  *
  * Returns: (transfer none): The key of the row.
  *
- * Since: 2.8.0
+ * Since: 2.7.2
  */
 gpointer gnt_tree_row_get_key(GntTree *tree, GntTreeRow *row);
 
@@ -274,7 +279,7 @@ gpointer gnt_tree_row_get_key(GntTree *tree, GntTreeRow *row);
  *
  * Returns: The next row.
  *
- * Since: 2.8.0
+ * Since: 2.7.2
  */
 GntTreeRow * gnt_tree_row_get_next(GntTree *tree, GntTreeRow *row);
 
@@ -287,7 +292,7 @@ GntTreeRow * gnt_tree_row_get_next(GntTree *tree, GntTreeRow *row);
  *
  * Returns: The previous row.
  *
- * Since: 2.8.0
+ * Since: 2.7.2
  */
 GntTreeRow * gnt_tree_row_get_prev(GntTree *tree, GntTreeRow *row);
 
@@ -300,7 +305,7 @@ GntTreeRow * gnt_tree_row_get_prev(GntTree *tree, GntTreeRow *row);
  *
  * Returns: The child row.
  *
- * Since: 2.8.0
+ * Since: 2.7.2
  */
 GntTreeRow * gnt_tree_row_get_child(GntTree *tree, GntTreeRow *row);
 
@@ -313,7 +318,7 @@ GntTreeRow * gnt_tree_row_get_child(GntTree *tree, GntTreeRow *row);
  *
  * Returns: The parent row.
  *
- * Since: 2.8.0
+ * Since: 2.7.2
  */
 GntTreeRow * gnt_tree_row_get_parent(GntTree *tree, GntTreeRow *row);
 
@@ -503,7 +508,7 @@ void gnt_tree_set_col_width(GntTree *tree, int col, int width);
  *
  * See gnt_tree_set_column_titles(), gnt_tree_set_show_title().
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 void gnt_tree_set_column_title(GntTree *tree, int index, const char *title);
 
@@ -615,7 +620,7 @@ void gnt_tree_set_column_visible(GntTree *tree, int col, gboolean vis);
  *
  * See gnt_tree_set_col_width(), gnt_tree_set_column_width_ratio().
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 void gnt_tree_set_column_resizable(GntTree *tree, int col, gboolean res);
 
@@ -638,7 +643,7 @@ void gnt_tree_set_column_is_binary(GntTree *tree, int col, gboolean bin);
  *
  * Set whether text in a column should be right-aligned.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 void gnt_tree_set_column_is_right_aligned(GntTree *tree, int col, gboolean right);
 
@@ -654,7 +659,7 @@ void gnt_tree_set_column_is_right_aligned(GntTree *tree, int col, gboolean right
  *
  * See gnt_tree_set_col_width(), gnt_tree_set_column_resizable().
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 void gnt_tree_set_column_width_ratio(GntTree *tree, int cols[]);
 
@@ -665,7 +670,7 @@ void gnt_tree_set_column_width_ratio(GntTree *tree, int cols[]);
  *
  * Set the column to use for typeahead searching.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 void gnt_tree_set_search_column(GntTree *tree, int col);
 
@@ -677,7 +682,7 @@ void gnt_tree_set_search_column(GntTree *tree, int col);
  *
  * Returns:  %TRUE if the user is searching, %FALSE otherwise.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 gboolean gnt_tree_is_searching(GntTree *tree);
 
@@ -692,7 +697,7 @@ gboolean gnt_tree_is_searching(GntTree *tree);
  *
  * Set a custom search function.
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 void gnt_tree_set_search_function(GntTree *tree,
 		gboolean (*func)(GntTree *tree, gpointer key, const char *search, const char *current));

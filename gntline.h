@@ -29,10 +29,10 @@
  * @short_description: A widget that draws a horizontal or vertical line
  */
 
-#include "gntwidget.h"
 #include "gnt.h"
 #include "gntcolors.h"
 #include "gntkeys.h"
+#include "gntwidget.h"
 
 #define GNT_TYPE_LINE gnt_line_get_type()
 

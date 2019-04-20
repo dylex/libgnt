@@ -55,21 +55,26 @@ typedef enum
 	GNT_ALIGN_BOTTOM
 } GntAlignment;
 
+/**
+ * GntBox:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntBox
 {
 	GntWidget parent;
 
-	gboolean vertical;
-	gboolean homogeneous;
-	gboolean fill;
-	GList *list;		/* List of widgets */
+	gboolean GNTSEAL(vertical);
+	gboolean GNTSEAL(homogeneous);
+	gboolean GNTSEAL(fill);
+	GList *GNTSEAL(list);		/* Deprecated. Use gnt_box_get_children. */
 
-	GntWidget *active;
-	int pad;			/* Number of spaces to use between widgets */
-	GntAlignment alignment;  /* How are the widgets going to be aligned? */
+	GntWidget *GNTSEAL(active);
+	int GNTSEAL(pad);			/* Number of spaces to use between widgets */
+	GntAlignment GNTSEAL(alignment);  /* How are the widgets going to be aligned? */
 
-	char *title;
-	GList *focus;		/* List of widgets to cycle focus (only valid for parent boxes) */
+	char *GNTSEAL(title);
+	GList *GNTSEAL(focus);		/* List of widgets to cycle focus (only valid for parent boxes) */
 
 	/*< private >*/
     void *res1;
@@ -114,6 +119,19 @@ GType gnt_box_get_type(void);
  * Returns: The new GntBox.
  */
 GntWidget * gnt_box_new(gboolean homo, gboolean vert);
+
+/**
+ * gnt_box_get_children:
+ * @box: The box
+ *
+ * Returns a list of the children of the widget.
+ *
+ * Returns: (element-type GntWidget) (transfer container): A new list
+ *          containing the children of the box.
+ *
+ * Since: 2.14.0
+ */
+GList *gnt_box_get_children(GntBox *box);
 
 /**
  * gnt_box_add_widget:

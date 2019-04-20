@@ -30,6 +30,7 @@
  * @see_also: #GntMenuItem #GntMenuItemCheck
  */
 
+#include "gnt.h"
 #include "gnttree.h"
 #include "gntcolors.h"
 #include "gntkeys.h"
@@ -61,18 +62,23 @@ typedef enum
 	GNT_MENU_POPUP,
 } GntMenuType;
 
+/**
+ * GntMenu:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntMenu
 {
 	GntTree parent;
-	GntMenuType type;
+	GntMenuType GNTSEAL(type);
 
-	GList *list;
-	guint selected;
+	GList *GNTSEAL(list);
+	guint GNTSEAL(selected);
 
 	/* This will keep track of its immediate submenu which is visible so that
 	 * keystrokes can be passed to it. */
-	GntMenu *submenu;
-	GntMenu *parentmenu;
+	GntMenu *GNTSEAL(submenu);
+	GntMenu *GNTSEAL(parentmenu);
 };
 
 struct _GntMenuClass

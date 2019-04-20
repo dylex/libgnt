@@ -29,10 +29,10 @@
  * @short_description: A widget for entering text
  */
 
-#include "gntwidget.h"
 #include "gnt.h"
 #include "gntcolors.h"
 #include "gntkeys.h"
+#include "gntwidget.h"
 
 #define GNT_TYPE_ENTRY				(gnt_entry_get_type())
 #define GNT_ENTRY(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_ENTRY, GntEntry))
@@ -59,32 +59,37 @@ typedef enum
 
 #define GNT_ENTRY_FLAG_ALL    (GNT_ENTRY_FLAG_ALPHA | GNT_ENTRY_FLAG_INT)
 
+/**
+ * GntEntry:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntEntry
 {
 	GntWidget parent;
 
-	GntEntryFlag flag;
+	GntEntryFlag GNTSEAL(flag);
 
-	char *start;
-	char *end;
-	char *scroll;   /* Current scrolling position */
-	char *cursor;   /* Cursor location */
-	                /* 0 <= cursor - scroll < widget-width */
+	char *GNTSEAL(start);
+	char *GNTSEAL(end);
+	char *GNTSEAL(scroll);   /* Current scrolling position */
+	char *GNTSEAL(cursor);   /* Cursor location */
+	                         /* 0 <= cursor - scroll < widget-width */
 
-	size_t buffer;  /* Size of the buffer */
+	size_t GNTSEAL(buffer);  /* Size of the buffer */
 
-	int max;        /* 0 means infinite */
-	gboolean masked;
+	int GNTSEAL(max);        /* 0 means infinite */
+	gboolean GNTSEAL(masked);
 
-	GList *history; /* History of the strings. User can use this by pressing ctrl+up/down */
-	int histlength; /* How long can the history be? */
+	GList *GNTSEAL(history); /* History of the strings. User can use this by pressing ctrl+up/down */
+	int GNTSEAL(histlength); /* How long can the history be? */
 
-	GList *suggests;    /* List of suggestions */
-	gboolean word;      /* Are the suggestions for only a word, or for the whole thing? */
-	gboolean always;    /* Should the list of suggestions show at all times, or only on tab-press? */
-	GntWidget *ddown;   /* The dropdown with the suggested list */
-	GntEntryKillRing *killring; /* Since: 2.3.0 */
-	GntEntrySearch *search;		/* Since: 2.7.0 */
+	GList *GNTSEAL(suggests);    /* List of suggestions */
+	gboolean GNTSEAL(word);      /* Are the suggestions for only a word, or for the whole thing? */
+	gboolean GNTSEAL(always);    /* Should the list of suggestions show at all times, or only on tab-press? */
+	GntWidget *GNTSEAL(ddown);   /* The dropdown with the suggested list */
+	GntEntryKillRing *GNTSEAL(killring); /* Since: 2.3.0 */
+	GntEntrySearch *GNTSEAL(search);     /* Since: 2.7.0 */
 };
 
 struct _GntEntryClass

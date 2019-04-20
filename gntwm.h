@@ -29,6 +29,7 @@
  * @short_description: A window manager
  */
 
+#include "gnt.h"
 #include "gntwidget.h"
 #include "gntmenu.h"
 #include "gntws.h"
@@ -97,35 +98,38 @@ typedef struct _GntListWindow {
  * @event_stack: Will be set to %TRUE when a user-event, ie. a mouse-click or a
  *               key-press is being processed. This variable will be used to
  *               determine whether to give focus to a new window.
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ *
  */
 struct _GntWM
 {
 	GntBindable inherit;
 
 	/*< public >*/
-	GMainLoop *loop;
+	GMainLoop *GNTSEAL(loop);
 
-	GList *workspaces;
-	GList *tagged; /* tagged windows */
-	GntWS *cws;
+	GList *GNTSEAL(workspaces);
+	GList *GNTSEAL(tagged); /* tagged windows */
+	GntWS *GNTSEAL(cws);
 
-	GntListWindow _list;
-	GntListWindow *windows;         /* Window-list window */
-	GntListWindow *actions;         /* Action-list window */
+	GntListWindow GNTSEAL(_list);
+	GntListWindow *GNTSEAL(windows);         /* Window-list window */
+	GntListWindow *GNTSEAL(actions);         /* Action-list window */
 
-	GHashTable *nodes;    /* GntWidget -> GntNode */
-	GHashTable *name_places;    /* window name -> ws*/
-	GHashTable *title_places;    /* window title -> ws */
+	GHashTable *GNTSEAL(nodes);    /* GntWidget -> GntNode */
+	GHashTable *GNTSEAL(name_places);    /* window name -> ws*/
+	GHashTable *GNTSEAL(title_places);    /* window title -> ws */
 
-	GList *acts;
+	GList *GNTSEAL(acts);
 
-	GntMenu *menu;
+	GntMenu *GNTSEAL(menu);
 
-	gboolean event_stack;
+	gboolean GNTSEAL(event_stack);
 
-	GntKeyPressMode mode;
+	GntKeyPressMode GNTSEAL(mode);
 
-	GHashTable *positions;
+	GHashTable *GNTSEAL(positions);
 
 	/*< private >*/
 	void *res1;
