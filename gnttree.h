@@ -48,7 +48,6 @@ typedef guint (*GntTreeHashFunc)(gconstpointer key);
 typedef gboolean (*GntTreeHashEqualityFunc)(gconstpointer a, gconstpointer b);
 
 typedef struct _GntTree			GntTree;
-typedef struct _GntTreePriv		GntTreePriv;
 typedef struct _GntTreeClass		GntTreeClass;
 
 typedef struct _GntTreeRow		GntTreeRow;
@@ -97,8 +96,6 @@ struct _GntTree
 	GntTreeColInfo *GNTSEAL(columns); /* Would a GList be better? */
 	gboolean GNTSEAL(show_title);
 	gboolean GNTSEAL(show_separator); /* Whether to show column separators */
-
-	GntTreePriv *GNTSEAL(priv);
 };
 
 struct _GntTreeClass

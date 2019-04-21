@@ -29,7 +29,7 @@
 #include <ctype.h>
 
 #define SEARCH_TIMEOUT_S 4   /* 4 secs */
-#define SEARCHING(tree)  (tree->priv->search && tree->priv->search->len > 0)
+#define SEARCHING(priv) (priv->search && priv->search->len > 0)
 
 #define COLUMN_INVISIBLE(tree, index)  (tree->columns[index].flags & GNT_TREE_COLUMN_INVISIBLE)
 #define BINARY_DATA(tree, index)       (tree->columns[index].flags & GNT_TREE_COLUMN_BINARY_DATA)
@@ -51,7 +51,7 @@ enum
 	SIGS,
 };
 
-struct _GntTreePriv
+typedef struct
 {
 	GString *search;
 	int search_timeout;
@@ -61,7 +61,7 @@ struct _GntTreePriv
 	GCompareFunc compare;
 	int lastvisible;
 	int expander_level;
-};
+} GntTreePrivate;
 
 #define	TAB_SIZE 3
 
@@ -102,11 +102,12 @@ static void _gnt_tree_init_internals(GntTree *tree, int col);
 
 static guint signals[SIGS] = { 0 };
 
-G_DEFINE_TYPE(GntTree, gnt_tree, GNT_TYPE_WIDGET)
+G_DEFINE_TYPE_WITH_PRIVATE(GntTree, gnt_tree, GNT_TYPE_WIDGET)
 
 static void
 readjust_columns(GntTree *tree)
 {
+	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
 	int i, col, total;
 	int width;
 #define WIDTH(i) (tree->columns[i].width_ratio ? tree->columns[i].width_ratio : tree->columns[i].width)
@@ -119,9 +120,9 @@ readjust_columns(GntTree *tree)
 		if (tree->columns[i].flags & GNT_TREE_COLUMN_INVISIBLE)
 			continue;
 		if (tree->columns[i].flags & GNT_TREE_COLUMN_FIXED_SIZE)
-			width -= WIDTH(i) + (tree->priv->lastvisible != i);
+			width -= WIDTH(i) + (priv->lastvisible != i);
 		else
-			total += WIDTH(i) + (tree->priv->lastvisible != i);
+			total += WIDTH(i) + (priv->lastvisible != i);
 	}
 
 	if (total == 0)
@@ -165,14 +166,25 @@ _get_next(GntTreeRow *row, gboolean godeep)
 static gboolean
 row_matches_search(GntTreeRow *row)
 {
-	GntTree *t = row->tree;
-	if (t->priv->search && t->priv->search->len > 0) {
-		GntTreeCol *col = (col = g_list_nth_data(row->columns, t->priv->search_column)) ? col : row->columns->data;
+	GntTree *tree = row->tree;
+	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
+
+	if (SEARCHING(priv)) {
+		GntTreeCol *col;
 		char *one, *two, *z;
-		if (t->priv->search_func)
-			return t->priv->search_func(t, row->key, t->priv->search->str, col->text);
+
+		col = g_list_nth_data(row->columns, priv->search_column);
+		if (!col) {
+			col = row->columns->data;
+		}
+
+		if (priv->search_func) {
+			return priv->search_func(tree, row->key,
+			                         priv->search->str, col->text);
+		}
+
 		one = g_utf8_casefold(col->text, -1);
-		two = g_utf8_casefold(t->priv->search->str, -1);
+		two = g_utf8_casefold(priv->search->str, -1);
 		z = strstr(one, two);
 		g_free(one);
 		g_free(two);
@@ -310,6 +322,7 @@ find_depth(GntTreeRow *row)
 static char *
 update_row_text(GntTree *tree, GntTreeRow *row)
 {
+	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
 	GString *string = g_string_new(NULL);
 	GList *iter;
 	int i;
@@ -344,9 +357,8 @@ update_row_text(GntTree *tree, GntTreeRow *row)
 				g_string_append_printf(string, "[%c] ",
 						row->isselected ? 'X' : ' ');
 				fl = 4;
-			}
-			else if (find_depth(row) < tree->priv->expander_level && row->child)
-			{
+			} else if (find_depth(row) < priv->expander_level &&
+			           row->child) {
 				if (row->collapsed)
 				{
 					string = g_string_append(string, "+ ");
@@ -356,9 +368,7 @@ update_row_text(GntTree *tree, GntTreeRow *row)
 					string = g_string_append(string, "- ");
 				}
 				fl = 2;
-			}
-			else
-			{
+			} else {
 				fl = TAB_SIZE * find_depth(row);
 				g_string_append_printf(string, "%*s", fl, "");
 			}
@@ -419,6 +429,7 @@ tree_mark_columns(GntTree *tree, int pos, int y, chtype type)
 static void
 redraw_tree(GntTree *tree)
 {
+	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
 	int start, i;
 	GntWidget *widget = GNT_WIDGET(tree);
 	GntTreeRow *row;
@@ -610,11 +621,12 @@ redraw_tree(GntTree *tree)
 			(row ?  ACS_DARROW : ' ') | gnt_color_pair(GNT_COLOR_HIGHLIGHT_D));
 
 	/* If there's a search-text, show it in the bottom of the tree */
-	if (tree->priv->search && tree->priv->search->len > 0) {
-		const char *str = gnt_util_onscreen_width_to_pointer(tree->priv->search->str, scrcol - 1, NULL);
+	if (SEARCHING(priv)) {
+		const char *str = gnt_util_onscreen_width_to_pointer(
+		        priv->search->str, scrcol - 1, NULL);
 		wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_HIGHLIGHT_D));
 		mvwaddnstr(widget->window, widget->priv.height - pos - 1, pos,
-				tree->priv->search->str, str - tree->priv->search->str);
+		           priv->search->str, str - priv->search->str);
 	}
 	wmove(widget->window, current, pos);
 
@@ -639,14 +651,17 @@ gnt_tree_size_request(GntWidget *widget)
 	if (widget->priv.width == 0)
 	{
 		GntTree *tree = GNT_TREE(widget);
+		GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
 		int i, width = 0;
 		width = gnt_widget_get_has_border(GNT_WIDGET(tree)) ? 3 : 1;
-		for (i = 0; i < tree->ncol; i++)
+		for (i = 0; i < tree->ncol; i++) {
 			if (!COLUMN_INVISIBLE(tree, i)) {
 				width = width + tree->columns[i].width;
-				if (tree->priv->lastvisible != i)
+				if (priv->lastvisible != i) {
 					width++;
+				}
 			}
+		}
 		widget->priv.width = width;
 	}
 }
@@ -694,11 +709,13 @@ static gboolean
 action_move_parent(GntBindable *bind, G_GNUC_UNUSED GList *unused)
 {
 	GntTree *tree = GNT_TREE(bind);
+	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
 	GntTreeRow *row = tree->current;
 	int dist;
 
-	if (!row || !row->parent || SEARCHING(tree))
+	if (!row || !row->parent || SEARCHING(priv)) {
 		return FALSE;
+	}
 
 	tree->current = row->parent;
 	if ((dist = get_distance(tree->current, tree->top)) > 0)
@@ -787,11 +804,12 @@ action_page_up(GntBindable *bind, G_GNUC_UNUSED GList *unused)
 static void
 end_search(GntTree *tree)
 {
-	if (tree->priv->search) {
-		g_source_remove(tree->priv->search_timeout);
-		g_string_free(tree->priv->search, TRUE);
-		tree->priv->search = NULL;
-		tree->priv->search_timeout = 0;
+	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
+	if (priv->search) {
+		g_source_remove(priv->search_timeout);
+		g_string_free(priv->search, TRUE);
+		priv->search = NULL;
+		priv->search_timeout = 0;
 		gnt_widget_set_disable_actions(GNT_WIDGET(tree), FALSE);
 	}
 }
@@ -811,18 +829,20 @@ static gboolean
 gnt_tree_key_pressed(GntWidget *widget, const char *text)
 {
 	GntTree *tree = GNT_TREE(widget);
+	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
 	GntTreeRow *old = tree->current;
 
 	if (text[0] == '\r' || text[0] == '\n') {
 		end_search(tree);
 		gnt_widget_activate(widget);
-	} else if (tree->priv->search) {
+	} else if (priv->search) {
 		gboolean changed = TRUE;
 		if (g_unichar_isprint(*text)) {
-			tree->priv->search = g_string_append_c(tree->priv->search, *text);
+			priv->search = g_string_append_c(priv->search, *text);
 		} else if (g_utf8_collate(text, GNT_KEY_BACKSPACE) == 0) {
-			if (tree->priv->search->len)
-				tree->priv->search->str[--tree->priv->search->len] = '\0';
+			if (priv->search->len) {
+				priv->search->str[--priv->search->len] = '\0';
+			}
 		} else
 			changed = FALSE;
 		if (changed) {
@@ -830,8 +850,9 @@ gnt_tree_key_pressed(GntWidget *widget, const char *text)
 		} else {
 			gnt_bindable_perform_action_key(GNT_BINDABLE(tree), text);
 		}
-		g_source_remove(tree->priv->search_timeout);
-		tree->priv->search_timeout = g_timeout_add_seconds(SEARCH_TIMEOUT_S, search_timeout, tree);
+		g_source_remove(priv->search_timeout);
+		priv->search_timeout = g_timeout_add_seconds(
+		        SEARCH_TIMEOUT_S, search_timeout, tree);
 		return TRUE;
 	} else if (text[0] == ' ' && text[1] == 0) {
 		/* Space pressed */
@@ -880,7 +901,6 @@ gnt_tree_destroy(GntWidget *widget)
 		g_hash_table_destroy(tree->hash);
 	g_list_free(tree->list);
 	gnt_tree_free_columns(tree);
-	g_free(tree->priv);
 }
 
 static gboolean
@@ -939,11 +959,16 @@ static gboolean
 start_search(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntTree *tree = GNT_TREE(bindable);
-	if (tree->priv->search)
+	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
+
+	if (priv->search) {
 		return FALSE;
+	}
+
 	gnt_widget_set_disable_actions(GNT_WIDGET(tree), TRUE);
-	tree->priv->search = g_string_new(NULL);
-	tree->priv->search_timeout = g_timeout_add_seconds(SEARCH_TIMEOUT_S, search_timeout, tree);
+	priv->search = g_string_new(NULL);
+	priv->search_timeout =
+	        g_timeout_add_seconds(SEARCH_TIMEOUT_S, search_timeout, tree);
 	return TRUE;
 }
 
@@ -951,8 +976,12 @@ static gboolean
 end_search_action(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntTree *tree = GNT_TREE(bindable);
-	if (tree->priv->search == NULL)
+	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
+
+	if (priv->search == NULL) {
 		return FALSE;
+	}
+
 	gnt_widget_set_disable_actions(GNT_WIDGET(tree), FALSE);
 	end_search(tree);
 	redraw_tree(tree);
@@ -1003,14 +1032,17 @@ gnt_tree_set_property(GObject *obj, guint prop_id, const GValue *value,
                       G_GNUC_UNUSED GParamSpec *spec)
 {
 	GntTree *tree = GNT_TREE(obj);
+	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
+
 	switch (prop_id) {
 		case PROP_COLUMNS:
 			_gnt_tree_init_internals(tree, g_value_get_int(value));
 			break;
 		case PROP_EXPANDER:
-			if (tree->priv->expander_level == g_value_get_int(value))
+			if (priv->expander_level == g_value_get_int(value)) {
 				break;
-			tree->priv->expander_level = g_value_get_int(value);
+			}
+			priv->expander_level = g_value_get_int(value);
 		default:
 			break;
 	}
@@ -1021,12 +1053,14 @@ gnt_tree_get_property(GObject *obj, guint prop_id, GValue *value,
                       G_GNUC_UNUSED GParamSpec *spec)
 {
 	GntTree *tree = GNT_TREE(obj);
+	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
+
 	switch (prop_id) {
 		case PROP_COLUMNS:
 			g_value_set_int(value, tree->ncol);
 			break;
 		case PROP_EXPANDER:
-			g_value_set_int(value, tree->priv->expander_level);
+			g_value_set_int(value, priv->expander_level);
 			break;
 		default:
 			break;
@@ -1127,7 +1161,6 @@ gnt_tree_init(GntTree *tree)
 	GntWidget *widget = GNT_WIDGET(tree);
 
 	tree->show_separator = TRUE;
-	tree->priv = g_new0(GntTreePriv, 1);
 
 	gnt_widget_set_grow_x(widget, TRUE);
 	gnt_widget_set_grow_y(widget, TRUE);
@@ -1217,10 +1250,12 @@ void gnt_tree_scroll(GntTree *tree, int count)
 static gpointer
 find_position(GntTree *tree, gpointer key, gpointer parent)
 {
+	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
 	GntTreeRow *row;
 
-	if (tree->priv->compare == NULL)
+	if (priv->compare == NULL) {
 		return NULL;
+	}
 
 	if (parent == NULL)
 		row = tree->root;
@@ -1235,8 +1270,9 @@ find_position(GntTree *tree, gpointer key, gpointer parent)
 
 	while (row)
 	{
-		if (tree->priv->compare(key, row->key) < 0)
+		if (priv->compare(key, row->key) < 0) {
 			return (row->prev ? row->prev->key : NULL);
+		}
 		if (row->next)
 			row = row->next;
 		else
@@ -1247,11 +1283,13 @@ find_position(GntTree *tree, gpointer key, gpointer parent)
 
 void gnt_tree_sort_row(GntTree *tree, gpointer key)
 {
+	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
 	GntTreeRow *row, *q, *s;
 	int current, newp;
 
-	if (!tree->priv->compare)
+	if (!priv->compare) {
 		return;
+	}
 
 	row = g_hash_table_lookup(tree->hash, key);
 	g_return_if_fail(row != NULL);
@@ -1265,8 +1303,9 @@ void gnt_tree_sort_row(GntTree *tree, gpointer key)
 
 	q = NULL;
 	while (s) {
-		if (tree->priv->compare(row->key, s->key) < 0)
+		if (priv->compare(row->key, s->key) < 0) {
 			break;
+		}
 		q = s;
 		s = s->next;
 	}
@@ -1317,6 +1356,7 @@ void gnt_tree_sort_row(GntTree *tree, gpointer key)
 
 GntTreeRow *gnt_tree_add_row_after(GntTree *tree, void *key, GntTreeRow *row, void *parent, void *bigbro)
 {
+	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
 	GntTreeRow *pr = NULL;
 
 	if (g_hash_table_lookup(tree->hash, key)) {
@@ -1328,8 +1368,7 @@ GntTreeRow *gnt_tree_add_row_after(GntTree *tree, void *key, GntTreeRow *row, vo
 	row->data = NULL;
 	g_hash_table_replace(tree->hash, key, row);
 
-	if (bigbro == NULL && tree->priv->compare)
-	{
+	if (bigbro == NULL && priv->compare) {
 		bigbro = find_position(tree, key, parent);
 	}
 
@@ -1553,14 +1592,15 @@ void gnt_tree_change_text(GntTree *tree, gpointer key, int colno, const char *te
 
 GntTreeRow *gnt_tree_add_choice(GntTree *tree, void *key, GntTreeRow *row, void *parent, void *bigbro)
 {
+	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
 	GntTreeRow *r;
 	r = g_hash_table_lookup(tree->hash, key);
 	g_return_val_if_fail(!r || !r->choice, NULL);
 
 	if (bigbro == NULL) {
-		if (tree->priv->compare)
+		if (priv->compare) {
 			bigbro = find_position(tree, key, parent);
-		else {
+		} else {
 			r = g_hash_table_lookup(tree->hash, parent);
 			if (!r)
 				r = tree->root;
@@ -1646,12 +1686,13 @@ void gnt_tree_set_selected(GntTree *tree , void *key)
 
 static void _gnt_tree_init_internals(GntTree *tree, int col)
 {
+	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
 	gnt_tree_free_columns(tree);
 
 	tree->ncol = col;
 	tree->hash = g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL, free_tree_row);
 	tree->columns = g_new0(struct _GntTreeColInfo, col);
-	tree->priv->lastvisible = col - 1;
+	priv->lastvisible = col - 1;
 	while (col--)
 	{
 		tree->columns[col].width = 15;
@@ -1752,7 +1793,12 @@ void gnt_tree_set_show_title(GntTree *tree, gboolean set)
 
 void gnt_tree_set_compare_func(GntTree *tree, GCompareFunc func)
 {
-	tree->priv->compare = func;
+	GntTreePrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_TREE(tree));
+	priv = gnt_tree_get_instance_private(tree);
+
+	priv->compare = func;
 }
 
 void gnt_tree_set_expanded(GntTree *tree, void *key, gboolean expanded)
@@ -1773,10 +1819,15 @@ void gnt_tree_set_show_separator(GntTree *tree, gboolean set)
 
 void gnt_tree_adjust_columns(GntTree *tree)
 {
-	GntTreeRow *row = tree->root;
+	GntTreePrivate *priv = NULL;
+	GntTreeRow *row;
 	int *widths, i, twidth;
 
+	g_return_if_fail(GNT_IS_TREE(tree));
+	priv = gnt_tree_get_instance_private(tree);
+
 	widths = g_new0(int, tree->ncol);
+	row = tree->root;
 	while (row) {
 		GList *iter;
 		for (i = 0, iter = row->columns; iter; iter = iter->next, i++) {
@@ -1800,8 +1851,9 @@ void gnt_tree_adjust_columns(GntTree *tree)
 		gnt_tree_set_col_width(tree, i, widths[i]);
 		if (!COLUMN_INVISIBLE(tree, i)) {
 			twidth = twidth + widths[i];
-			if (tree->priv->lastvisible != i)
+			if (priv->lastvisible != i) {
 				twidth += 1;
+			}
 		}
 	}
 	g_free(widths);
@@ -1826,19 +1878,29 @@ set_column_flag(GntTree *tree, int col, GntTreeColumnFlag flag, gboolean set)
 
 void gnt_tree_set_column_visible(GntTree *tree, int col, gboolean vis)
 {
+	GntTreePrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_TREE(tree));
 	g_return_if_fail(col < tree->ncol);
+
+	priv = gnt_tree_get_instance_private(tree);
+
 	set_column_flag(tree, col, GNT_TREE_COLUMN_INVISIBLE, !vis);
 	if (vis) {
 		/* the column is visible */
-		if (tree->priv->lastvisible < col)
-			tree->priv->lastvisible = col;
+		if (priv->lastvisible < col) {
+			priv->lastvisible = col;
+		}
 	} else {
-		if (tree->priv->lastvisible == col)
-			while (tree->priv->lastvisible) {
-				tree->priv->lastvisible--;
-				if (!COLUMN_INVISIBLE(tree, tree->priv->lastvisible))
+		if (priv->lastvisible == col) {
+			while (priv->lastvisible) {
+				priv->lastvisible--;
+				if (!COLUMN_INVISIBLE(tree,
+				                      priv->lastvisible)) {
 					break;
+				}
 			}
+		}
 	}
 	if (gnt_widget_get_mapped(GNT_WIDGET(tree)))
 		readjust_columns(tree);
@@ -1872,20 +1934,36 @@ void gnt_tree_set_column_width_ratio(GntTree *tree, int cols[])
 
 void gnt_tree_set_search_column(GntTree *tree, int col)
 {
+	GntTreePrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_TREE(tree));
 	g_return_if_fail(col < tree->ncol);
 	g_return_if_fail(!BINARY_DATA(tree, col));
-	tree->priv->search_column = col;
+
+	priv = gnt_tree_get_instance_private(tree);
+
+	priv->search_column = col;
 }
 
 gboolean gnt_tree_is_searching(GntTree *tree)
 {
-	return (tree->priv->search != NULL);
+	GntTreePrivate *priv = NULL;
+
+	g_return_val_if_fail(GNT_IS_TREE(tree), FALSE);
+	priv = gnt_tree_get_instance_private(tree);
+
+	return (priv->search != NULL);
 }
 
 void gnt_tree_set_search_function(GntTree *tree,
 		gboolean (*func)(GntTree *tree, gpointer key, const char *search, const char *current))
 {
-	tree->priv->search_func = func;
+	GntTreePrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_TREE(tree));
+	priv = gnt_tree_get_instance_private(tree);
+
+	priv->search_func = func;
 }
 
 gpointer gnt_tree_get_parent_key(GntTree *tree, gpointer key)
