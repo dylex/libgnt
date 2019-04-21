@@ -107,8 +107,15 @@ GHashTable * g_hash_table_duplicate(GHashTable *src, GHashFunc hash, GEqualFunc 
  *
  * To be used with g_signal_new. Look in the key_pressed signal-definition in
  * gntwidget.c for usage.
+ *
+ * Deprecated: 2.14.0: Use g_signal_accumulator_true_handled() instead.
  */
-gboolean gnt_boolean_handled_accumulator(GSignalInvocationHint *ihint, GValue *return_accu, const GValue *handler_return, gpointer dummy);
+#ifndef GNT_DISABLE_DEPRECATED
+gboolean gnt_boolean_handled_accumulator(GSignalInvocationHint *ihint,
+					 GValue *return_accu,
+                                         const GValue *handler_return,
+                                         gpointer dummy) G_GNUC_DEPRECATED;
+#endif
 
 /**
  * gnt_widget_bindings_view:
