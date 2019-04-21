@@ -118,8 +118,12 @@ gboolean gnt_boolean_handled_accumulator(GSignalInvocationHint *ihint, GValue *r
  *
  * Returns: (transfer full): Returns a GntTree populated with "key" -> "binding"
  *          for the widget.
+ *
+ * Deprecated: 2.14.0: Use gnt_bindable_bindings_view() instead.
  */
-GntWidget * gnt_widget_bindings_view(GntWidget *widget);
+#ifndef GNT_DISABLE_DEPRECATED
+GntWidget *gnt_widget_bindings_view(GntWidget *widget) G_GNUC_DEPRECATED;
+#endif
 
 /**
  * gnt_util_parse_widgets:
