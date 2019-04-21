@@ -1444,7 +1444,7 @@ gnt_wm_class_init(GntWMClass *klass)
 					 G_TYPE_FROM_CLASS(klass),
 					 G_SIGNAL_RUN_LAST,
 					 G_STRUCT_OFFSET(GntWMClass, window_resize_confirm),
-					 gnt_boolean_handled_accumulator, NULL,
+					 g_signal_accumulator_true_handled, NULL,
 					 gnt_closure_marshal_BOOLEAN__POINTER_POINTER_POINTER,
 					 G_TYPE_BOOLEAN, 3, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_POINTER);
 
@@ -1453,7 +1453,7 @@ gnt_wm_class_init(GntWMClass *klass)
 					 G_TYPE_FROM_CLASS(klass),
 					 G_SIGNAL_RUN_LAST,
 					 G_STRUCT_OFFSET(GntWMClass, window_move_confirm),
-					 gnt_boolean_handled_accumulator, NULL,
+					 g_signal_accumulator_true_handled, NULL,
 					 gnt_closure_marshal_BOOLEAN__POINTER_POINTER_POINTER,
 					 G_TYPE_BOOLEAN, 3, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_POINTER);
 
@@ -1496,7 +1496,7 @@ gnt_wm_class_init(GntWMClass *klass)
 					 G_TYPE_FROM_CLASS(klass),
 					 G_SIGNAL_RUN_LAST,
 					 G_STRUCT_OFFSET(GntWMClass, mouse_clicked),
-					 gnt_boolean_handled_accumulator, NULL,
+					 g_signal_accumulator_true_handled, NULL,
 					 gnt_closure_marshal_BOOLEAN__INT_INT_INT_POINTER,
 					 G_TYPE_BOOLEAN, 4, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_POINTER);
 
