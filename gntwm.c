@@ -1821,8 +1821,7 @@ gnt_wm_new_window_real(GntWM *wm, GntWidget *widget)
 
 void gnt_wm_new_window(GntWM *wm, GntWidget *widget)
 {
-	while (widget->parent)
-		widget = widget->parent;
+	widget = gnt_widget_get_toplevel(widget);
 
 	if (!gnt_widget_get_visible(widget) ||
 	    g_hash_table_lookup(wm->nodes, widget)) {
@@ -2041,8 +2040,7 @@ void gnt_wm_resize_window(GntWM *wm, GntWidget *widget, int width, int height)
 	GntNode *node;
 	int maxx, maxy;
 
-	while (widget->parent)
-		widget = widget->parent;
+	widget = gnt_widget_get_toplevel(widget);
 	node = g_hash_table_lookup(wm->nodes, widget);
 	if (!node)
 		return;
@@ -2112,8 +2110,7 @@ void gnt_wm_move_window(GntWM *wm, GntWidget *widget, int x, int y)
 	gboolean ret = TRUE;
 	GntNode *node;
 
-	while (widget->parent)
-		widget = widget->parent;
+	widget = gnt_widget_get_toplevel(widget);
 	node = g_hash_table_lookup(wm->nodes, widget);
 	if (!node)
 		return;
@@ -2175,8 +2172,7 @@ void gnt_wm_update_window(GntWM *wm, GntWidget *widget)
 	GntNode *node = NULL;
 	GntWS *ws;
 
-	while (widget->parent)
-		widget = widget->parent;
+	widget = gnt_widget_get_toplevel(widget);
 	if (!GNT_IS_MENU(widget)) {
 		if (!GNT_IS_BOX(widget))
 			return;

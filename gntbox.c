@@ -520,8 +520,7 @@ gnt_box_clicked(GntWidget *widget, GntMouseEvent event, int cx, int cy)
 		if (cx >= x && cx < x + w && cy >= y && cy < y + h) {
 			if (event <= GNT_MIDDLE_MOUSE_DOWN &&
 			    gnt_widget_get_take_focus(wid)) {
-				while (widget->parent)
-					widget = widget->parent;
+				widget = gnt_widget_get_toplevel(widget);
 				gnt_box_give_focus_to_child(GNT_BOX(widget), wid);
 			}
 			return gnt_widget_clicked(wid, event, cx, cy);
@@ -871,8 +870,7 @@ void gnt_box_give_focus_to_child(GntBox *box, GntWidget *widget)
 	GList *find;
 	gpointer now;
 
-	while (GNT_WIDGET(box)->parent)
-		box = GNT_BOX(GNT_WIDGET(box)->parent);
+	box = GNT_BOX(gnt_widget_get_toplevel(GNT_WIDGET(box)));
 
 	find = g_list_find(box->focus, widget);
 	now = box->active;

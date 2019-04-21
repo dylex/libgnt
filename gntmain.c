@@ -703,8 +703,7 @@ gboolean gnt_widget_has_focus(GntWidget *widget)
 
 	w = widget;
 
-	while (widget->parent)
-		widget = widget->parent;
+	widget = gnt_widget_get_toplevel(widget);
 
 	if (widget == wm->_list.window)
 		return TRUE;
@@ -718,8 +717,7 @@ gboolean gnt_widget_has_focus(GntWidget *widget)
 
 void gnt_widget_set_urgent(GntWidget *widget)
 {
-	while (widget->parent)
-		widget = widget->parent;
+	widget = gnt_widget_get_toplevel(widget);
 
 	if (wm->cws->ordered && wm->cws->ordered->data == widget)
 		return;

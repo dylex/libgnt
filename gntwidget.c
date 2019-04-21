@@ -585,8 +585,8 @@ void gnt_widget_queue_update(GntWidget *widget)
 
 	if (widget->window == NULL)
 		return;
-	while (widget->parent)
-		widget = widget->parent;
+
+	widget = gnt_widget_get_toplevel(widget);
 
 	priv = gnt_widget_get_instance_private(widget);
 	if (priv->queue_update == 0) {
