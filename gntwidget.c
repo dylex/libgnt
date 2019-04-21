@@ -236,7 +236,7 @@ gnt_widget_class_init(GntWidgetClass *klass)
 					 G_TYPE_FROM_CLASS(klass),
 					 G_SIGNAL_RUN_LAST,
 					 G_STRUCT_OFFSET(GntWidgetClass, key_pressed),
-					 gnt_boolean_handled_accumulator, NULL, NULL,
+					 g_signal_accumulator_true_handled, NULL, NULL,
 					 G_TYPE_BOOLEAN, 1, G_TYPE_STRING);
 
 	signals[SIG_CLICKED] =
@@ -244,7 +244,7 @@ gnt_widget_class_init(GntWidgetClass *klass)
 					 G_TYPE_FROM_CLASS(klass),
 					 G_SIGNAL_RUN_LAST,
 					 G_STRUCT_OFFSET(GntWidgetClass, clicked),
-					 gnt_boolean_handled_accumulator, NULL, NULL,
+					 g_signal_accumulator_true_handled, NULL, NULL,
 					 G_TYPE_BOOLEAN, 3, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT);
 
 	signals[SIG_CONTEXT_MENU] =
@@ -252,7 +252,7 @@ gnt_widget_class_init(GntWidgetClass *klass)
 					 G_TYPE_FROM_CLASS(klass),
 					 G_SIGNAL_RUN_LAST,
 					 0,
-					 gnt_boolean_handled_accumulator, NULL, NULL,
+					 g_signal_accumulator_true_handled, NULL, NULL,
 					 G_TYPE_BOOLEAN, 0);
 
 	/* This is relevant for all widgets */

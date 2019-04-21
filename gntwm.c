@@ -1447,7 +1447,7 @@ gnt_wm_class_init(GntWMClass *klass)
 					 G_TYPE_FROM_CLASS(klass),
 					 G_SIGNAL_RUN_LAST,
 					 G_STRUCT_OFFSET(GntWMClass, window_resize_confirm),
-					 gnt_boolean_handled_accumulator, NULL, NULL,
+					 g_signal_accumulator_true_handled, NULL, NULL,
 					 G_TYPE_BOOLEAN, 3, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_POINTER);
 
 	signals[SIG_CONFIRM_MOVE] =
@@ -1455,7 +1455,7 @@ gnt_wm_class_init(GntWMClass *klass)
 					 G_TYPE_FROM_CLASS(klass),
 					 G_SIGNAL_RUN_LAST,
 					 G_STRUCT_OFFSET(GntWMClass, window_move_confirm),
-					 gnt_boolean_handled_accumulator, NULL, NULL,
+					 g_signal_accumulator_true_handled, NULL, NULL,
 					 G_TYPE_BOOLEAN, 3, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_POINTER);
 
 	signals[SIG_RESIZED] =
@@ -1493,7 +1493,7 @@ gnt_wm_class_init(GntWMClass *klass)
 					 G_TYPE_FROM_CLASS(klass),
 					 G_SIGNAL_RUN_LAST,
 					 G_STRUCT_OFFSET(GntWMClass, mouse_clicked),
-					 gnt_boolean_handled_accumulator, NULL, NULL,
+					 g_signal_accumulator_true_handled, NULL, NULL,
 					 G_TYPE_BOOLEAN, 4, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_POINTER);
 
 	signals[SIG_TERMINAL_REFRESH] =

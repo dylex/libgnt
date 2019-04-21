@@ -27,6 +27,8 @@ version 3.0.0 (????/??/??):
 	* _GntProgressBarOrientation
 	* _GntTreeColumnFlag
 	* _GntWidgetFlags
+	* gnt_boolean_handled_accumulator; use
+	  g_signal_accumulator_true_handled instead.
 	* gnt_widget_bindings_view; use gnt_bindable_bindings_view instead.
 
 version 2.13.0 (2018/03/08):
