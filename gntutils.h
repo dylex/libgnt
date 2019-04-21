@@ -111,17 +111,6 @@ GHashTable * gnt_hash_table_duplicate(GHashTable *src, GHashFunc hash, GEqualFun
 gboolean gnt_boolean_handled_accumulator(GSignalInvocationHint *ihint, GValue *return_accu, const GValue *handler_return, gpointer dummy);
 
 /**
- * gnt_widget_bindings_view:
- * @widget: The widget to get bindings for.
- *
- * Get a helpful display about the bindings of a widget.
- *
- * Returns: (transfer full): Returns a GntTree populated with "key" -> "binding"
- *          for the widget.
- */
-GntWidget * gnt_widget_bindings_view(GntWidget *widget);
-
-/**
  * gnt_util_parse_widgets:
  * @string:  The XML string.
  * @num:     The number of widgets to return, followed by 'num' GntWidget **

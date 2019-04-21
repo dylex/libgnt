@@ -27,6 +27,7 @@ version 3.0.0 (????/??/??):
 	* _GntProgressBarOrientation
 	* _GntTreeColumnFlag
 	* _GntWidgetFlags
+	* gnt_widget_bindings_view; use gnt_bindable_bindings_view instead.
 
 version 2.13.0 (2018/03/08):
 	No changes.
