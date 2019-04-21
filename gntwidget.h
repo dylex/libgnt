@@ -50,7 +50,7 @@
 #define GNT_IS_WIDGET_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_WIDGET))
 #define GNT_WIDGET_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_WIDGET, GntWidgetClass))
 
-#ifndef LIBGNT_DISABLE_DEPRECATED
+#ifndef GNT_DISABLE_DEPRECATED
 /**
  * GNT_WIDGET_FLAGS:
  * Deprecated: 2.14.0: See #GntWidgetFlags for individual accessors instead.
@@ -110,7 +110,7 @@ typedef struct _GntWidgetClass		GntWidgetClass;
  * Deprecated: 2.14.0: Use the individual accessor functions documented below
  *             instead.
  */
-#ifndef LIBGNT_DISABLE_DEPRECATED
+#ifndef GNT_DISABLE_DEPRECATED
 typedef enum _GntWidgetFlags
 {
 	GNT_WIDGET_DESTROYING     = 1 << 0,
