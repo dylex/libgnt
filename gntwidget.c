@@ -27,6 +27,11 @@
 #include "gntstyle.h"
 #include "gntutils.h"
 
+#define GNT_WIDGET_FLAGS(obj) (GNT_WIDGET(obj)->priv.flags)
+#define GNT_WIDGET_SET_FLAGS(obj, flags) (GNT_WIDGET_FLAGS(obj) |= flags)
+#define GNT_WIDGET_UNSET_FLAGS(obj, flags) (GNT_WIDGET_FLAGS(obj) &= ~(flags))
+#define GNT_WIDGET_IS_FLAG_SET(obj, flags) (GNT_WIDGET_FLAGS(obj) & (flags))
+
 /* Yes, there are two "private" types; we should migrate contents of
  * GntWidgetPriv here when we break ABI. */
 typedef struct

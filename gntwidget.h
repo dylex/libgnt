@@ -49,29 +49,6 @@
 #define GNT_IS_WIDGET_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_WIDGET))
 #define GNT_WIDGET_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_WIDGET, GntWidgetClass))
 
-#ifndef LIBGNT_DISABLE_DEPRECATED
-/**
- * GNT_WIDGET_FLAGS:
- * Deprecated: 2.14.0: See #GntWidgetFlags for individual accessors instead.
- */
-#define GNT_WIDGET_FLAGS(obj)				(GNT_WIDGET(obj)->priv.flags)
-/**
- * GNT_WIDGET_SET_FLAGS:
- * Deprecated: 2.14.0: See #GntWidgetFlags for individual accessors instead.
- */
-#define GNT_WIDGET_SET_FLAGS(obj, flags)		(GNT_WIDGET_FLAGS(obj) |= flags)
-/**
- * GNT_WIDGET_UNSET_FLAGS:
- * Deprecated: 2.14.0: See #GntWidgetFlags for individual accessors instead.
- */
-#define GNT_WIDGET_UNSET_FLAGS(obj, flags)	(GNT_WIDGET_FLAGS(obj) &= ~(flags))
-/**
- * GNT_WIDGET_IS_FLAG_SET:
- * Deprecated: 2.14.0: See #GntWidgetFlags for individual accessors instead.
- */
-#define GNT_WIDGET_IS_FLAG_SET(obj, flags)	(GNT_WIDGET_FLAGS(obj) & (flags))
-#endif
-
 typedef struct _GntWidget			GntWidget;
 typedef struct _GntWidgetPriv		GntWidgetPriv;
 typedef struct _GntWidgetClass		GntWidgetClass;
