@@ -60,6 +60,14 @@ widget_show(gpointer data, gpointer nodes)
  * GObject Implementation
  *****************************************************************************/
 static void
+gnt_ws_destroy(GObject *obj)
+{
+	GntWS *ws = GNT_WS(obj);
+
+	g_free(ws->name);
+}
+
+static void
 gnt_ws_init(GntWS *ws)
 {
 	ws->list = NULL;
@@ -68,8 +76,11 @@ gnt_ws_init(GntWS *ws)
 }
 
 static void
-gnt_ws_class_init(G_GNUC_UNUSED GntWSClass *klass)
+gnt_ws_class_init(GntWSClass *klass)
 {
+	GObjectClass *obj_class = G_OBJECT_CLASS(klass);
+
+	obj_class->dispose = gnt_ws_destroy;
 }
 
 /******************************************************************************

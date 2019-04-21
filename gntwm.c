@@ -1691,16 +1691,8 @@ GntWS *gnt_wm_widget_find_workspace(GntWM *wm, GntWidget *widget)
 	return NULL;
 }
 
-static void
-free_workspaces(gpointer data, G_GNUC_UNUSED gpointer n)
-{
-	GntWS *s = data;
-	g_free(s->name);
-}
-
 void gnt_wm_set_workspaces(GntWM *wm, GList *workspaces)
 {
-	g_list_foreach(wm->workspaces, free_workspaces, NULL);
 	wm->workspaces = workspaces;
 	gnt_wm_switch_workspace(wm, 0);
 }
