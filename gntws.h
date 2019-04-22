@@ -52,7 +52,6 @@ struct _GntWS
 	GntBindable inherit;
 	GList *GNTSEAL(list);
 	GList *GNTSEAL(ordered);
-	gpointer GNTSEAL(ui_data);
 
 	void *GNTSEAL(res1);
 	void *GNTSEAL(res2);
