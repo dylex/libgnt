@@ -79,7 +79,6 @@ struct _GntWidgetPriv
 {
 	int GNTSEAL(x), GNTSEAL(y);
 	int GNTSEAL(width), GNTSEAL(height);
-	char *GNTSEAL(name);
 
 	int GNTSEAL(minw), GNTSEAL(minh);    /* Minimum size for the widget */
 };
@@ -325,7 +324,7 @@ void gnt_widget_activate(GntWidget *widget);
  *
  * Set the name of a widget.
  */
-void gnt_widget_set_name(GntWidget *widget, const char *name);
+void gnt_widget_set_name(GntWidget *widget, const gchar *name);
 
 /**
  * gnt_widget_get_name:
@@ -335,7 +334,7 @@ void gnt_widget_set_name(GntWidget *widget, const char *name);
  *
  * Returns: The name of the widget.
  */
-const char *gnt_widget_get_name(GntWidget *widget);
+const gchar *gnt_widget_get_name(GntWidget *widget);
 
 /**
  * gnt_widget_queue_update:

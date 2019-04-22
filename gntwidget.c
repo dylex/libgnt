@@ -56,6 +56,7 @@ typedef enum
 typedef struct
 {
 	GntWidgetFlags flags;
+	gchar *name;
 
 	guint queue_update;
 } GntWidgetPrivate;
@@ -90,9 +91,8 @@ G_DEFINE_TYPE_WITH_PRIVATE(GntWidget, gnt_widget, GNT_TYPE_BINDABLE)
  * GObject Implementation
  *****************************************************************************/
 static void
-gnt_widget_init(GntWidget *widget)
+gnt_widget_init(G_GNUC_UNUSED GntWidget *widget)
 {
-	widget->priv.name = NULL;
 }
 
 static void
@@ -577,15 +577,27 @@ gnt_widget_set_focus(GntWidget *widget, gboolean set)
 	return TRUE;
 }
 
-void gnt_widget_set_name(GntWidget *widget, const char *name)
+void
+gnt_widget_set_name(GntWidget *widget, const gchar *name)
 {
-	g_free(widget->priv.name);
-	widget->priv.name = g_strdup(name);
+	GntWidgetPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
+
+	g_free(priv->name);
+	priv->name = g_strdup(name);
 }
 
-const char *gnt_widget_get_name(GntWidget *widget)
+const gchar *
+gnt_widget_get_name(GntWidget *widget)
 {
-	return widget->priv.name;
+	GntWidgetPrivate *priv = NULL;
+
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), NULL);
+	priv = gnt_widget_get_instance_private(widget);
+
+	return priv->name;
 }
 
 void gnt_widget_activate(GntWidget *widget)
