@@ -154,7 +154,7 @@ static void
 destroy_suggest(GntEntryPrivate *priv)
 {
 	if (priv->ddown) {
-		gnt_widget_destroy(priv->ddown->parent);
+		gnt_widget_destroy(gnt_widget_get_parent(priv->ddown));
 		priv->ddown = NULL;
 	}
 }
@@ -299,7 +299,7 @@ show_suggest_dropdown(GntEntry *entry)
 				priv->ddown = ddown;
 			}
 		}
-		gnt_widget_draw(priv->ddown->parent);
+		gnt_widget_draw(gnt_widget_get_parent(priv->ddown));
 	}
 
 	return TRUE;
@@ -1021,7 +1021,7 @@ gnt_entry_destroy(GntWidget *widget)
 	}
 
 	if (priv->ddown) {
-		gnt_widget_destroy(priv->ddown->parent);
+		gnt_widget_destroy(gnt_widget_get_parent(priv->ddown));
 	}
 
 	g_free(priv->search->needle);

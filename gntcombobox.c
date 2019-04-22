@@ -73,7 +73,7 @@ hide_popup(GntComboBox *box, gboolean set)
 		set_selection(box, gnt_tree_get_selection_data(GNT_TREE(box->dropdown)));
 	else
 		gnt_tree_set_selected(GNT_TREE(box->dropdown), box->selected);
-	gnt_widget_hide(box->dropdown->parent);
+	gnt_widget_hide(gnt_widget_get_parent(box->dropdown));
 }
 
 static void
@@ -133,7 +133,7 @@ static void
 popup_dropdown(GntComboBox *box)
 {
 	GntWidget *widget = GNT_WIDGET(box);
-	GntWidget *parent = box->dropdown->parent;
+	GntWidget *parent = gnt_widget_get_parent(box->dropdown);
 	int height = g_list_length(GNT_TREE(box->dropdown)->list);
 	int y = widget->priv.y + widget->priv.height - 1;
 	gnt_widget_set_size(box->dropdown, widget->priv.width, height + 2);
@@ -157,7 +157,9 @@ static gboolean
 gnt_combo_box_key_pressed(GntWidget *widget, const char *text)
 {
 	GntComboBox *box = GNT_COMBO_BOX(widget);
-	gboolean showing = gnt_widget_get_mapped(box->dropdown->parent);
+	gboolean showing;
+
+	showing = gnt_widget_get_mapped(gnt_widget_get_parent(box->dropdown));
 
 	if (showing) {
 		if (text[1] == 0) {
@@ -215,15 +217,17 @@ gnt_combo_box_key_pressed(GntWidget *widget, const char *text)
 static void
 gnt_combo_box_destroy(GntWidget *widget)
 {
-	gnt_widget_destroy(GNT_COMBO_BOX(widget)->dropdown->parent);
+	GntComboBox *combo = GNT_COMBO_BOX(widget);
+	gnt_widget_destroy(gnt_widget_get_parent(combo->dropdown));
 }
 
 static void
 gnt_combo_box_lost_focus(GntWidget *widget)
 {
 	GntComboBox *combo = GNT_COMBO_BOX(widget);
-	if (gnt_widget_get_mapped(combo->dropdown->parent))
+	if (gnt_widget_get_mapped(gnt_widget_get_parent(combo->dropdown))) {
 		hide_popup(combo, FALSE);
+	}
 	widget_lost_focus(widget);
 }
 
@@ -232,7 +236,9 @@ gnt_combo_box_clicked(GntWidget *widget, GntMouseEvent event,
                       G_GNUC_UNUSED int x, G_GNUC_UNUSED int y)
 {
 	GntComboBox *box = GNT_COMBO_BOX(widget);
-	gboolean dshowing = gnt_widget_get_mapped(box->dropdown->parent);
+	gboolean dshowing;
+
+	dshowing = gnt_widget_get_mapped(gnt_widget_get_parent(box->dropdown));
 
 	if (event == GNT_MOUSE_SCROLL_UP) {
 		if (dshowing)
@@ -262,9 +268,11 @@ gnt_combo_box_size_changed(GntWidget *widget, G_GNUC_UNUSED int oldw,
 static gboolean
 dropdown_menu(GntBindable *b, G_GNUC_UNUSED GList *params)
 {
-	if (gnt_widget_get_mapped(GNT_COMBO_BOX(b)->dropdown->parent))
+	GntComboBox *combo = GNT_COMBO_BOX(b);
+	if (gnt_widget_get_mapped(gnt_widget_get_parent(combo->dropdown))) {
 		return FALSE;
-	popup_dropdown(GNT_COMBO_BOX(b));
+	}
+	popup_dropdown(combo);
 	return TRUE;
 }
 

@@ -77,8 +77,9 @@ gnt_box_draw(GntWidget *widget)
 {
 	GntBox *box = GNT_BOX(widget);
 
-	if (box->focus == NULL && widget->parent == NULL)
+	if (box->focus == NULL && gnt_widget_get_parent(widget) == NULL) {
 		g_list_foreach(box->list, add_to_focus, box);
+	}
 
 	g_list_foreach(box->list, (GFunc)gnt_widget_draw, NULL);
 
@@ -253,8 +254,10 @@ static GntWidget *
 find_focusable_widget(GntBox *box)
 {
 	/* XXX: Make sure the widget is visible? */
-	if (box->focus == NULL && GNT_WIDGET(box)->parent == NULL)
+	if (box->focus == NULL &&
+	    gnt_widget_get_parent(GNT_WIDGET(box)) == NULL) {
 		g_list_foreach(box->list, add_to_focus, box);
+	}
 
 	if (box->active == NULL && box->focus)
 		box->active = box->focus->data;
@@ -764,7 +767,7 @@ void gnt_box_remove(GntBox *box, GntWidget *widget)
 {
 	box->list = g_list_remove(box->list, widget);
 	if (gnt_widget_get_take_focus(widget) &&
-	    GNT_WIDGET(box)->parent == NULL && box->focus) {
+	    gnt_widget_get_parent(GNT_WIDGET(box)) == NULL && box->focus) {
 		if (widget == box->active)
 		{
 			find_next_focus(box);
@@ -794,8 +797,9 @@ void gnt_box_readjust(GntBox *box)
 	GntWidget *wid;
 	int width, height;
 
-	if (GNT_WIDGET(box)->parent != NULL)
+	if (gnt_widget_get_parent(GNT_WIDGET(box)) != NULL) {
 		return;
+	}
 
 	for (iter = box->list; iter; iter = iter->next)
 	{
@@ -821,8 +825,7 @@ void gnt_box_readjust(GntBox *box)
 	wid->priv.width = 0;
 	wid->priv.height = 0;
 
-	if (wid->parent == NULL)
-	{
+	if (gnt_widget_get_parent(wid) == NULL) {
 		g_list_free(box->focus);
 		box->focus = NULL;
 		box->active = NULL;
