@@ -27,15 +27,36 @@
 #include "gntstyle.h"
 #include "gntutils.h"
 
-#define GNT_WIDGET_FLAGS(obj) (GNT_WIDGET(obj)->priv.flags)
-#define GNT_WIDGET_SET_FLAGS(obj, flags) (GNT_WIDGET_FLAGS(obj) |= flags)
-#define GNT_WIDGET_UNSET_FLAGS(obj, flags) (GNT_WIDGET_FLAGS(obj) &= ~(flags))
-#define GNT_WIDGET_IS_FLAG_SET(obj, flags) (GNT_WIDGET_FLAGS(obj) & (flags))
+#define GNT_WIDGET_FLAGS(priv) (priv->flags)
+#define GNT_WIDGET_SET_FLAGS(priv, flags) (GNT_WIDGET_FLAGS(priv) |= flags)
+#define GNT_WIDGET_UNSET_FLAGS(priv, flags) (GNT_WIDGET_FLAGS(priv) &= ~(flags))
+#define GNT_WIDGET_IS_FLAG_SET(priv, flags) (GNT_WIDGET_FLAGS(priv) & (flags))
+
+typedef enum
+{
+	GNT_WIDGET_DESTROYING = 1 << 0,
+	GNT_WIDGET_CAN_TAKE_FOCUS = 1 << 1,
+	GNT_WIDGET_MAPPED = 1 << 2,
+	/* XXX: Need to set the following two as properties, and setup a
+	 * callback whenever these get changed. */
+	GNT_WIDGET_NO_BORDER = 1 << 3,
+	GNT_WIDGET_NO_SHADOW = 1 << 4,
+	GNT_WIDGET_HAS_FOCUS = 1 << 5,
+	GNT_WIDGET_DRAWING = 1 << 6,
+	GNT_WIDGET_URGENT = 1 << 7,
+	GNT_WIDGET_GROW_X = 1 << 8,
+	GNT_WIDGET_GROW_Y = 1 << 9,
+	GNT_WIDGET_INVISIBLE = 1 << 10,
+	GNT_WIDGET_TRANSIENT = 1 << 11,
+	GNT_WIDGET_DISABLE_ACTIONS = 1 << 12,
+} GntWidgetFlags;
 
 /* Yes, there are two "private" types; we should migrate contents of
  * GntWidgetPriv here when we break ABI. */
 typedef struct
 {
+	GntWidgetFlags flags;
+
 	guint queue_update;
 } GntWidgetPrivate;
 
@@ -275,27 +296,38 @@ gnt_widget_class_init(GntWidgetClass *klass)
  *****************************************************************************/
 void gnt_widget_set_take_focus(GntWidget *widget, gboolean can)
 {
+	GntWidgetPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
+
 	if (can)
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_CAN_TAKE_FOCUS);
+		GNT_WIDGET_SET_FLAGS(priv, GNT_WIDGET_CAN_TAKE_FOCUS);
 	else
-		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_CAN_TAKE_FOCUS);
+		GNT_WIDGET_UNSET_FLAGS(priv, GNT_WIDGET_CAN_TAKE_FOCUS);
 }
 
 gboolean
 gnt_widget_get_take_focus(GntWidget *widget)
 {
-	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	GntWidgetPrivate *priv = NULL;
 
-	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_CAN_TAKE_FOCUS);
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	priv = gnt_widget_get_instance_private(widget);
+
+	return GNT_WIDGET_IS_FLAG_SET(priv, GNT_WIDGET_CAN_TAKE_FOCUS);
 }
 
 void
 gnt_widget_destroy(GntWidget *widget)
 {
+	GntWidgetPrivate *priv = NULL;
+
 	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
 
 	if (!gnt_widget_in_destruction(widget)) {
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_DESTROYING);
+		GNT_WIDGET_SET_FLAGS(priv, GNT_WIDGET_DESTROYING);
 		gnt_widget_hide(widget);
 		delwin(widget->window);
 		g_object_run_dispose(G_OBJECT(widget));
@@ -604,230 +636,306 @@ gboolean gnt_widget_confirm_size(GntWidget *widget, int width, int height)
 
 void gnt_widget_set_visible(GntWidget *widget, gboolean set)
 {
+	GntWidgetPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
+
 	if (set)
-		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_INVISIBLE);
+		GNT_WIDGET_UNSET_FLAGS(priv, GNT_WIDGET_INVISIBLE);
 	else
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_INVISIBLE);
+		GNT_WIDGET_SET_FLAGS(priv, GNT_WIDGET_INVISIBLE);
 }
 
 gboolean
 gnt_widget_get_visible(GntWidget *widget)
 {
-	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	GntWidgetPrivate *priv = NULL;
 
-	return !GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_INVISIBLE);
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	priv = gnt_widget_get_instance_private(widget);
+
+	return !GNT_WIDGET_IS_FLAG_SET(priv, GNT_WIDGET_INVISIBLE);
 }
 
 gboolean gnt_widget_has_shadow(GntWidget *widget)
 {
-	return (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_SHADOW) &&
-			gnt_style_get_bool(GNT_STYLE_SHADOW, FALSE));
+	GntWidgetPrivate *priv = NULL;
+
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	priv = gnt_widget_get_instance_private(widget);
+
+	return (!GNT_WIDGET_IS_FLAG_SET(priv, GNT_WIDGET_NO_SHADOW) &&
+	        gnt_style_get_bool(GNT_STYLE_SHADOW, FALSE));
 }
 
 gboolean
 gnt_widget_in_destruction(GntWidget *widget)
 {
-	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	GntWidgetPrivate *priv = NULL;
 
-	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_DESTROYING);
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	priv = gnt_widget_get_instance_private(widget);
+
+	return GNT_WIDGET_IS_FLAG_SET(priv, GNT_WIDGET_DESTROYING);
 }
 
 void
 gnt_widget_set_drawing(GntWidget *widget, gboolean drawing)
 {
+	GntWidgetPrivate *priv = NULL;
+
 	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
 
 	if (drawing) {
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_DRAWING);
+		GNT_WIDGET_SET_FLAGS(priv, GNT_WIDGET_DRAWING);
 	} else {
-		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_DRAWING);
+		GNT_WIDGET_UNSET_FLAGS(priv, GNT_WIDGET_DRAWING);
 	}
 }
 
 gboolean
 gnt_widget_get_drawing(GntWidget *widget)
 {
-	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	GntWidgetPrivate *priv = NULL;
 
-	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_DRAWING);
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	priv = gnt_widget_get_instance_private(widget);
+
+	return GNT_WIDGET_IS_FLAG_SET(priv, GNT_WIDGET_DRAWING);
 }
 
 void
 gnt_widget_set_mapped(GntWidget *widget, gboolean mapped)
 {
+	GntWidgetPrivate *priv = NULL;
+
 	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
 
 	if (mapped) {
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_MAPPED);
+		GNT_WIDGET_SET_FLAGS(priv, GNT_WIDGET_MAPPED);
 	} else {
-		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_MAPPED);
+		GNT_WIDGET_UNSET_FLAGS(priv, GNT_WIDGET_MAPPED);
 	}
 }
 
 gboolean
 gnt_widget_get_mapped(GntWidget *widget)
 {
-	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	GntWidgetPrivate *priv = NULL;
 
-	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED);
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	priv = gnt_widget_get_instance_private(widget);
+
+	return GNT_WIDGET_IS_FLAG_SET(priv, GNT_WIDGET_MAPPED);
 }
 
 void
 gnt_widget_set_has_border(GntWidget *widget, gboolean has_border)
 {
+	GntWidgetPrivate *priv = NULL;
+
 	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
 
 	if (has_border) {
-		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_NO_BORDER);
+		GNT_WIDGET_UNSET_FLAGS(priv, GNT_WIDGET_NO_BORDER);
 	} else {
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_BORDER);
+		GNT_WIDGET_SET_FLAGS(priv, GNT_WIDGET_NO_BORDER);
 	}
 }
 
 gboolean
 gnt_widget_get_has_border(GntWidget *widget)
 {
-	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	GntWidgetPrivate *priv = NULL;
 
-	return !GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER);
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	priv = gnt_widget_get_instance_private(widget);
+
+	return !GNT_WIDGET_IS_FLAG_SET(priv, GNT_WIDGET_NO_BORDER);
 }
 
 void
 gnt_widget_set_has_shadow(GntWidget *widget, gboolean has_shadow)
 {
+	GntWidgetPrivate *priv = NULL;
+
 	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
 
 	if (has_shadow) {
-		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_NO_SHADOW);
+		GNT_WIDGET_UNSET_FLAGS(priv, GNT_WIDGET_NO_SHADOW);
 	} else {
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_SHADOW);
+		GNT_WIDGET_SET_FLAGS(priv, GNT_WIDGET_NO_SHADOW);
 	}
 }
 
 gboolean
 gnt_widget_get_has_shadow(GntWidget *widget)
 {
-	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	GntWidgetPrivate *priv = NULL;
 
-	return !GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_SHADOW);
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	priv = gnt_widget_get_instance_private(widget);
+
+	return !GNT_WIDGET_IS_FLAG_SET(priv, GNT_WIDGET_NO_SHADOW);
 }
 
 void
 gnt_widget_set_has_focus(GntWidget *widget, gboolean has_focus)
 {
+	GntWidgetPrivate *priv = NULL;
+
 	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
 
 	if (has_focus) {
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_HAS_FOCUS);
+		GNT_WIDGET_SET_FLAGS(priv, GNT_WIDGET_HAS_FOCUS);
 	} else {
-		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_HAS_FOCUS);
+		GNT_WIDGET_UNSET_FLAGS(priv, GNT_WIDGET_HAS_FOCUS);
 	}
 }
 
 gboolean
 gnt_widget_get_has_focus(GntWidget *widget)
 {
-	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	GntWidgetPrivate *priv = NULL;
 
-	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_HAS_FOCUS);
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	priv = gnt_widget_get_instance_private(widget);
+
+	return GNT_WIDGET_IS_FLAG_SET(priv, GNT_WIDGET_HAS_FOCUS);
 }
 
 void
 gnt_widget_set_is_urgent(GntWidget *widget, gboolean urgent)
 {
+	GntWidgetPrivate *priv = NULL;
+
 	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
 
 	if (urgent) {
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_URGENT);
+		GNT_WIDGET_SET_FLAGS(priv, GNT_WIDGET_URGENT);
 	} else {
-		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_URGENT);
+		GNT_WIDGET_UNSET_FLAGS(priv, GNT_WIDGET_URGENT);
 	}
 }
 
 gboolean
 gnt_widget_get_is_urgent(GntWidget *widget)
 {
-	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	GntWidgetPrivate *priv = NULL;
 
-	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_URGENT);
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	priv = gnt_widget_get_instance_private(widget);
+
+	return GNT_WIDGET_IS_FLAG_SET(priv, GNT_WIDGET_URGENT);
 }
 
 void
 gnt_widget_set_grow_x(GntWidget *widget, gboolean grow_x)
 {
+	GntWidgetPrivate *priv = NULL;
+
 	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
 
 	if (grow_x) {
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_GROW_X);
+		GNT_WIDGET_SET_FLAGS(priv, GNT_WIDGET_GROW_X);
 	} else {
-		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_GROW_X);
+		GNT_WIDGET_UNSET_FLAGS(priv, GNT_WIDGET_GROW_X);
 	}
 }
 
 gboolean
 gnt_widget_get_grow_x(GntWidget *widget)
 {
-	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	GntWidgetPrivate *priv = NULL;
 
-	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_GROW_X);
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	priv = gnt_widget_get_instance_private(widget);
+
+	return GNT_WIDGET_IS_FLAG_SET(priv, GNT_WIDGET_GROW_X);
 }
 
 void
 gnt_widget_set_grow_y(GntWidget *widget, gboolean grow_y)
 {
+	GntWidgetPrivate *priv = NULL;
+
 	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
 
 	if (grow_y) {
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_GROW_Y);
+		GNT_WIDGET_SET_FLAGS(priv, GNT_WIDGET_GROW_Y);
 	} else {
-		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_GROW_Y);
+		GNT_WIDGET_UNSET_FLAGS(priv, GNT_WIDGET_GROW_Y);
 	}
 }
 
 gboolean
 gnt_widget_get_grow_y(GntWidget *widget)
 {
-	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	GntWidgetPrivate *priv = NULL;
 
-	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_GROW_Y);
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	priv = gnt_widget_get_instance_private(widget);
+
+	return GNT_WIDGET_IS_FLAG_SET(priv, GNT_WIDGET_GROW_Y);
 }
 
 void
 gnt_widget_set_transient(GntWidget *widget, gboolean transient)
 {
+	GntWidgetPrivate *priv = NULL;
+
 	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
 
 	if (transient) {
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_TRANSIENT);
+		GNT_WIDGET_SET_FLAGS(priv, GNT_WIDGET_TRANSIENT);
 	} else {
-		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_TRANSIENT);
+		GNT_WIDGET_UNSET_FLAGS(priv, GNT_WIDGET_TRANSIENT);
 	}
 }
 
 gboolean
 gnt_widget_get_transient(GntWidget *widget)
 {
-	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	GntWidgetPrivate *priv = NULL;
 
-	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_TRANSIENT);
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	priv = gnt_widget_get_instance_private(widget);
+
+	return GNT_WIDGET_IS_FLAG_SET(priv, GNT_WIDGET_TRANSIENT);
 }
 
 void
 gnt_widget_set_disable_actions(GntWidget *widget, gboolean disable_actions)
 {
+	GntWidgetPrivate *priv = NULL;
+
 	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
 
 	if (disable_actions) {
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_DISABLE_ACTIONS);
+		GNT_WIDGET_SET_FLAGS(priv, GNT_WIDGET_DISABLE_ACTIONS);
 	} else {
-		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_DISABLE_ACTIONS);
+		GNT_WIDGET_UNSET_FLAGS(priv, GNT_WIDGET_DISABLE_ACTIONS);
 	}
 }
 
 gboolean
 gnt_widget_get_disable_actions(GntWidget *widget)
 {
-	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	GntWidgetPrivate *priv = NULL;
 
-	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_DISABLE_ACTIONS);
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	priv = gnt_widget_get_instance_private(widget);
+
+	return GNT_WIDGET_IS_FLAG_SET(priv, GNT_WIDGET_DISABLE_ACTIONS);
 }

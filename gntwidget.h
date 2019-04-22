@@ -53,60 +53,6 @@ typedef struct _GntWidget			GntWidget;
 typedef struct _GntWidgetPriv		GntWidgetPriv;
 typedef struct _GntWidgetClass		GntWidgetClass;
 
-/**
- * GntWidgetFlags:
- * @GNT_WIDGET_DESTROYING: Deprecated. Use gnt_widget_in_destruction() instead.
- *                         You may not set this flag directly.
- * @GNT_WIDGET_CAN_TAKE_FOCUS: Deprecated. Use gnt_widget_set_take_focus() and
- *                             gnt_widget_get_take_focus() instead.
- * @GNT_WIDGET_MAPPED: Deprecated. Use gnt_widget_set_mapped() and
- *                     gnt_widget_get_mapped() instead.
- * @GNT_WIDGET_NO_BORDER: Deprecated. Use gnt_widget_set_has_border() and
- *                        gnt_widget_get_has_border() instead.
- * @GNT_WIDGET_NO_SHADOW: Deprecated. Use gnt_widget_set_has_shadow() and
- *                        gnt_widget_get_has_shadow() instead.
- * @GNT_WIDGET_HAS_FOCUS: Deprecated. Use gnt_widget_set_has_focus() and
- *                        gnt_widget_get_has_focus() instead.
- * @GNT_WIDGET_DRAWING: Deprecated. Use gnt_widget_set_drawing() and
- *                      gnt_widget_get_drawing() instead.
- * @GNT_WIDGET_URGENT: Deprecated. Use gnt_widget_set_is_urgent() and
- *                     gnt_widget_get_is_urgent() instead.
- * @GNT_WIDGET_GROW_X: Deprecated. Use gnt_widget_set_grow_x() and
- *                     gnt_widget_get_grow_x() instead.
- * @GNT_WIDGET_GROW_Y: Deprecated. Use gnt_widget_set_grow_y() and
- *                     gnt_widget_get_grow_y() instead.
- * @GNT_WIDGET_INVISIBLE: Deprecated. Use gnt_widget_set_visible() and
- *                        gnt_widget_get_visible() instead.
- * @GNT_WIDGET_TRANSIENT: Deprecated. Use gnt_widget_set_transient() and
- *                        gnt_widget_get_transient() instead.
- * @GNT_WIDGET_DISABLE_ACTIONS: Deprecated. Use
- *                              gnt_widget_set_disable_actions() and
- *                              gnt_widget_get_disable_actions() instead.
- *
- * Deprecated: 2.14.0: Use the individual accessor functions documented below
- *             instead.
- */
-#ifndef LIBGNT_DISABLE_DEPRECATED
-typedef enum
-{
-	GNT_WIDGET_DESTROYING     = 1 << 0,
-	GNT_WIDGET_CAN_TAKE_FOCUS = 1 << 1,
-	GNT_WIDGET_MAPPED         = 1 << 2,
-	/* XXX: Need to set the following two as properties, and setup a callback whenever these
-	 * get chnaged. */
-	GNT_WIDGET_NO_BORDER      = 1 << 3,
-	GNT_WIDGET_NO_SHADOW      = 1 << 4,
-	GNT_WIDGET_HAS_FOCUS      = 1 << 5,
-	GNT_WIDGET_DRAWING        = 1 << 6,
-	GNT_WIDGET_URGENT         = 1 << 7,
-	GNT_WIDGET_GROW_X         = 1 << 8,
-	GNT_WIDGET_GROW_Y         = 1 << 9,
-	GNT_WIDGET_INVISIBLE      = 1 << 10,
-	GNT_WIDGET_TRANSIENT      = 1 << 11,
-	GNT_WIDGET_DISABLE_ACTIONS = 1 << 12,
-} GntWidgetFlags;
-#endif
-
 /* XXX: This will probably move elsewhere */
 typedef enum
 {
@@ -133,7 +79,6 @@ struct _GntWidgetPriv
 {
 	int GNTSEAL(x), GNTSEAL(y);
 	int GNTSEAL(width), GNTSEAL(height);
-	GntWidgetFlags GNTSEAL(flags);
 	char *GNTSEAL(name);
 
 	int GNTSEAL(minw), GNTSEAL(minh);    /* Minimum size for the widget */
