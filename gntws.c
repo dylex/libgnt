@@ -29,7 +29,12 @@
 #include "gntwm.h"
 #include "gntws.h"
 
-G_DEFINE_TYPE(GntWS, gnt_ws, GNT_TYPE_BINDABLE)
+typedef struct
+{
+	gchar *name;
+} GntWSPrivate;
+
+G_DEFINE_TYPE_WITH_PRIVATE(GntWS, gnt_ws, GNT_TYPE_BINDABLE)
 
 /******************************************************************************
  * Helpers
@@ -63,8 +68,9 @@ static void
 gnt_ws_destroy(GObject *obj)
 {
 	GntWS *ws = GNT_WS(obj);
+	GntWSPrivate *priv = gnt_ws_get_instance_private(ws);
 
-	g_free(ws->name);
+	g_free(priv->name);
 }
 
 static void
@@ -72,7 +78,6 @@ gnt_ws_init(GntWS *ws)
 {
 	ws->list = NULL;
 	ws->ordered = NULL;
-	ws->name = NULL;
 }
 
 static void
@@ -159,8 +164,13 @@ void gnt_ws_remove_widget(GntWS *ws, GntWidget* wid)
 void
 gnt_ws_set_name(GntWS *ws, const gchar *name)
 {
-	g_free(ws->name);
-	ws->name = g_strdup(name);
+	GntWSPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WS(ws));
+	priv = gnt_ws_get_instance_private(ws);
+
+	g_free(priv->name);
+	priv->name = g_strdup(name);
 }
 
 void
@@ -187,15 +197,25 @@ gnt_ws_show(GntWS *ws, GHashTable *nodes)
 		widget_show(l->data, nodes);
 }
 
-GntWS *gnt_ws_new(const char *name)
+GntWS *
+gnt_ws_new(const gchar *name)
 {
 	GntWS *ws = GNT_WS(g_object_new(GNT_TYPE_WS, NULL));
-	ws->name = g_strdup(name ? name : "(noname)");
+	GntWSPrivate *priv = gnt_ws_get_instance_private(ws);
+
+	priv->name = g_strdup(name ? name : "(noname)");
+
 	return ws;
 }
 
-const char * gnt_ws_get_name(GntWS *ws)
+const gchar *
+gnt_ws_get_name(GntWS *ws)
 {
-	return ws->name;
+	GntWSPrivate *priv = NULL;
+
+	g_return_val_if_fail(GNT_IS_WS(ws), NULL);
+	priv = gnt_ws_get_instance_private(ws);
+
+	return priv->name;
 }
 

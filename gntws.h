@@ -50,7 +50,6 @@ typedef struct _GntWS GntWS;
 struct _GntWS
 {
 	GntBindable inherit;
-	char *GNTSEAL(name);
 	GList *GNTSEAL(list);
 	GList *GNTSEAL(ordered);
 	gpointer GNTSEAL(ui_data);
