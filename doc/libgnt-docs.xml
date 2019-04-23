@@ -18,6 +18,12 @@
     </abstract>
   </bookinfo>
 
+  <part id="object-hierarchy">
+    <title>Object Hierarchy</title>
+
+    <xi:include href="xml/tree_index.sgml"/>
+  </part>
+
   <part id="core">
     <title>Core API Reference</title>
 
