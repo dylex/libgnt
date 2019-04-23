@@ -129,6 +129,8 @@ typedef enum _GntWidgetFlags
 	GNT_WIDGET_TRANSIENT      = 1 << 11,
 	GNT_WIDGET_DISABLE_ACTIONS = 1 << 12,
 } GntWidgetFlags;
+#else
+typedef enum _GntWidgetFlags GntWidgetFlags;
 #endif
 
 /* XXX: This will probably move elsewhere */
