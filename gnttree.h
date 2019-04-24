@@ -35,20 +35,12 @@
 #include "gnttextview.h"
 #include "gntwidget.h"
 
-#define GNT_TYPE_TREE				(gnt_tree_get_type())
-#define GNT_TREE(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_TREE, GntTree))
-#define GNT_TREE_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_TREE, GntTreeClass))
-#define GNT_IS_TREE(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_TREE))
-#define GNT_IS_TREE_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_TREE))
-#define GNT_TREE_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_TREE, GntTreeClass))
+#define GNT_TYPE_TREE gnt_tree_get_type()
 
 #define GNT_TYPE_TREE_ROW			(gnt_tree_row_get_type())
 
 typedef guint (*GntTreeHashFunc)(gconstpointer key);
 typedef gboolean (*GntTreeHashEqualityFunc)(gconstpointer a, gconstpointer b);
-
-typedef struct _GntTree			GntTree;
-typedef struct _GntTreeClass		GntTreeClass;
 
 typedef struct _GntTreeRow		GntTreeRow;
 typedef struct _GntTreeCol		GntTreeCol;
@@ -69,34 +61,14 @@ struct _GntTreeColInfo
 	GntTreeColumnFlag flags;
 };
 
+G_BEGIN_DECLS
+
 /**
- * GntTree:
+ * gnt_tree_get_type:
  *
- * Access to any fields is deprecated. See inline comments for replacements.
+ * Returns: The GType for GntTree
  */
-struct _GntTree
-{
-	GntWidget parent;
-
-	GntTreeRow *GNTSEAL(current);    /* current selection */
-
-	GntTreeRow *GNTSEAL(top);        /* The topmost visible item */
-	GntTreeRow *GNTSEAL(bottom);     /* The bottommost visible item */
-
-	GntTreeRow *GNTSEAL(root);       /* The root of all evil */
-
-	GList *GNTSEAL(list);            /* List of GntTreeRow s */
-	GHashTable *GNTSEAL(hash);       /* We need this for quickly referencing the rows */
-	GntTreeHashFunc GNTSEAL(hash_func);
-	GntTreeHashEqualityFunc GNTSEAL(hash_eq_func);
-	GDestroyNotify GNTSEAL(key_destroy);
-	GDestroyNotify GNTSEAL(value_destroy);
-
-	int GNTSEAL(ncol);                /* No. of columns */
-	GntTreeColInfo *GNTSEAL(columns); /* Would a GList be better? */
-	gboolean GNTSEAL(show_title);
-	gboolean GNTSEAL(show_separator); /* Whether to show column separators */
-};
+G_DECLARE_DERIVABLE_TYPE(GntTree, gnt_tree, GNT, TREE, GntWidget)
 
 struct _GntTreeClass
 {
@@ -111,15 +83,6 @@ struct _GntTreeClass
 	void (*gnt_reserved3)(void);
 	void (*gnt_reserved4)(void);
 };
-
-G_BEGIN_DECLS
-
-/**
- * gnt_tree_get_type:
- *
- * Returns: The GType for GntTree
- */
-GType gnt_tree_get_type(void);
 
 /**
  * gnt_tree_row_get_type:
