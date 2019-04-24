@@ -35,15 +35,9 @@
 #include "gntcolors.h"
 #include "gntkeys.h"
 
-#define GNT_TYPE_MENU				(gnt_menu_get_type())
-#define GNT_MENU(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_MENU, GntMenu))
-#define GNT_MENU_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_MENU, GntMenuClass))
-#define GNT_IS_MENU(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_MENU))
-#define GNT_IS_MENU_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_MENU))
-#define GNT_MENU_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_MENU, GntMenuClass))
+#define GNT_TYPE_MENU gnt_menu_get_type()
 
 typedef struct _GntMenu			GntMenu;
-typedef struct _GntMenuClass		GntMenuClass;
 
 #include "gntmenuitem.h"
 
@@ -62,36 +56,6 @@ typedef enum
 	GNT_MENU_POPUP,
 } GntMenuType;
 
-/**
- * GntMenu:
- *
- * Access to any fields is deprecated. See inline comments for replacements.
- */
-struct _GntMenu
-{
-	GntTree parent;
-	GntMenuType GNTSEAL(type);
-
-	GList *GNTSEAL(list);
-	guint GNTSEAL(selected);
-
-	/* This will keep track of its immediate submenu which is visible so that
-	 * keystrokes can be passed to it. */
-	GntMenu *GNTSEAL(submenu);
-	GntMenu *GNTSEAL(parentmenu);
-};
-
-struct _GntMenuClass
-{
-	GntTreeClass parent;
-
-	/*< private >*/
-	void (*gnt_reserved1)(void);
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
-};
-
 G_BEGIN_DECLS
 
 /**
@@ -99,7 +63,7 @@ G_BEGIN_DECLS
  *
  * Returns:  The GType for GntMenu.
  */
-GType gnt_menu_get_type(void);
+G_DECLARE_FINAL_TYPE(GntMenu, gnt_menu, GNT, MENU, GntTree)
 
 /**
  * gnt_menu_new:

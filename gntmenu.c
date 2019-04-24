@@ -27,6 +27,20 @@
 #include <ctype.h>
 #include <string.h>
 
+struct _GntMenu
+{
+	GntTree parent;
+	GntMenuType type;
+
+	GList *list;
+	guint selected;
+
+	/* This will keep track of its immediate submenu which is visible so
+	 * that keystrokes can be passed to it. */
+	GntMenu *submenu;
+	GntMenu *parentmenu;
+};
+
 enum
 {
 	SIGS = 1,
