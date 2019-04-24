@@ -32,15 +32,7 @@
 #include "gnt.h"
 #include "gntwidget.h"
 
-#define GNT_TYPE_BOX				(gnt_box_get_type())
-#define GNT_BOX(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_BOX, GntBox))
-#define GNT_BOX_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_BOX, GntBoxClass))
-#define GNT_IS_BOX(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_BOX))
-#define GNT_IS_BOX_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_BOX))
-#define GNT_BOX_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_BOX, GntBoxClass))
-
-typedef struct _GntBox			GntBox;
-typedef struct _GntBoxClass		GntBoxClass;
+#define GNT_TYPE_BOX gnt_box_get_type()
 
 typedef enum
 {
@@ -54,34 +46,6 @@ typedef enum
 	GNT_ALIGN_TOP,
 	GNT_ALIGN_BOTTOM
 } GntAlignment;
-
-/**
- * GntBox:
- *
- * Access to any fields is deprecated. See inline comments for replacements.
- */
-struct _GntBox
-{
-	GntWidget parent;
-
-	gboolean GNTSEAL(vertical);
-	gboolean GNTSEAL(homogeneous);
-	gboolean GNTSEAL(fill);
-	GList *GNTSEAL(list);		/* Deprecated. Use gnt_box_get_children. */
-
-	GntWidget *GNTSEAL(active);
-	int GNTSEAL(pad);			/* Number of spaces to use between widgets */
-	GntAlignment GNTSEAL(alignment);  /* How are the widgets going to be aligned? */
-
-	char *GNTSEAL(title);
-	GList *GNTSEAL(focus);		/* List of widgets to cycle focus (only valid for parent boxes) */
-
-	/*< private >*/
-    void *res1;
-    void *res2;
-    void *res3;
-    void *res4;
-};
 
 struct _GntBoxClass
 {
@@ -103,7 +67,7 @@ G_BEGIN_DECLS
  *
  * Returns: The GType.
  */
-GType gnt_box_get_type(void);
+G_DECLARE_DERIVABLE_TYPE(GntBox, gnt_box, GNT, BOX, GntWidget)
 
 #define gnt_vbox_new(homogeneous) gnt_box_new(homogeneous, TRUE)
 #define gnt_hbox_new(homogeneous) gnt_box_new(homogeneous, FALSE)
