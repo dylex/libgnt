@@ -47,13 +47,10 @@ static GntWidget * find_focusable_widget(GntBox *box);
 G_DEFINE_TYPE(GntBox, gnt_box, GNT_TYPE_WIDGET)
 
 static void
-add_to_focus(gpointer value, gpointer data)
+add_to_focus(GntWidget *w, GntBox *box)
 {
-	GntBox *box = GNT_BOX(data);
-	GntWidget *w = GNT_WIDGET(value);
-
 	if (GNT_IS_BOX(w))
-		g_list_foreach(GNT_BOX(w)->list, add_to_focus, box);
+		g_list_foreach(GNT_BOX(w)->list, (GFunc)add_to_focus, box);
 	else if (gnt_widget_get_take_focus(w))
 		box->focus = g_list_append(box->focus, w);
 }
@@ -78,7 +75,7 @@ gnt_box_draw(GntWidget *widget)
 	GntBox *box = GNT_BOX(widget);
 
 	if (box->focus == NULL && gnt_widget_get_parent(widget) == NULL) {
-		g_list_foreach(box->list, add_to_focus, box);
+		g_list_foreach(box->list, (GFunc)add_to_focus, box);
 	}
 
 	g_list_foreach(box->list, (GFunc)gnt_widget_draw, NULL);
@@ -256,7 +253,7 @@ find_focusable_widget(GntBox *box)
 	/* XXX: Make sure the widget is visible? */
 	if (box->focus == NULL &&
 	    gnt_widget_get_parent(GNT_WIDGET(box)) == NULL) {
-		g_list_foreach(box->list, add_to_focus, box);
+		g_list_foreach(box->list, (GFunc)add_to_focus, box);
 	}
 
 	if (box->active == NULL && box->focus)
