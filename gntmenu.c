@@ -527,3 +527,34 @@ GntMenuItem *gnt_menu_get_item(GntMenu *menu, const char *id)
 	return item;
 }
 
+/* Internal. */
+GntMenuType
+gnt_menu_get_menutype(GntMenu *menu)
+{
+	g_return_val_if_fail(GNT_IS_MENU(menu), 0);
+	return menu->type;
+}
+
+/* Internal. */
+GntMenuItem *
+gnt_menu_get_selected_item(GntMenu *menu)
+{
+	g_return_val_if_fail(GNT_IS_MENU(menu), NULL);
+	return g_list_nth_data(menu->list, menu->selected);
+}
+
+/* Internal. */
+GntMenu *
+gnt_menu_get_parent_menu(GntMenu *menu)
+{
+	g_return_val_if_fail(GNT_IS_MENU(menu), NULL);
+	return menu->parentmenu;
+}
+
+/* Internal. */
+GntMenu *
+gnt_menu_get_submenu(GntMenu *menu)
+{
+	g_return_val_if_fail(GNT_IS_MENU(menu), NULL);
+	return menu->submenu;
+}

@@ -24,6 +24,8 @@
 #include "gntstyle.h"
 #include "gntwindow.h"
 
+#include "gntmenuprivate.h"
+
 #include <string.h>
 
 typedef struct
@@ -56,9 +58,8 @@ show_menu(GntBindable *bind, G_GNUC_UNUSED GList *params)
 		GntMenu *menu = priv->menu;
 
 		gnt_screen_menu_show(menu);
-		if (menu->type == GNT_MENU_TOPLEVEL) {
-			GntMenuItem *item;
-			item = g_list_nth_data(menu->list, menu->selected);
+		if (gnt_menu_get_menutype(menu) == GNT_MENU_TOPLEVEL) {
+			GntMenuItem *item = gnt_menu_get_selected_item(menu);
 			if (item && gnt_menuitem_get_submenu(item)) {
 				gnt_widget_activate(GNT_WIDGET(menu));
 			}
