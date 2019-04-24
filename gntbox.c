@@ -280,9 +280,8 @@ find_focusable_widget(GntBox *box)
 }
 
 static void
-find_next_focus(GntBox *box)
+find_next_focus(GntBoxPrivate *priv)
 {
-	GntBoxPrivate *priv = gnt_box_get_instance_private(box);
 	gpointer last = priv->active;
 	do
 	{
@@ -300,9 +299,8 @@ find_next_focus(GntBox *box)
 }
 
 static void
-find_prev_focus(GntBox *box)
+find_prev_focus(GntBoxPrivate *priv)
 {
-	GntBoxPrivate *priv = gnt_box_get_instance_private(box);
 	gpointer last = priv->active;
 
 	if (!priv->focus) {
@@ -359,9 +357,9 @@ box_focus_change(GntBox *box, gboolean next)
 	now = priv->active;
 
 	if (next) {
-		find_next_focus(box);
+		find_next_focus(priv);
 	} else {
-		find_prev_focus(box);
+		find_prev_focus(priv);
 	}
 
 	if (now && now != priv->active) {
@@ -861,7 +859,7 @@ void gnt_box_remove(GntBox *box, GntWidget *widget)
 	if (gnt_widget_get_take_focus(widget) &&
 	    gnt_widget_get_parent(GNT_WIDGET(box)) == NULL && priv->focus) {
 		if (widget == priv->active) {
-			find_next_focus(box);
+			find_next_focus(priv);
 			if (priv->active == widget) {
 				/* There's only one widget */
 				priv->active = NULL;
@@ -973,9 +971,9 @@ void gnt_box_move_focus(GntBox *box, int dir)
 	now = priv->active;
 
 	if (dir == 1)
-		find_next_focus(box);
+		find_next_focus(priv);
 	else if (dir == -1)
-		find_prev_focus(box);
+		find_prev_focus(priv);
 
 	if (now && now != priv->active) {
 		gnt_widget_set_focus(now, FALSE);
