@@ -446,7 +446,7 @@ GntBindable * gnt_bindable_bindings_view(GntBindable *bind)
 	gnt_tree_set_compare_func(bv.tree, (GCompareFunc)g_utf8_collate);
 	g_hash_table_foreach(klass->actions, add_action, &bv);
 	g_hash_table_foreach(klass->bindings, add_binding, &bv);
-	if (GNT_TREE(tree)->list == NULL) {
+	if (gnt_tree_get_rows(GNT_TREE(tree)) == NULL) {
 		gnt_widget_destroy(GNT_WIDGET(tree));
 		tree = NULL;
 	} else
