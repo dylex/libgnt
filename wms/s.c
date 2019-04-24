@@ -33,6 +33,7 @@
 #include "gntwindow.h"
 #include "gntlabel.h"
 
+#include "gntboxprivate.h"
 #include "gntwsprivate.h"
 
 #define GNT_TYPE_S_WM gnt_s_wm_get_type()
@@ -124,7 +125,7 @@ s_new_window(GntWM *wm, GntWidget *win)
 
 			gnt_widget_set_size(win, -1, h + 2);  /* XXX: Why is the +2 needed here? -- sadrul */
 		} else if (!gnt_widget_get_transient(win)) {
-			const char *title = GNT_BOX(win)->title;
+			const gchar *title = gnt_box_get_title(GNT_BOX(win));
 			if (title == NULL || !g_hash_table_lookup(wm->positions, title)) {
 				/* In the middle of the screen */
 				x = (maxx - w) / 2;

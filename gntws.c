@@ -29,6 +29,8 @@
 #include "gntwm.h"
 #include "gntws.h"
 
+#include "gntboxprivate.h"
+
 typedef struct
 {
 	gchar *name;
@@ -121,7 +123,7 @@ gnt_ws_draw_taskbar(GntWS *ws, gboolean reposition)
 	for (i = 0, iter = ws->list; iter; iter = iter->next, i++) {
 		GntWidget *w = iter->data;
 		int color;
-		const char *title;
+		const gchar *title;
 
 		if (w == ws->ordered->data) {
 			/* This is the current window in focus */
@@ -137,7 +139,7 @@ gnt_ws_draw_taskbar(GntWS *ws, gboolean reposition)
 			mvwhline(taskbar, 0, width * i, ' ' | gnt_color_pair(color), width);
 		else
 			mvwhline(taskbar, 0, width * i, ' ' | gnt_color_pair(color), getmaxx(stdscr) - width * i);
-		title = GNT_BOX(w)->title;
+		title = gnt_box_get_title(GNT_BOX(w));
 		mvwprintw(taskbar, 0, width * i, "%s", title ? C_(title) : "<gnt>");
 		if (i)
 			mvwaddch(taskbar, 0, width *i - 1, ACS_VLINE | A_STANDOUT | gnt_color_pair(GNT_COLOR_NORMAL));

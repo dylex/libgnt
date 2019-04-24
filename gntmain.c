@@ -50,6 +50,7 @@
 #include "gntwindow.h"
 #include "gntwm.h"
 
+#include "gntboxprivate.h"
 #include "gntmenuprivate.h"
 #include "gntwsprivate.h"
 
@@ -713,8 +714,9 @@ gboolean gnt_widget_has_focus(GntWidget *widget)
 		return TRUE;
 	if (gnt_ws_is_top_widget(wm->cws, widget)) {
 		if (GNT_IS_BOX(widget) &&
-				(GNT_BOX(widget)->active == w || widget == w))
+		    (gnt_box_get_active(GNT_BOX(widget)) == w || widget == w)) {
 			return TRUE;
+		}
 	}
 	return FALSE;
 }

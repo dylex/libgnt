@@ -142,12 +142,11 @@ GntWidget *gnt_window_new()
 GntWidget *
 gnt_window_box_new(gboolean homogeneous, gboolean vert)
 {
-	GntWidget *wid = gnt_window_new();
+	GntWidget *wid = g_object_new(GNT_TYPE_WINDOW, "homogeneous",
+	                              homogeneous, "vertical", vert, NULL);
 	GntBox *box = GNT_BOX(wid);
 
-	box->homogeneous = homogeneous;
-	box->vertical = vert;
-	box->alignment = vert ? GNT_ALIGN_LEFT : GNT_ALIGN_MID;
+	gnt_box_set_alignment(box, vert ? GNT_ALIGN_LEFT : GNT_ALIGN_MID);
 
 	return wid;
 }

@@ -675,6 +675,14 @@ void gnt_box_set_title(GntBox *b, const char *title)
 	g_free(prev);
 }
 
+/* Internal. */
+const gchar *
+gnt_box_get_title(GntBox *box)
+{
+	g_return_val_if_fail(GNT_IS_BOX(box), NULL);
+	return box->title;
+}
+
 void gnt_box_set_pad(GntBox *box, int pad)
 {
 	box->pad = pad;
@@ -840,6 +848,14 @@ void gnt_box_readjust(GntBox *box)
 void gnt_box_set_fill(GntBox *box, gboolean fill)
 {
 	box->fill = fill;
+}
+
+/* Internal. */
+GntWidget *
+gnt_box_get_active(GntBox *box)
+{
+	g_return_val_if_fail(GNT_IS_BOX(box), NULL);
+	return box->active;
 }
 
 void gnt_box_move_focus(GntBox *box, int dir)
