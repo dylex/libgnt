@@ -41,12 +41,12 @@ typedef struct
 	char *title;
 	GList *focus; /* List of widgets to cycle focus (only valid for parent
 	                 boxes) */
+
+	GntWidget *last_resize;
+	GntWidget *size_queued;
 } GntBoxPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE(GntBox, gnt_box, GNT_TYPE_WIDGET)
-
-#define PROP_LAST_RESIZE_S "last-resize"
-#define PROP_SIZE_QUEUED_S "size-queued"
 
 enum
 {
@@ -441,7 +441,7 @@ gnt_box_confirm_size(GntWidget *widget, int width, int height)
 		return TRUE;		/* Quit playing games with my size */
 
 	child = NULL;
-	last = g_object_get_data(G_OBJECT(box), PROP_LAST_RESIZE_S);
+	last = priv->last_resize;
 
 	/* First, make sure all the widgets will fit into the box after resizing. */
 	for (iter = priv->list; iter; iter = iter->next) {
@@ -465,7 +465,7 @@ gnt_box_confirm_size(GntWidget *widget, int width, int height)
 			child = NULL;
 	}
 
-	g_object_set_data(G_OBJECT(box), PROP_SIZE_QUEUED_S, child);
+	priv->size_queued = child;
 
 	if (child) {
 		for (iter = priv->list; iter; iter = iter->next) {
@@ -510,12 +510,12 @@ gnt_box_size_changed(GntWidget *widget, int oldw, int oldh)
 	wchange = widget->priv.width - oldw;
 	hchange = widget->priv.height - oldh;
 
-	wid = g_object_get_data(G_OBJECT(box), PROP_SIZE_QUEUED_S);
+	wid = priv->size_queued;
 	if (wid) {
 		gnt_widget_get_size(wid, &tw, &th);
 		gnt_widget_set_size(wid, tw + wchange, th + hchange);
-		g_object_set_data(G_OBJECT(box), PROP_SIZE_QUEUED_S, NULL);
-		g_object_set_data(G_OBJECT(box), PROP_LAST_RESIZE_S, wid);
+		priv->size_queued = NULL;
+		priv->last_resize = wid;
 	}
 
 	if (priv->vertical) {
