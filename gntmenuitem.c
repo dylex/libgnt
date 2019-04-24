@@ -24,6 +24,28 @@
 #include "gntmenu.h"
 #include "gntmenuitem.h"
 
+typedef struct
+{
+	/* These will be used to determine the position of the submenu */
+	gint x;
+	gint y;
+	gchar trigger;
+	gchar *id;
+
+	gchar *text;
+
+	/* A GntMenuItem can have a callback associated with it.
+	 * The callback will be activated whenever the user selects it and
+	 * presses enter (or clicks). However, if the GntMenuItem has some
+	 * child, then the callback and callbackdata will be ignored. */
+	gpointer callbackdata;
+	GntMenuItemCallback callback;
+
+	GntMenu *submenu;
+
+	gboolean visible;
+} GntMenuItemPrivate;
+
 enum
 {
 	SIG_ACTIVATE,
@@ -31,7 +53,7 @@ enum
 };
 static guint signals[SIGS] = { 0 };
 
-G_DEFINE_TYPE(GntMenuItem, gnt_menuitem, G_TYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE(GntMenuItem, gnt_menuitem, G_TYPE_OBJECT)
 
 /******************************************************************************
  * GObject Implementation
@@ -41,11 +63,15 @@ static void
 gnt_menuitem_destroy(GObject *obj)
 {
 	GntMenuItem *item = GNT_MENU_ITEM(obj);
-	g_free(item->text);
-	item->text = NULL;
-	if (item->submenu)
-		gnt_widget_destroy(GNT_WIDGET(item->submenu));
-	g_free(item->priv.id);
+	GntMenuItemPrivate *priv = gnt_menuitem_get_instance_private(item);
+
+	g_free(priv->text);
+	priv->text = NULL;
+	if (priv->submenu) {
+		gnt_widget_destroy(GNT_WIDGET(priv->submenu));
+	}
+	g_free(priv->id);
+
 	G_OBJECT_CLASS(gnt_menuitem_parent_class)->dispose(obj);
 }
 
@@ -67,18 +93,22 @@ gnt_menuitem_class_init(GntMenuItemClass *klass)
 static void
 gnt_menuitem_init(GntMenuItem *item)
 {
-	item->visible = TRUE;
+	GntMenuItemPrivate *priv = gnt_menuitem_get_instance_private(item);
+
+	priv->visible = TRUE;
 }
 
 /******************************************************************************
  * GntMenuItem API
  *****************************************************************************/
-GntMenuItem *gnt_menuitem_new(const char *text)
+GntMenuItem *
+gnt_menuitem_new(const gchar *text)
 {
 	GObject *item = g_object_new(GNT_TYPE_MENU_ITEM, NULL);
 	GntMenuItem *menuitem = GNT_MENU_ITEM(item);
+	GntMenuItemPrivate *priv = gnt_menuitem_get_instance_private(menuitem);
 
-	menuitem->text = g_strdup(text);
+	priv->text = g_strdup(text);
 
 	return menuitem;
 }
@@ -87,22 +117,26 @@ GntMenuItem *gnt_menuitem_new(const char *text)
 void
 gnt_menuitem_set_position(GntMenuItem *item, gint x, gint y)
 {
+	GntMenuItemPrivate *priv = NULL;
 	g_return_if_fail(GNT_IS_MENU_ITEM(item));
-	item->priv.x = x;
-	item->priv.y = y;
+	priv = gnt_menuitem_get_instance_private(item);
+	priv->x = x;
+	priv->y = y;
 }
 
 /* Internal. */
 void
 gnt_menuitem_get_position(GntMenuItem *item, gint *x, gint *y)
 {
+	GntMenuItemPrivate *priv = NULL;
 	g_return_if_fail(GNT_IS_MENU_ITEM(item));
+	priv = gnt_menuitem_get_instance_private(item);
 
 	if (x) {
-		*x = item->priv.x;
+		*x = priv->x;
 	}
 	if (y) {
-		*y = item->priv.y;
+		*y = priv->y;
 	}
 }
 
@@ -110,54 +144,101 @@ gnt_menuitem_get_position(GntMenuItem *item, gint *x, gint *y)
 gboolean
 gnt_menuitem_has_callback(GntMenuItem *item)
 {
+	GntMenuItemPrivate *priv = NULL;
 	g_return_val_if_fail(GNT_IS_MENU_ITEM(item), FALSE);
-	return item->callback != NULL;
+	priv = gnt_menuitem_get_instance_private(item);
+	return priv->callback != NULL;
 }
 
 void gnt_menuitem_set_callback(GntMenuItem *item, GntMenuItemCallback callback, gpointer data)
 {
-	item->callback = callback;
-	item->callbackdata = data;
+	GntMenuItemPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_MENU_ITEM(item));
+	priv = gnt_menuitem_get_instance_private(item);
+
+	priv->callback = callback;
+	priv->callbackdata = data;
 }
 
 void gnt_menuitem_set_submenu(GntMenuItem *item, GntMenu *menu)
 {
-	if (item->submenu)
-		gnt_widget_destroy(GNT_WIDGET(item->submenu));
-	item->submenu = menu;
+	GntMenuItemPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_MENU_ITEM(item));
+	priv = gnt_menuitem_get_instance_private(item);
+
+	if (priv->submenu) {
+		gnt_widget_destroy(GNT_WIDGET(priv->submenu));
+	}
+	priv->submenu = menu;
 }
 
 GntMenu *gnt_menuitem_get_submenu(GntMenuItem *item)
 {
-	return item->submenu;
+	GntMenuItemPrivate *priv = NULL;
+
+	g_return_val_if_fail(GNT_IS_MENU_ITEM(item), NULL);
+	priv = gnt_menuitem_get_instance_private(item);
+
+	return priv->submenu;
 }
 
-void gnt_menuitem_set_trigger(GntMenuItem *item, char trigger)
+void
+gnt_menuitem_set_trigger(GntMenuItem *item, gchar trigger)
 {
-	item->priv.trigger = trigger;
+	GntMenuItemPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_MENU_ITEM(item));
+	priv = gnt_menuitem_get_instance_private(item);
+
+	priv->trigger = trigger;
 }
 
-char gnt_menuitem_get_trigger(GntMenuItem *item)
+gchar
+gnt_menuitem_get_trigger(GntMenuItem *item)
 {
-	return item->priv.trigger;
+	GntMenuItemPrivate *priv = NULL;
+
+	g_return_val_if_fail(GNT_IS_MENU_ITEM(item), 0);
+	priv = gnt_menuitem_get_instance_private(item);
+
+	return priv->trigger;
 }
 
-void gnt_menuitem_set_id(GntMenuItem *item, const char *id)
+void
+gnt_menuitem_set_id(GntMenuItem *item, const gchar *id)
 {
-	g_free(item->priv.id);
-	item->priv.id = g_strdup(id);
+	GntMenuItemPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_MENU_ITEM(item));
+	priv = gnt_menuitem_get_instance_private(item);
+
+	g_free(priv->id);
+	priv->id = g_strdup(id);
 }
 
-const char * gnt_menuitem_get_id(GntMenuItem *item)
+const gchar *
+gnt_menuitem_get_id(GntMenuItem *item)
 {
-	return item->priv.id;
+	GntMenuItemPrivate *priv = NULL;
+
+	g_return_val_if_fail(GNT_IS_MENU_ITEM(item), NULL);
+	priv = gnt_menuitem_get_instance_private(item);
+
+	return priv->id;
 }
 
 gboolean gnt_menuitem_activate(GntMenuItem *item)
 {
+	GntMenuItemPrivate *priv = NULL;
+
+	g_return_val_if_fail(GNT_IS_MENU_ITEM(item), FALSE);
+	priv = gnt_menuitem_get_instance_private(item);
+
 	g_signal_emit(item, signals[SIG_ACTIVATE], 0);
-	if (item->callback) {
-		item->callback(item, item->callbackdata);
+	if (priv->callback) {
+		priv->callback(item, priv->callbackdata);
 		return TRUE;
 	}
 	return FALSE;
@@ -166,28 +247,43 @@ gboolean gnt_menuitem_activate(GntMenuItem *item)
 void
 gnt_menuitem_set_visible(GntMenuItem *item, gboolean visible)
 {
-	item->visible = visible;
+	GntMenuItemPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_MENU_ITEM(item));
+	priv = gnt_menuitem_get_instance_private(item);
+
+	priv->visible = visible;
 }
 
 gboolean
 gnt_menuitem_is_visible(GntMenuItem *item)
 {
-	g_return_val_if_fail(GNT_IS_MENU_ITEM(item), FALSE);
+	GntMenuItemPrivate *priv = NULL;
 
-	return item->visible;
+	g_return_val_if_fail(GNT_IS_MENU_ITEM(item), FALSE);
+	priv = gnt_menuitem_get_instance_private(item);
+
+	return priv->visible;
 }
 
 void
 gnt_menuitem_set_text(GntMenuItem *item, const gchar *text)
 {
-	g_free(item->text);
-	item->text = g_strdup(text);
+	GntMenuItemPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_MENU_ITEM(item));
+	priv = gnt_menuitem_get_instance_private(item);
+
+	g_free(priv->text);
+	priv->text = g_strdup(text);
 }
 
 /* Internal. */
 const gchar *
 gnt_menuitem_get_text(GntMenuItem *item)
 {
+	GntMenuItemPrivate *priv = NULL;
 	g_return_val_if_fail(GNT_IS_MENU_ITEM(item), NULL);
-	return item->text;
+	priv = gnt_menuitem_get_instance_private(item);
+	return priv->text;
 }

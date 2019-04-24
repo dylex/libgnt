@@ -33,58 +33,13 @@
 #include <glib.h>
 #include <glib-object.h>
 
-#define GNT_TYPE_MENU_ITEM				(gnt_menuitem_get_type())
-#define GNT_MENU_ITEM(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_MENU_ITEM, GntMenuItem))
-#define GNT_MENU_ITEM_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_MENU_ITEM, GntMenuItemClass))
-#define GNT_IS_MENU_ITEM(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_MENU_ITEM))
-#define GNT_IS_MENU_ITEM_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_MENU_ITEM))
-#define GNT_MENU_ITEM_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_MENU_ITEM, GntMenuItemClass))
-
-typedef struct _GntMenuItem			GntMenuItem;
-typedef struct _GntMenuItemPriv		GntMenuItemPriv;
-typedef struct _GntMenuItemClass		GntMenuItemClass;
+typedef struct _GntMenuItem GntMenuItem;
 
 #include "gntmenu.h"
 
-/**
- * GntMenuItemPriv:
- *
- * Access to any fields is deprecated. See inline comments for replacements.
- */
-struct _GntMenuItemPriv
-{
-	/* These will be used to determine the position of the submenu */
-	int GNTSEAL(x);
-	int GNTSEAL(y);
-	char GNTSEAL(trigger);
-	char *GNTSEAL(id);
-};
+#define GNT_TYPE_MENU_ITEM gnt_menuitem_get_type()
 
 typedef void (*GntMenuItemCallback)(GntMenuItem *item, gpointer data);
-
-/**
- * GntMenuItem:
- *
- * Access to any fields is deprecated. See inline comments for replacements.
- */
-struct _GntMenuItem
-{
-	GObject parent;
-	GntMenuItemPriv GNTSEAL(priv);
-
-	char *GNTSEAL(text);
-
-	/* A GntMenuItem can have a callback associated with it.
-	 * The callback will be activated whenever the suer selects it and presses enter (or clicks).
-	 * However, if the GntMenuItem has some child, then the callback and callbackdata will be ignored. */
-	gpointer GNTSEAL(callbackdata);
-	GntMenuItemCallback GNTSEAL(callback);
-
-	GntMenu *GNTSEAL(submenu);
-
-	/*< private >*/
-	gboolean GNTSEAL(visible);
-};
 
 struct _GntMenuItemClass
 {
@@ -104,7 +59,7 @@ G_BEGIN_DECLS
  *
  * Returns: GType for GntMenuItem.
  */
-GType gnt_menuitem_get_type(void);
+G_DECLARE_DERIVABLE_TYPE(GntMenuItem, gnt_menuitem, GNT, MENU_ITEM, GObject)
 
 /**
  * gnt_menuitem_new:
@@ -114,7 +69,7 @@ GType gnt_menuitem_get_type(void);
  *
  * Returns:  The newly created menuitem.
  */
-GntMenuItem * gnt_menuitem_new(const char *text);
+GntMenuItem *gnt_menuitem_new(const gchar *text);
 
 /**
  * gnt_menuitem_set_callback:
@@ -154,7 +109,7 @@ GntMenu *gnt_menuitem_get_submenu(GntMenuItem *item);
  *
  * Set a trigger key for the item.
  */
-void gnt_menuitem_set_trigger(GntMenuItem *item, char trigger);
+void gnt_menuitem_set_trigger(GntMenuItem *item, gchar trigger);
 
 /**
  * gnt_menuitem_get_trigger:
@@ -166,7 +121,7 @@ void gnt_menuitem_set_trigger(GntMenuItem *item, char trigger);
  *
  * Returns: The trigger key for the menuitem.
  */
-char gnt_menuitem_get_trigger(GntMenuItem *item);
+gchar gnt_menuitem_get_trigger(GntMenuItem *item);
 
 /**
  * gnt_menuitem_set_id:
@@ -177,7 +132,7 @@ char gnt_menuitem_get_trigger(GntMenuItem *item);
  *
  * Since: 2.3.0
  */
-void gnt_menuitem_set_id(GntMenuItem *item, const char *id);
+void gnt_menuitem_set_id(GntMenuItem *item, const gchar *id);
 
 /**
  * gnt_menuitem_get_id:
@@ -189,7 +144,7 @@ void gnt_menuitem_set_id(GntMenuItem *item, const char *id);
  *
  * Since: 2.3.0
  */
-const char * gnt_menuitem_get_id(GntMenuItem *item);
+const gchar *gnt_menuitem_get_id(GntMenuItem *item);
 
 /**
  * gnt_menuitem_activate:
