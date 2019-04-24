@@ -24,6 +24,7 @@
 #include "gntbox.h"
 #include "gntcombobox.h"
 #include "gnttree.h"
+#include "gnttreeprivate.h"
 #include "gntstyle.h"
 #include "gntutils.h"
 
@@ -203,10 +204,10 @@ gnt_combo_box_key_pressed(GntWidget *widget, const char *text)
 
 		int len = strlen(text);
 		GntTree *tree = GNT_TREE(box->dropdown);
-		GntTreeRow *current = tree->current;
+		GntTreeRow *current = gnt_tree_get_current(tree);
 
 		SEARCH_IN_RANGE(gnt_tree_row_get_next(tree, current), NULL);
-		SEARCH_IN_RANGE(tree->top, current);
+		SEARCH_IN_RANGE(gnt_tree_get_top(tree), current);
 
 #undef SEARCH_IN_RANGE
 	}

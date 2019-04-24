@@ -1684,6 +1684,20 @@ void gnt_tree_set_selected(GntTree *tree , void *key)
 	tree_selection_changed(tree, row, tree->current);
 }
 
+/* Internal. */
+GntTreeRow *
+gnt_tree_get_current(GntTree *tree)
+{
+	return tree->current;
+}
+
+/* Internal. */
+GntTreeRow *
+gnt_tree_get_top(GntTree *tree)
+{
+	return tree->top;
+}
+
 static void _gnt_tree_init_internals(GntTree *tree, int col)
 {
 	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
