@@ -24,6 +24,8 @@
 #include "gntmenu.h"
 #include "gntmenuitemcheck.h"
 
+#include "gntmenuitemprivate.h"
+
 #include <ctype.h>
 #include <string.h>
 
@@ -68,8 +70,9 @@ show_submenu(GntMenu *menu)
 			return;
 
 	item = g_list_nth_data(menu->list, menu->selected);
-	if (!item || !item->submenu)
+	if (!item || !gnt_menuitem_get_submenu(item)) {
 		return;
+	}
 	menuitem_activate(menu, item);
 }
 
@@ -90,16 +93,20 @@ gnt_menu_draw(GntWidget *widget)
 			if (!gnt_menuitem_is_visible(item))
 				continue;
 			type = ' ';
-			if (item->callback || item->submenu)
+			if (gnt_menuitem_has_callback(item) ||
+			    gnt_menuitem_get_submenu(item)) {
 				type |= gnt_color_pair(GNT_COLOR_HIGHLIGHT);
-			else
+			} else {
 				type |= gnt_color_pair(GNT_COLOR_DISABLED);
+			}
 			if (i == menu->selected)
 				type |= A_REVERSE;
-			item->priv.x = getcurx(widget->window) + widget->priv.x;
-			item->priv.y = getcury(widget->window) + widget->priv.y + 1;
+			gnt_menuitem_set_position(
+			        item, getcurx(widget->window) + widget->priv.x,
+			        getcury(widget->window) + widget->priv.y + 1);
 			wbkgdset(widget->window, type);
-			wprintw(widget->window, " %s   ", C_(item->text));
+			wprintw(widget->window, " %s   ",
+			        C_(gnt_menuitem_get_text(item)));
 		}
 	} else {
 		org_draw(widget);
@@ -133,18 +140,29 @@ menu_tree_add(GntMenu *menu, GntMenuItem *item, GntMenuItem *parent)
 		trigger[0] = '(';
 
 	if (GNT_IS_MENU_ITEM_CHECK(item)) {
-		gnt_tree_add_choice(GNT_TREE(menu), item,
-			gnt_tree_create_row(GNT_TREE(menu), item->text, trigger, " "), parent, NULL);
+		gnt_tree_add_choice(
+		        GNT_TREE(menu), item,
+		        gnt_tree_create_row(GNT_TREE(menu),
+		                            gnt_menuitem_get_text(item),
+		                            trigger, " "),
+		        parent, NULL);
 		gnt_tree_set_choice(GNT_TREE(menu), item, gnt_menuitem_check_get_checked(GNT_MENU_ITEM_CHECK(item)));
 	} else {
-		gnt_tree_add_row_last(GNT_TREE(menu), item,
-			gnt_tree_create_row(GNT_TREE(menu), item->text, trigger, item->submenu ? ">" : " "), parent);
-		if (!item->callback && !item->submenu)
+		gnt_tree_add_row_last(
+		        GNT_TREE(menu), item,
+		        gnt_tree_create_row(
+		                GNT_TREE(menu), gnt_menuitem_get_text(item),
+		                trigger,
+		                gnt_menuitem_get_submenu(item) ? ">" : " "),
+		        parent);
+		if (!gnt_menuitem_has_callback(item) &&
+		    !gnt_menuitem_get_submenu(item)) {
 			gnt_tree_set_row_color(GNT_TREE(menu), item, GNT_COLOR_DISABLED);
+		}
 	}
 
-	if (0 && item->submenu) {
-		GntMenu *sub = GNT_MENU(item->submenu);
+	if (0 && gnt_menuitem_get_submenu(item)) {
+		GntMenu *sub = GNT_MENU(gnt_menuitem_get_submenu(item));
 		GList *iter;
 		for (iter = sub->list; iter; iter = iter->next) {
 			GntMenuItem *it = GNT_MENU_ITEM(iter->data);
@@ -175,7 +193,7 @@ assign_triggers(GntMenu *menu)
 	for (iter = menu->list; iter; iter = iter->next) {
 		GntMenuItem *item = iter->data;
 		char trigger = gnt_menuitem_get_trigger(item);
-		const char *text = item->text;
+		const gchar *text = gnt_menuitem_get_text(item);
 		if (trigger != '\0')
 			continue;
 		while (*text) {
@@ -187,7 +205,7 @@ assign_triggers(GntMenu *menu)
 			break;
 		}
 		if (trigger == 0)
-			trigger = item->text[0];
+			trigger = gnt_menuitem_get_text(item)[0];
 		gnt_menuitem_set_trigger(item, trigger);
 		bools[(int)GET_VAL(trigger)] = 1;
 	}
@@ -225,17 +243,23 @@ menuitem_activate(GntMenu *menu, GntMenuItem *item)
 	if (gnt_menuitem_activate(item)) {
 		menu_hide_all(menu);
 	} else {
-		if (item->submenu) {
-			GntMenu *sub = GNT_MENU(item->submenu);
+		GntMenu *sub = GNT_MENU(gnt_menuitem_get_submenu(item));
+		if (sub) {
+			gint x, y;
 			menu->submenu = sub;
 			sub->type = GNT_MENU_POPUP;	/* Submenus are *never* toplevel */
 			sub->parentmenu = menu;
 			if (menu->type != GNT_MENU_TOPLEVEL) {
 				GntWidget *widget = GNT_WIDGET(menu);
-				item->priv.x = widget->priv.x + widget->priv.width - 1;
-				item->priv.y = widget->priv.y + gnt_tree_get_selection_visible_line(GNT_TREE(menu));
+				gnt_menuitem_set_position(
+				        item,
+				        widget->priv.x + widget->priv.width - 1,
+				        widget->priv.y +
+				                gnt_tree_get_selection_visible_line(
+				                        GNT_TREE(menu)));
 			}
-			gnt_widget_set_position(GNT_WIDGET(sub), item->priv.x, item->priv.y);
+			gnt_menuitem_get_position(item, &x, &y);
+			gnt_widget_set_position(GNT_WIDGET(sub), x, y);
 			gnt_widget_set_visible(GNT_WIDGET(sub), TRUE);
 			gnt_widget_draw(GNT_WIDGET(sub));
 		} else {
@@ -352,7 +376,7 @@ gnt_menu_key_pressed(GntWidget *widget, const char *text)
 				return TRUE;
 		} else if (strcmp(text, GNT_KEY_RIGHT) == 0) {
 			GntMenuItem *item = gnt_tree_get_selection_data(GNT_TREE(menu));
-			if (item && item->submenu) {
+			if (item && gnt_menuitem_get_submenu(item)) {
 				menuitem_activate(menu, item);
 				return TRUE;
 			}

@@ -83,6 +83,37 @@ GntMenuItem *gnt_menuitem_new(const char *text)
 	return menuitem;
 }
 
+/* Internal. */
+void
+gnt_menuitem_set_position(GntMenuItem *item, gint x, gint y)
+{
+	g_return_if_fail(GNT_IS_MENU_ITEM(item));
+	item->priv.x = x;
+	item->priv.y = y;
+}
+
+/* Internal. */
+void
+gnt_menuitem_get_position(GntMenuItem *item, gint *x, gint *y)
+{
+	g_return_if_fail(GNT_IS_MENU_ITEM(item));
+
+	if (x) {
+		*x = item->priv.x;
+	}
+	if (y) {
+		*y = item->priv.y;
+	}
+}
+
+/* Internal. */
+gboolean
+gnt_menuitem_has_callback(GntMenuItem *item)
+{
+	g_return_val_if_fail(GNT_IS_MENU_ITEM(item), FALSE);
+	return item->callback != NULL;
+}
+
 void gnt_menuitem_set_callback(GntMenuItem *item, GntMenuItemCallback callback, gpointer data)
 {
 	item->callback = callback;
@@ -151,4 +182,12 @@ gnt_menuitem_set_text(GntMenuItem *item, const gchar *text)
 {
 	g_free(item->text);
 	item->text = g_strdup(text);
+}
+
+/* Internal. */
+const gchar *
+gnt_menuitem_get_text(GntMenuItem *item)
+{
+	g_return_val_if_fail(GNT_IS_MENU_ITEM(item), NULL);
+	return item->text;
 }

@@ -54,7 +54,8 @@ GntMenuItem *gnt_menuitem_check_new(const char *text)
 	GntMenuItem *item = g_object_new(GNT_TYPE_MENU_ITEM_CHECK, NULL);
 	GntMenuItem *menuitem = GNT_MENU_ITEM(item);
 
-	menuitem->text = g_strdup(text);
+	gnt_menuitem_set_text(menuitem, text);
+
 	return item;
 }
 
