@@ -476,8 +476,10 @@ clear_tags(GntBindable *bind, G_GNUC_UNUSED GList *params)
 	g_list_free_full(priv->tags, g_free);
 	priv->tags = NULL;
 
-	for (iter = GNT_TREE(tree)->list; iter; iter = iter->next)
+	for (iter = gnt_tree_get_rows(GNT_TREE(tree)); iter;
+	     iter = iter->next) {
 		gnt_tree_set_row_flags(GNT_TREE(tree), iter->data, GNT_TEXT_FLAG_NORMAL);
+	}
 
 	return TRUE;
 }

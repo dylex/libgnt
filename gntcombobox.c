@@ -135,7 +135,7 @@ popup_dropdown(GntComboBox *box)
 {
 	GntWidget *widget = GNT_WIDGET(box);
 	GntWidget *parent = gnt_widget_get_parent(box->dropdown);
-	int height = g_list_length(GNT_TREE(box->dropdown)->list);
+	int height = g_list_length(gnt_tree_get_rows(GNT_TREE(box->dropdown)));
 	int y = widget->priv.y + widget->priv.height - 1;
 	gnt_widget_set_size(box->dropdown, widget->priv.width, height + 2);
 
