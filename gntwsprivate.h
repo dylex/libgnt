@@ -37,6 +37,9 @@ GList *gnt_ws_get_last(GntWS *ws);
 void gnt_ws_append_widget(GntWS *ws, GntWidget *widget);
 void gnt_ws_bring_to_front(GntWS *ws, GntWidget *widget);
 
+void gnt_ws_set_list(GntWS *ws, GList *list);
+GList *gnt_ws_get_list(GntWS *ws);
+
 G_END_DECLS
 
 #endif /* GNT_WS_PRIVATE_H */

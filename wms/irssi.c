@@ -240,7 +240,9 @@ irssi_update_window(GntWM *wm, GntNode *node)
 	const char *name = gnt_widget_get_name(win);
 	if (!name || !GNT_IS_BOX(win) || !strstr(name, "conversation-window"))
 		return;
-	g_object_set_data(G_OBJECT(win), "irssi-index", GINT_TO_POINTER(g_list_index(wm->cws->list, win)));
+	g_object_set_data(
+	        G_OBJECT(win), "irssi-index",
+	        GINT_TO_POINTER(g_list_index(gnt_ws_get_list(wm->cws), win)));
 	g_timeout_add(0, (GSourceFunc)update_conv_window_title, node);
 }
 

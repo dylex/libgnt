@@ -220,6 +220,22 @@ gnt_ws_get_name(GntWS *ws)
 }
 
 /* Internal. */
+void
+gnt_ws_set_list(GntWS *ws, GList *list)
+{
+	g_return_if_fail(GNT_IS_WS(ws));
+	ws->list = list;
+}
+
+/* Internal. */
+GList *
+gnt_ws_get_list(GntWS *ws)
+{
+	g_return_val_if_fail(GNT_IS_WS(ws), NULL);
+	return ws->list;
+}
+
+/* Internal. */
 gboolean gnt_ws_is_empty(GntWS *ws)
 {
 	g_return_val_if_fail(GNT_IS_WS(ws), TRUE);

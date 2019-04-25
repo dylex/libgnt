@@ -406,6 +406,7 @@ static void
 switch_window(GntWM *wm, int direction, gboolean urgent)
 {
 	GntWidget *w = NULL, *wid = NULL;
+	GList *list;
 	int pos, orgpos;
 
 	if (wm->_list.window || wm->menu)
@@ -420,20 +421,22 @@ switch_window(GntWM *wm, int direction, gboolean urgent)
 	}
 
 	w = gnt_ws_get_top_widget(wm->cws);
-	orgpos = pos = g_list_index(wm->cws->list, w);
+	list = gnt_ws_get_list(wm->cws);
+	orgpos = pos = g_list_index(list, w);
 	g_return_if_fail(pos >= 0);
 
 	do {
 		pos += direction;
 
 		if (pos < 0) {
-			wid = g_list_last(wm->cws->list)->data;
-			pos = g_list_length(wm->cws->list) - 1;
-		} else if ((guint)pos >= g_list_length(wm->cws->list)) {
-			wid = wm->cws->list->data;
+			wid = g_list_last(list)->data;
+			pos = g_list_length(list) - 1;
+		} else if ((guint)pos >= g_list_length(list)) {
+			wid = list->data;
 			pos = 0;
-		} else
-			wid = g_list_nth_data(wm->cws->list, pos);
+		} else {
+			wid = g_list_nth_data(list, pos);
+		}
 	} while (urgent && !gnt_widget_get_is_urgent(wid) && pos != orgpos);
 
 	gnt_wm_raise_window(wm, wid);
@@ -471,8 +474,7 @@ switch_window_n(GntBindable *bind, GList *list)
 	else
 		n = 0;
 
-	if ((l = g_list_nth(wm->cws->list, n)) != NULL)
-	{
+	if ((l = g_list_nth(gnt_ws_get_list(wm->cws), n)) != NULL) {
 		gnt_wm_raise_window(wm, l->data);
 	}
 
@@ -594,7 +596,7 @@ populate_window_list(GntWM *wm, gboolean workspace)
 	GList *iter;
 	GntTree *tree = GNT_TREE(wm->windows->tree);
 	if (!workspace) {
-		for (iter = wm->cws->list; iter; iter = iter->next) {
+		for (iter = gnt_ws_get_list(wm->cws); iter; iter = iter->next) {
 			GntBox *box = GNT_BOX(iter->data);
 
 			gnt_tree_add_row_last(tree, box,
@@ -606,7 +608,8 @@ populate_window_list(GntWM *wm, gboolean workspace)
 		for (; ws; ws = ws->next) {
 			gnt_tree_add_row_last(tree, ws->data,
 					gnt_tree_create_row(tree, gnt_ws_get_name(GNT_WS(ws->data))), NULL);
-			for (iter = GNT_WS(ws->data)->list; iter; iter = iter->next) {
+			for (iter = gnt_ws_get_list(GNT_WS(ws->data)); iter;
+			     iter = iter->next) {
 				GntBox *box = GNT_BOX(iter->data);
 
 				gnt_tree_add_row_last(tree, box,
@@ -865,7 +868,7 @@ dump_screen(G_GNUC_UNUSED GntBindable *b, G_GNUC_UNUSED GList *params)
 static void
 shift_window(GntWM *wm, GntWidget *widget, int dir)
 {
-	GList *all = wm->cws->list;
+	GList *all = gnt_ws_get_list(wm->cws);
 	GList *list = g_list_find(all, widget);
 	int length, pos;
 	if (!list)
@@ -885,7 +888,7 @@ shift_window(GntWM *wm, GntWidget *widget, int dir)
 
 	all = g_list_insert(all, widget, pos);
 	all = g_list_delete_link(all, list);
-	wm->cws->list = all;
+	gnt_ws_set_list(wm->cws, all);
 	gnt_ws_draw_taskbar(wm->cws, FALSE);
 	if (!gnt_ws_is_empty(wm->cws)) {
 		GntWidget *w = gnt_ws_get_top_widget(wm->cws);
@@ -1682,8 +1685,10 @@ gnt_wm_widget_move_workspace(GntWM *wm, GntWS *neww, GntWidget *widget)
 static gint widget_in_workspace(gconstpointer workspace, gconstpointer wid)
 {
 	GntWS *s = (GntWS *)workspace;
-	if (s->list && g_list_find(s->list, wid))
+	GList *list = gnt_ws_get_list(s);
+	if (list && g_list_find(list, wid)) {
 		return 0;
+	}
 	return 1;
 }
 
@@ -1881,7 +1886,7 @@ void gnt_wm_window_close(GntWM *wm, GntWidget *widget)
 	}
 
 	if (s) {
-		pos = g_list_index(s->list, widget);
+		pos = g_list_index(gnt_ws_get_list(s), widget);
 
 		if (pos != -1) {
 			gnt_ws_remove_widget(s, widget);
