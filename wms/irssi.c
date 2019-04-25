@@ -43,6 +43,8 @@
 #include "gntwindow.h"
 #include "gntlabel.h"
 
+#include "gntwsprivate.h"
+
 #define GNT_TYPE_IRSSI_WM gnt_irssi_wm_get_type()
 G_DECLARE_FINAL_TYPE(GntIrssiWM, gnt_irssi_wm, GNT, IRSSI_WM, GntWM)
 
@@ -267,8 +269,9 @@ move_direction(GntBindable *bindable, GList *list)
 	int x, y, w, h;
 	GntWidget *win;
 
-	if (wm->cws->ordered == NULL || is_budddylist(win = GNT_WIDGET(wm->cws->ordered->data)))
+	if (gnt_ws_is_empty(wm->cws) || is_budddylist(win = gnt_ws_get_top_widget(wm->cws))) {
 		return FALSE;
+	}
 
 	find_window_position(irssi, win, &hor, &vert);
 

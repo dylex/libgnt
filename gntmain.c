@@ -50,6 +50,8 @@
 #include "gntwindow.h"
 #include "gntwm.h"
 
+#include "gntwsprivate.h"
+
 #include <panel.h>
 
 #include <stdio.h>
@@ -158,8 +160,9 @@ detect_mouse_action(const char *buffer)
 	GntWidget *widget = NULL;
 	PANEL *p = NULL;
 
-	if (!wm->cws->ordered || buffer[0] != 27)
+	if (gnt_ws_is_empty(wm->cws) || buffer[0] != 27) {
 		return FALSE;
+	}
 
 	buffer++;
 	if (strlen(buffer) < 5)
@@ -214,7 +217,7 @@ detect_mouse_action(const char *buffer)
 
 	if (event == GNT_LEFT_MOUSE_DOWN && widget &&
 	    widget != wm->_list.window && !gnt_widget_get_transient(widget)) {
-		if (widget != wm->cws->ordered->data) {
+		if (!gnt_ws_is_top_widget(wm->cws, widget)) {
 			gnt_wm_raise_window(wm, widget);
 		}
 		if (y == widget->priv.y) {
@@ -707,7 +710,7 @@ gboolean gnt_widget_has_focus(GntWidget *widget)
 
 	if (widget == wm->_list.window)
 		return TRUE;
-	if (wm->cws->ordered && wm->cws->ordered->data == widget) {
+	if (gnt_ws_is_top_widget(wm->cws, widget)) {
 		if (GNT_IS_BOX(widget) &&
 				(GNT_BOX(widget)->active == w || widget == w))
 			return TRUE;
@@ -719,8 +722,9 @@ void gnt_widget_set_urgent(GntWidget *widget)
 {
 	widget = gnt_widget_get_toplevel(widget);
 
-	if (wm->cws->ordered && wm->cws->ordered->data == widget)
+	if (gnt_ws_is_top_widget(wm->cws, widget)) {
 		return;
+	}
 
 	gnt_widget_set_is_urgent(widget, TRUE);
 

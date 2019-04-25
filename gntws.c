@@ -219,3 +219,67 @@ gnt_ws_get_name(GntWS *ws)
 	return priv->name;
 }
 
+/* Internal. */
+gboolean gnt_ws_is_empty(GntWS *ws)
+{
+	g_return_val_if_fail(GNT_IS_WS(ws), TRUE);
+	return ws->ordered == NULL;
+}
+
+/* Internal. */
+gboolean gnt_ws_is_single(GntWS *ws)
+{
+	g_return_val_if_fail(GNT_IS_WS(ws), FALSE);
+	return ws->ordered != NULL && ws->ordered->next == NULL;
+}
+
+/* Internal. */
+GntWidget *
+gnt_ws_get_top_widget(GntWS *ws)
+{
+	g_return_val_if_fail(GNT_IS_WS(ws), NULL);
+	return ws->ordered ? ws->ordered->data : NULL;
+}
+
+/* Internal. */
+gboolean
+gnt_ws_is_top_widget(GntWS *ws, GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WS(ws), FALSE);
+	return ws->ordered && ws->ordered->data == widget;
+}
+
+/* Internal. */
+GList *
+gnt_ws_get_last(GntWS *ws)
+{
+	g_return_val_if_fail(GNT_IS_WS(ws), NULL);
+	return ws->ordered ? g_list_last(ws->ordered) : NULL;
+}
+
+/* Internal.
+ * Different from gnt_ws_add_widget in that it doesn't modify focus. */
+void
+gnt_ws_append_widget(GntWS *ws, GntWidget *widget)
+{
+	g_return_if_fail(GNT_IS_WS(ws));
+	ws->list = g_list_append(ws->list, widget);
+	ws->ordered = g_list_append(ws->ordered, widget);
+}
+
+/* Internal. */
+void
+gnt_ws_bring_to_front(GntWS *ws, GntWidget *widget)
+{
+	g_return_if_fail(GNT_IS_WS(ws));
+
+	if (widget != ws->ordered->data) {
+		GntWidget *old_widget = ws->ordered->data;
+		ws->ordered = g_list_remove(ws->ordered, widget);
+		ws->ordered = g_list_prepend(ws->ordered, widget);
+		gnt_widget_set_focus(old_widget, FALSE);
+		gnt_widget_draw(old_widget);
+	}
+	gnt_widget_set_focus(widget, TRUE);
+	gnt_widget_draw(widget);
+}
