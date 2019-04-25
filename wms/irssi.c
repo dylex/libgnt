@@ -129,7 +129,7 @@ draw_line_separators(GntIrssiWM *irssi)
 }
 
 static gboolean
-is_budddylist(GntWidget *win)
+is_buddylist(GntWidget *win)
 {
 	const char *name = gnt_widget_get_name(win);
 	if (name && strcmp(name, "buddylist") == 0)
@@ -195,8 +195,9 @@ static void
 irssi_window_resized(GntWM *wm, GntNode *node)
 {
 	GntIrssiWM *irssi = NULL;
-	if (!is_budddylist(node->me))
+	if (!is_buddylist(node->me)) {
 		return;
+	}
 
 	irssi = GNT_IRSSI_WM(wm);
 	gnt_widget_get_size(node->me, &irssi->buddylistwidth, NULL);
@@ -206,7 +207,7 @@ irssi_window_resized(GntWM *wm, GntNode *node)
 static gboolean
 irssi_close_window(GntWM *wm, GntWidget *win)
 {
-	if (is_budddylist(win)) {
+	if (is_buddylist(win)) {
 		GntIrssiWM *irssi = GNT_IRSSI_WM(wm);
 		irssi->buddylistwidth = 0;
 	}
@@ -271,7 +272,8 @@ move_direction(GntBindable *bindable, GList *list)
 	int x, y, w, h;
 	GntWidget *win;
 
-	if (gnt_ws_is_empty(wm->cws) || is_budddylist(win = gnt_ws_get_top_widget(wm->cws))) {
+	if (gnt_ws_is_empty(wm->cws) ||
+	    is_buddylist(win = gnt_ws_get_top_widget(wm->cws))) {
 		return FALSE;
 	}
 
@@ -308,7 +310,7 @@ refresh_window(GntWidget *widget, G_GNUC_UNUSED GntNode *node,
 	if (!GNT_IS_WINDOW(widget))
 		return;
 
-	if (is_budddylist(widget)) {
+	if (is_buddylist(widget)) {
 		return;
 	}
 

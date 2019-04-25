@@ -63,8 +63,8 @@ G_BEGIN_DECLS
  */
 G_DECLARE_DERIVABLE_TYPE(GntWindow, gnt_window, GNT, WINDOW, GntBox)
 
-#define gnt_vwindow_new(homo) gnt_window_box_new(homo, TRUE)
-#define gnt_hwindow_new(homo) gnt_window_box_new(homo, FALSE)
+#define gnt_vwindow_new(homogeneous) gnt_window_box_new(homogeneous, TRUE)
+#define gnt_hwindow_new(homogeneous) gnt_window_box_new(homogeneous, FALSE)
 
 /**
  * gnt_window_new:
@@ -77,14 +77,15 @@ GntWidget * gnt_window_new(void);
 
 /**
  * gnt_window_box_new:
- * @homo:  %TRUE if the widgets inside the window should have the same dimensions.
- * @vert:  %TRUE if the widgets inside the window should be stacked vertically.
+ * @homogeneous: %TRUE if the widgets inside the window should have the same
+ *               dimensions.
+ * @vert: %TRUE if the widgets inside the window should be stacked vertically.
  *
  * Create a new window.
  *
  * Returns:  The newly created window.
  */
-GntWidget * gnt_window_box_new(gboolean homo, gboolean vert);
+GntWidget *gnt_window_box_new(gboolean homogeneous, gboolean vert);
 
 /**
  * gnt_window_set_menu:

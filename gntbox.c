@@ -34,7 +34,7 @@ enum
 {
 	PROP_0,
 	PROP_VERTICAL,
-	PROP_HOMO        /* ... */
+	PROP_HOMOGENEOUS
 };
 
 enum
@@ -541,7 +541,7 @@ gnt_box_set_property(GObject *obj, guint prop_id, const GValue *value,
 		case PROP_VERTICAL:
 			box->vertical = g_value_get_boolean(value);
 			break;
-		case PROP_HOMO:
+		case PROP_HOMOGENEOUS:
 			box->homogeneous = g_value_get_boolean(value);
 			break;
 		default:
@@ -559,7 +559,7 @@ gnt_box_get_property(GObject *obj, guint prop_id, GValue *value,
 		case PROP_VERTICAL:
 			g_value_set_boolean(value, box->vertical);
 			break;
-		case PROP_HOMO:
+		case PROP_HOMOGENEOUS:
 			g_value_set_boolean(value, box->homogeneous);
 			break;
 		default:
@@ -598,7 +598,7 @@ gnt_box_class_init(GntBoxClass *klass)
 			)
 		);
 	g_object_class_install_property(obj_class,
-			PROP_HOMO,
+			PROP_HOMOGENEOUS,
 			g_param_spec_boolean("homogeneous", "Homogeneous",
 				"Whether the child widgets in the box should have the same size.",
 				TRUE,
@@ -636,10 +636,11 @@ gnt_box_init(GntBox *box)
 /******************************************************************************
  * GntBox API
  *****************************************************************************/
-GntWidget *gnt_box_new(gboolean homo, gboolean vert)
+GntWidget *
+gnt_box_new(gboolean homogeneous, gboolean vert)
 {
-	GntWidget *widget = g_object_new(GNT_TYPE_BOX, "homogeneous", homo,
-			"vertical", vert, NULL);
+	GntWidget *widget = g_object_new(GNT_TYPE_BOX, "homogeneous",
+	                                 homogeneous, "vertical", vert, NULL);
 	GntBox *box = GNT_BOX(widget);
 
 	box->alignment = vert ? GNT_ALIGN_LEFT : GNT_ALIGN_MID;
