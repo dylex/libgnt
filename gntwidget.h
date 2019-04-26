@@ -42,17 +42,6 @@
 
 #include "gntbindable.h"
 
-#define GNT_TYPE_WIDGET				(gnt_widget_get_type())
-#define GNT_WIDGET(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_WIDGET, GntWidget))
-#define GNT_WIDGET_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_WIDGET, GntWidgetClass))
-#define GNT_IS_WIDGET(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_WIDGET))
-#define GNT_IS_WIDGET_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_WIDGET))
-#define GNT_WIDGET_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_WIDGET, GntWidgetClass))
-
-typedef struct _GntWidget			GntWidget;
-typedef struct _GntWidgetPriv		GntWidgetPriv;
-typedef struct _GntWidgetClass		GntWidgetClass;
-
 /* XXX: This will probably move elsewhere */
 typedef enum
 {
@@ -70,39 +59,16 @@ typedef enum
 	GNT_PARAM_SERIALIZABLE	= 1 << G_PARAM_USER_SHIFT
 } GntParamFlags;
 
-/**
- * GntWidgetPriv:
- *
- * Access to any fields is deprecated. See inline comments for replacements.
- */
-struct _GntWidgetPriv
-{
-	int GNTSEAL(x), GNTSEAL(y);
-	int GNTSEAL(width), GNTSEAL(height);
+G_BEGIN_DECLS
 
-	int GNTSEAL(minw), GNTSEAL(minh);    /* Minimum size for the widget */
-};
+#define GNT_TYPE_WIDGET gnt_widget_get_type()
 
 /**
- * GntWidget:
+ * gnt_widget_get_type:
  *
- * Access to any fields is deprecated. See inline comments for replacements.
+ * Returns:  GType for GntWidget.
  */
-struct _GntWidget
-{
-	GntBindable inherit;
-
-	GntWidget *GNTSEAL(parent); /* Deprecated. Use gnt_widget_get_parent. */
-
-	GntWidgetPriv GNTSEAL(priv);
-	WINDOW *GNTSEAL(window);
-
-	/*< private >*/
-	void *res1;
-	void *res2;
-	void *res3;
-	void *res4;
-};
+G_DECLARE_DERIVABLE_TYPE(GntWidget, gnt_widget, GNT, WIDGET, GntBindable)
 
 struct _GntWidgetClass
 {
@@ -131,15 +97,6 @@ struct _GntWidgetClass
 	void (*gnt_reserved3)(void);
 	void (*gnt_reserved4)(void);
 };
-
-G_BEGIN_DECLS
-
-/**
- * gnt_widget_get_type:
- *
- * Returns:  GType for GntWidget.
- */
-GType gnt_widget_get_type(void);
 
 /**
  * gnt_widget_destroy:

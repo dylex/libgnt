@@ -51,12 +51,17 @@ typedef enum
 	GNT_WIDGET_DISABLE_ACTIONS = 1 << 12,
 } GntWidgetFlags;
 
-/* Yes, there are two "private" types; we should migrate contents of
- * GntWidgetPriv here when we break ABI. */
 typedef struct
 {
+	WINDOW *window;
+	GntWidget *parent;
+
+	gint x, y;
+	gint width, height;
 	GntWidgetFlags flags;
 	gchar *name;
+
+	gint minw, minh; /* Minimum size for the widget */
 
 	guint queue_update;
 } GntWidgetPrivate;
@@ -127,18 +132,18 @@ gnt_widget_focus_change(GntWidget *widget)
 static gboolean
 gnt_widget_dummy_confirm_size(GntWidget *widget, int width, int height)
 {
+	GntWidgetPrivate *priv = gnt_widget_get_instance_private(widget);
 	gboolean shadow;
-	if (width < widget->priv.minw || height < widget->priv.minh) {
+
+	if (width < priv->minw || height < priv->minh) {
 		return FALSE;
 	}
 
 	shadow = gnt_widget_has_shadow(widget);
-	if (widget->priv.width + shadow != width &&
-	    !gnt_widget_get_grow_x(widget)) {
+	if (priv->width + shadow != width && !gnt_widget_get_grow_x(widget)) {
 		return FALSE;
 	}
-	if (widget->priv.height + shadow != height &&
-	    !gnt_widget_get_grow_y(widget)) {
+	if (priv->height + shadow != height && !gnt_widget_get_grow_y(widget)) {
 		return FALSE;
 	}
 
@@ -329,7 +334,7 @@ gnt_widget_destroy(GntWidget *widget)
 	if (!gnt_widget_in_destruction(widget)) {
 		GNT_WIDGET_SET_FLAGS(priv, GNT_WIDGET_DESTROYING);
 		gnt_widget_hide(widget);
-		delwin(widget->window);
+		delwin(priv->window);
 		g_object_run_dispose(G_OBJECT(widget));
 	}
 	GNTDEBUG;
@@ -347,6 +352,11 @@ gnt_widget_show(GntWidget *widget)
 void
 gnt_widget_draw(GntWidget *widget)
 {
+	GntWidgetPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
+
 	/* Draw the widget */
 	if (gnt_widget_get_drawing(widget))
 		return;
@@ -356,9 +366,8 @@ gnt_widget_draw(GntWidget *widget)
 		gnt_widget_map(widget);
 	}
 
-	if (widget->window == NULL)
-	{
-		widget->window = newpad(widget->priv.height + 20, widget->priv.width + 20);
+	if (priv->window == NULL) {
+		priv->window = newpad(priv->height + 20, priv->width + 20);
 
 		init_widget(widget);
 	}
@@ -404,8 +413,13 @@ gnt_widget_expose(GntWidget *widget, int x, int y, int width, int height)
 void
 gnt_widget_hide(GntWidget *widget)
 {
+	GntWidgetPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
+
 	g_signal_emit(widget, signals[SIG_HIDE], 0);
-	wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_NORMAL));
+	wbkgdset(priv->window, '\0' | gnt_color_pair(GNT_COLOR_NORMAL));
 	gnt_screen_release(widget);
 	gnt_widget_set_visible(widget, FALSE);
 	gnt_widget_set_mapped(widget, FALSE);
@@ -414,53 +428,78 @@ gnt_widget_hide(GntWidget *widget)
 WINDOW *
 gnt_widget_get_window(GntWidget *widget)
 {
+	GntWidgetPrivate *priv = NULL;
+
 	g_return_val_if_fail(GNT_IS_WIDGET(widget), NULL);
-	return widget->window;
+	priv = gnt_widget_get_instance_private(widget);
+
+	return priv->window;
 }
 
 void
 gnt_widget_set_parent(GntWidget *widget, GntWidget *parent)
 {
+	GntWidgetPrivate *priv = NULL;
+
 	g_return_if_fail(GNT_IS_WIDGET(widget));
-	widget->parent = parent;
+	priv = gnt_widget_get_instance_private(widget);
+
+	priv->parent = parent;
 }
 
 GntWidget *
 gnt_widget_get_parent(GntWidget *widget)
 {
-	g_return_val_if_fail(GNT_IS_WIDGET(widget), NULL);
+	GntWidgetPrivate *priv = NULL;
 
-	return widget->parent;
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), NULL);
+	priv = gnt_widget_get_instance_private(widget);
+
+	return priv->parent;
 }
 
 GntWidget *
 gnt_widget_get_toplevel(GntWidget *widget)
 {
-	g_return_val_if_fail(GNT_IS_WIDGET(widget), NULL);
+	GntWidgetPrivate *priv = NULL;
 
-	while (widget->parent) {
-		widget = widget->parent;
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), NULL);
+	priv = gnt_widget_get_instance_private(widget);
+
+	while (priv->parent) {
+		widget = priv->parent;
+		priv = gnt_widget_get_instance_private(widget);
 	}
 
 	return widget;
 }
 
 void
-gnt_widget_set_position(GntWidget *wid, int x, int y)
+gnt_widget_set_position(GntWidget *widget, int x, int y)
 {
-	g_signal_emit(wid, signals[SIG_POSITION], 0, x, y);
+	GntWidgetPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
+
+	g_signal_emit(widget, signals[SIG_POSITION], 0, x, y);
 	/* XXX: Need to install properties for these and g_object_notify */
-	wid->priv.x = x;
-	wid->priv.y = y;
+	priv->x = x;
+	priv->y = y;
 }
 
 void
-gnt_widget_get_position(GntWidget *wid, int *x, int *y)
+gnt_widget_get_position(GntWidget *widget, int *x, int *y)
 {
+	GntWidgetPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
+
 	if (x)
-		*x = wid->priv.x;
+		*x = priv->x;
 	if (y)
-		*y = wid->priv.y;
+		*y = priv->y;
 }
 
 void
@@ -470,16 +509,20 @@ gnt_widget_size_request(GntWidget *widget)
 }
 
 void
-gnt_widget_get_size(GntWidget *wid, int *width, int *height)
+gnt_widget_get_size(GntWidget *widget, int *width, int *height)
 {
-	gboolean shadow = TRUE;
-	if (!gnt_widget_has_shadow(wid))
-		shadow = FALSE;
+	GntWidgetPrivate *priv = NULL;
+	gint shadow;
+
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
+
+	shadow = gnt_widget_has_shadow(widget) ? 1 : 0;
 
 	if (width)
-		*width = wid->priv.width + shadow;
+		*width = priv->width + shadow;
 	if (height)
-		*height = wid->priv.height + shadow;
+		*height = priv->height + shadow;
 }
 
 /* Internal.
@@ -488,56 +531,70 @@ gnt_widget_get_size(GntWidget *wid, int *width, int *height)
 void
 gnt_widget_get_internal_size(GntWidget *widget, gint *width, gint *height)
 {
+	GntWidgetPrivate *priv = NULL;
 	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
 	if (width) {
-		*width = widget->priv.width;
+		*width = priv->width;
 	}
 	if (height) {
-		*height = widget->priv.height;
+		*height = priv->height;
 	}
 }
 
 static void
 init_widget(GntWidget *widget)
 {
+	GntWidgetPrivate *priv = gnt_widget_get_instance_private(widget);
 	gboolean shadow = TRUE;
 
 	if (!gnt_widget_has_shadow(widget))
 		shadow = FALSE;
 
-	wbkgd(widget->window, gnt_color_pair(GNT_COLOR_NORMAL));
-	werase(widget->window);
+	wbkgd(priv->window, gnt_color_pair(GNT_COLOR_NORMAL));
+	werase(priv->window);
 
 	if (gnt_widget_get_has_border(widget)) {
 		/* - This is ugly. */
 		/* - What's your point? */
-		mvwvline(widget->window, 0, 0, ACS_VLINE | gnt_color_pair(GNT_COLOR_NORMAL), widget->priv.height);
-		mvwvline(widget->window, 0, widget->priv.width - 1,
-				ACS_VLINE | gnt_color_pair(GNT_COLOR_NORMAL), widget->priv.height);
-		mvwhline(widget->window, widget->priv.height - 1, 0,
-				ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL), widget->priv.width);
-		mvwhline(widget->window, 0, 0, ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL), widget->priv.width);
-		mvwaddch(widget->window, 0, 0, ACS_ULCORNER | gnt_color_pair(GNT_COLOR_NORMAL));
-		mvwaddch(widget->window, 0, widget->priv.width - 1,
-				ACS_URCORNER | gnt_color_pair(GNT_COLOR_NORMAL));
-		mvwaddch(widget->window, widget->priv.height - 1, 0,
-				ACS_LLCORNER | gnt_color_pair(GNT_COLOR_NORMAL));
-		mvwaddch(widget->window, widget->priv.height - 1, widget->priv.width - 1,
-				ACS_LRCORNER | gnt_color_pair(GNT_COLOR_NORMAL));
+		mvwvline(priv->window, 0, 0,
+		         ACS_VLINE | gnt_color_pair(GNT_COLOR_NORMAL),
+		         priv->height);
+		mvwvline(priv->window, 0, priv->width - 1,
+		         ACS_VLINE | gnt_color_pair(GNT_COLOR_NORMAL),
+		         priv->height);
+		mvwhline(priv->window, priv->height - 1, 0,
+		         ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL),
+		         priv->width);
+		mvwhline(priv->window, 0, 0,
+		         ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL),
+		         priv->width);
+		mvwaddch(priv->window, 0, 0,
+		         ACS_ULCORNER | gnt_color_pair(GNT_COLOR_NORMAL));
+		mvwaddch(priv->window, 0, priv->width - 1,
+		         ACS_URCORNER | gnt_color_pair(GNT_COLOR_NORMAL));
+		mvwaddch(priv->window, priv->height - 1, 0,
+		         ACS_LLCORNER | gnt_color_pair(GNT_COLOR_NORMAL));
+		mvwaddch(priv->window, priv->height - 1, priv->width - 1,
+		         ACS_LRCORNER | gnt_color_pair(GNT_COLOR_NORMAL));
 	}
 
 	if (shadow)
 	{
-		wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_SHADOW));
-		mvwvline(widget->window, 1, widget->priv.width, ' ', widget->priv.height);
-		mvwhline(widget->window, widget->priv.height, 1, ' ', widget->priv.width);
+		wbkgdset(priv->window, '\0' | gnt_color_pair(GNT_COLOR_SHADOW));
+		mvwvline(priv->window, 1, priv->width, ' ', priv->height);
+		mvwhline(priv->window, priv->height, 1, ' ', priv->width);
 	}
 }
 
 gboolean
 gnt_widget_set_size(GntWidget *widget, int width, int height)
 {
+	GntWidgetPrivate *priv = NULL;
 	gboolean ret = TRUE;
+
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+	priv = gnt_widget_get_instance_private(widget);
 
 	if (gnt_widget_has_shadow(widget))
 	{
@@ -545,9 +602,9 @@ gnt_widget_set_size(GntWidget *widget, int width, int height)
 		height--;
 	}
 	if (width <= 0)
-		width = widget->priv.width;
+		width = priv->width;
 	if (height <= 0)
-		height = widget->priv.height;
+		height = priv->height;
 
 	if (gnt_widget_get_mapped(widget)) {
 		ret = gnt_widget_confirm_size(widget, width, height);
@@ -561,20 +618,20 @@ gnt_widget_set_size(GntWidget *widget, int width, int height)
 		if (!gnt_widget_has_shadow(widget))
 			shadow = FALSE;
 
-		oldw = widget->priv.width;
-		oldh = widget->priv.height;
+		oldw = priv->width;
+		oldh = priv->height;
 
-		widget->priv.width = width;
-		widget->priv.height = height;
-		if (width + shadow >= getmaxx(widget->window) || height + shadow >= getmaxy(widget->window)) {
-			delwin(widget->window);
-			widget->window = newpad(height + 20, width + 20);
+		priv->width = width;
+		priv->height = height;
+		if (width + shadow >= getmaxx(priv->window) ||
+		    height + shadow >= getmaxy(priv->window)) {
+			delwin(priv->window);
+			priv->window = newpad(height + 20, width + 20);
 		}
 
 		g_signal_emit(widget, signals[SIG_SIZE_CHANGED], 0, oldw, oldh);
 
-		if (widget->window)
-		{
+		if (priv->window) {
 			init_widget(widget);
 		}
 		if (gnt_widget_get_mapped(widget)) {
@@ -593,21 +650,29 @@ gnt_widget_set_size(GntWidget *widget, int width, int height)
 void
 gnt_widget_set_internal_size(GntWidget *widget, gint width, gint height)
 {
+	GntWidgetPrivate *priv = NULL;
+
 	g_return_if_fail(GNT_IS_WIDGET(widget));
-	widget->priv.width = width;
-	widget->priv.height = height;
+	priv = gnt_widget_get_instance_private(widget);
+
+	priv->width = width;
+	priv->height = height;
 }
 
 /* Internal. */
 void
 gnt_widget_get_minimum_size(GntWidget *widget, gint *width, gint *height)
 {
+	GntWidgetPrivate *priv = NULL;
+
 	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
+
 	if (width) {
-		*width = widget->priv.minw;
+		*width = priv->minw;
 	}
 	if (height) {
-		*height = widget->priv.minh;
+		*height = priv->minh;
 	}
 }
 
@@ -615,9 +680,13 @@ gnt_widget_get_minimum_size(GntWidget *widget, gint *width, gint *height)
 void
 gnt_widget_set_minimum_size(GntWidget *widget, gint width, gint height)
 {
+	GntWidgetPrivate *priv = NULL;
+
 	g_return_if_fail(GNT_IS_WIDGET(widget));
-	widget->priv.minw = width;
-	widget->priv.minh = height;
+	priv = gnt_widget_get_instance_private(widget);
+
+	priv->minw = width;
+	priv->minh = height;
 }
 
 gboolean
@@ -688,13 +757,14 @@ void gnt_widget_queue_update(GntWidget *widget)
 	GntWidgetPrivate *priv = NULL;
 
 	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
 
-	if (widget->window == NULL)
+	if (priv->window == NULL) {
 		return;
+	}
 
 	widget = gnt_widget_get_toplevel(widget);
 
-	priv = gnt_widget_get_instance_private(widget);
 	if (priv->queue_update == 0) {
 		priv->queue_update =
 		        g_timeout_add(0, update_queue_callback, widget);

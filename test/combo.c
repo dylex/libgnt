@@ -11,12 +11,12 @@
 static void
 button_activated(GntWidget *b, GntComboBox *combo)
 {
-	GntWidget *w = b->parent;
+	GntWidget *w = gnt_widget_get_parent(b);
 	const gchar *text = gnt_combo_box_get_selected_data(GNT_COMBO_BOX(combo));
 
 	gnt_box_add_widget(GNT_BOX(w), gnt_label_new(text));
 	fprintf(stderr, "%s\n", text);
-	gnt_box_readjust(GNT_BOX(w->parent));
+	gnt_box_readjust(GNT_BOX(gnt_widget_get_parent(w)));
 }
 
 static void
