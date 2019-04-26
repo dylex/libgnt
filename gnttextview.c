@@ -216,25 +216,15 @@ gnt_text_view_key_pressed(G_GNUC_UNUSED GntWidget *widget,
 }
 
 static void
-free_text_segment(gpointer data, G_GNUC_UNUSED gpointer unused)
+free_text_line(GntTextLine *line)
 {
-	GntTextSegment *seg = data;
-	g_free(seg);
-}
-
-static void
-free_text_line(gpointer data, G_GNUC_UNUSED gpointer unused)
-{
-	GntTextLine *line = data;
-	g_list_foreach(line->segments, free_text_segment, NULL);
-	g_list_free(line->segments);
+	g_list_free_full(line->segments, (GDestroyNotify)g_free);
 	g_free(line);
 }
 
 static void
-free_tag(gpointer data, G_GNUC_UNUSED gpointer unused)
+free_tag(GntTextTag *tag)
 {
-	GntTextTag *tag = data;
 	g_free(tag->name);
 	g_free(tag);
 }
@@ -244,10 +234,8 @@ gnt_text_view_destroy(GntWidget *widget)
 {
 	GntTextView *view = GNT_TEXT_VIEW(widget);
 	view->list = g_list_first(view->list);
-	g_list_foreach(view->list, free_text_line, NULL);
-	g_list_free(view->list);
-	g_list_foreach(view->tags, free_tag, NULL);
-	g_list_free(view->tags);
+	g_list_free_full(view->list, (GDestroyNotify)free_text_line);
+	g_list_free_full(view->tags, (GDestroyNotify)free_tag);
 	g_string_free(view->string, TRUE);
 }
 
@@ -421,7 +409,7 @@ gnt_text_view_reflow(GntTextView *view)
 			gnt_text_view_append_text_with_flags(view, start, seg->tvflag);
 			*end = back;
 		}
-		free_text_line(line, NULL);
+		free_text_line(line);
 	}
 	g_list_free(list);
 
@@ -670,8 +658,7 @@ static void reset_text_view(GntTextView *view)
 {
 	GntTextLine *line;
 
-	g_list_foreach(view->list, free_text_line, NULL);
-	g_list_free(view->list);
+	g_list_free_full(view->list, (GDestroyNotify)free_text_line);
 	view->list = NULL;
 
 	line = g_new0(GntTextLine, 1);
@@ -685,7 +672,7 @@ void gnt_text_view_clear(GntTextView *view)
 {
 	reset_text_view(view);
 
-	g_list_foreach(view->tags, free_tag, NULL);
+	g_list_free_full(view->tags, (GDestroyNotify)free_tag);
 	view->tags = NULL;
 
 	if (GNT_WIDGET(view)->window)
@@ -773,14 +760,14 @@ int gnt_text_view_tag_change(GntTextView *view, const char *name, const char *te
 					} else if (seg->start >= tag->start) {
 						/* This segment starts in the middle of the tag */
 						if (text == NULL) {
-							free_text_segment(seg, NULL);
+							g_free(seg);
 							if (G_UNLIKELY(line == NULL)) {
 								g_warn_if_reached();
 								break;
 							}
 							line->segments = g_list_delete_link(line->segments, segs);
 							if (line->segments == NULL) {
-								free_text_line(line, NULL);
+								free_text_line(line);
 								line = NULL;
 								if (view->list == iter) {
 									if (inext)
@@ -807,7 +794,7 @@ int gnt_text_view_tag_change(GntTextView *view, const char *name, const char *te
 			if (text == NULL) {
 				/* Remove the tag */
 				view->tags = g_list_delete_link(view->tags, list);
-				free_tag(tag, NULL);
+				free_tag(tag);
 			} else {
 				tag->end -= change;
 			}

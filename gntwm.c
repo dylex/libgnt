@@ -1404,10 +1404,9 @@ gnt_wm_destroy(GObject *obj)
 	g_hash_table_destroy(wm->nodes);
 	wm->nodes = NULL;
 
-	while (wm->workspaces) {
-		g_object_unref(wm->workspaces->data);
-		wm->workspaces = g_list_delete_link(wm->workspaces, wm->workspaces);
-	}
+	g_list_free_full(wm->workspaces, g_object_unref);
+	wm->workspaces = NULL;
+
 #ifdef USE_PYTHON
 	if (started_python) {
 		Py_Finalize();
