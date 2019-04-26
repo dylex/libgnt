@@ -32,6 +32,8 @@
 typedef struct
 {
 	gchar *name;
+	GList *list;
+	GList *ordered;
 } GntWSPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE(GntWS, gnt_ws, GNT_TYPE_BINDABLE)
@@ -74,10 +76,8 @@ gnt_ws_destroy(GObject *obj)
 }
 
 static void
-gnt_ws_init(GntWS *ws)
+gnt_ws_init(G_GNUC_UNUSED GntWS *ws)
 {
-	ws->list = NULL;
-	ws->ordered = NULL;
 }
 
 static void
@@ -89,12 +89,13 @@ gnt_ws_class_init(GntWSClass *klass)
 }
 
 /******************************************************************************
- * GObject Implementation
+ * GntWS API
  *****************************************************************************/
 void
 gnt_ws_draw_taskbar(GntWS *ws, gboolean reposition)
 {
 	static WINDOW *taskbar = NULL;
+	GntWSPrivate *priv = NULL;
 	GList *iter;
 	int n, width = 0;
 	int i;
@@ -102,7 +103,8 @@ gnt_ws_draw_taskbar(GntWS *ws, gboolean reposition)
 	if (gnt_is_refugee())
 		return;
 
-	g_return_if_fail(ws != NULL);
+	g_return_if_fail(GNT_IS_WS(ws));
+	priv = gnt_ws_get_instance_private(ws);
 
 	if (taskbar == NULL) {
 		taskbar = newwin(1, getmaxx(stdscr), getmaxy(stdscr) - 1, 0);
@@ -114,16 +116,16 @@ gnt_ws_draw_taskbar(GntWS *ws, gboolean reposition)
 	wbkgdset(taskbar, '\0' | gnt_color_pair(GNT_COLOR_NORMAL));
 	werase(taskbar);
 
-	n = g_list_length(ws->list);
+	n = g_list_length(priv->list);
 	if (n)
 		width = getmaxx(stdscr) / n;
 
-	for (i = 0, iter = ws->list; iter; iter = iter->next, i++) {
+	for (i = 0, iter = priv->list; iter; iter = iter->next, i++) {
 		GntWidget *w = iter->data;
 		int color;
 		const gchar *title;
 
-		if (w == ws->ordered->data) {
+		if (w == priv->ordered->data) {
 			/* This is the current window in focus */
 			color = GNT_COLOR_TITLE;
 		} else if (gnt_widget_get_is_urgent(w)) {
@@ -147,18 +149,28 @@ gnt_ws_draw_taskbar(GntWS *ws, gboolean reposition)
 
 void gnt_ws_add_widget(GntWS *ws, GntWidget* wid)
 {
+	GntWSPrivate *priv = NULL;
 	GntWidget *oldfocus;
-	oldfocus = ws->ordered ? ws->ordered->data : NULL;
-	ws->list = g_list_append(ws->list, wid);
-	ws->ordered = g_list_prepend(ws->ordered, wid);
+
+	g_return_if_fail(GNT_IS_WS(ws));
+	priv = gnt_ws_get_instance_private(ws);
+
+	oldfocus = priv->ordered ? priv->ordered->data : NULL;
+	priv->list = g_list_append(priv->list, wid);
+	priv->ordered = g_list_prepend(priv->ordered, wid);
 	if (oldfocus)
 		gnt_widget_set_focus(oldfocus, FALSE);
 }
 
 void gnt_ws_remove_widget(GntWS *ws, GntWidget* wid)
 {
-	ws->list = g_list_remove(ws->list, wid);
-	ws->ordered = g_list_remove(ws->ordered, wid);
+	GntWSPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WS(ws));
+	priv = gnt_ws_get_instance_private(ws);
+
+	priv->list = g_list_remove(priv->list, wid);
+	priv->ordered = g_list_remove(priv->ordered, wid);
 }
 
 void
@@ -176,7 +188,12 @@ gnt_ws_set_name(GntWS *ws, const gchar *name)
 void
 gnt_ws_hide(GntWS *ws, GHashTable *nodes)
 {
-	g_list_foreach(ws->ordered, widget_hide, nodes);
+	GntWSPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WS(ws));
+	priv = gnt_ws_get_instance_private(ws);
+
+	g_list_foreach(priv->ordered, widget_hide, nodes);
 }
 
 void gnt_ws_widget_hide(GntWidget *widget, GHashTable *nodes)
@@ -192,9 +209,15 @@ void gnt_ws_widget_show(GntWidget *widget, GHashTable *nodes)
 void
 gnt_ws_show(GntWS *ws, GHashTable *nodes)
 {
+	GntWSPrivate *priv = NULL;
 	GList *l;
-	for (l = g_list_last(ws->ordered); l; l = g_list_previous(l))
+
+	g_return_if_fail(GNT_IS_WS(ws));
+	priv = gnt_ws_get_instance_private(ws);
+
+	for (l = g_list_last(priv->ordered); l; l = g_list_previous(l)) {
 		widget_show(l->data, nodes);
+	}
 }
 
 GntWS *
@@ -223,54 +246,70 @@ gnt_ws_get_name(GntWS *ws)
 void
 gnt_ws_set_list(GntWS *ws, GList *list)
 {
+	GntWSPrivate *priv = NULL;
 	g_return_if_fail(GNT_IS_WS(ws));
-	ws->list = list;
+	priv = gnt_ws_get_instance_private(ws);
+	priv->list = list;
 }
 
 /* Internal. */
 GList *
 gnt_ws_get_list(GntWS *ws)
 {
+	GntWSPrivate *priv = NULL;
 	g_return_val_if_fail(GNT_IS_WS(ws), NULL);
-	return ws->list;
+	priv = gnt_ws_get_instance_private(ws);
+	return priv->list;
 }
 
 /* Internal. */
-gboolean gnt_ws_is_empty(GntWS *ws)
+gboolean
+gnt_ws_is_empty(GntWS *ws)
 {
+	GntWSPrivate *priv = NULL;
 	g_return_val_if_fail(GNT_IS_WS(ws), TRUE);
-	return ws->ordered == NULL;
+	priv = gnt_ws_get_instance_private(ws);
+	return priv->ordered == NULL;
 }
 
 /* Internal. */
-gboolean gnt_ws_is_single(GntWS *ws)
+gboolean
+gnt_ws_is_single(GntWS *ws)
 {
+	GntWSPrivate *priv = NULL;
 	g_return_val_if_fail(GNT_IS_WS(ws), FALSE);
-	return ws->ordered != NULL && ws->ordered->next == NULL;
+	priv = gnt_ws_get_instance_private(ws);
+	return priv->ordered != NULL && priv->ordered->next == NULL;
 }
 
 /* Internal. */
 GntWidget *
 gnt_ws_get_top_widget(GntWS *ws)
 {
+	GntWSPrivate *priv = NULL;
 	g_return_val_if_fail(GNT_IS_WS(ws), NULL);
-	return ws->ordered ? ws->ordered->data : NULL;
+	priv = gnt_ws_get_instance_private(ws);
+	return priv->ordered ? priv->ordered->data : NULL;
 }
 
 /* Internal. */
 gboolean
 gnt_ws_is_top_widget(GntWS *ws, GntWidget *widget)
 {
+	GntWSPrivate *priv = NULL;
 	g_return_val_if_fail(GNT_IS_WS(ws), FALSE);
-	return ws->ordered && ws->ordered->data == widget;
+	priv = gnt_ws_get_instance_private(ws);
+	return priv->ordered && priv->ordered->data == widget;
 }
 
 /* Internal. */
 GList *
 gnt_ws_get_last(GntWS *ws)
 {
+	GntWSPrivate *priv = NULL;
 	g_return_val_if_fail(GNT_IS_WS(ws), NULL);
-	return ws->ordered ? g_list_last(ws->ordered) : NULL;
+	priv = gnt_ws_get_instance_private(ws);
+	return priv->ordered ? g_list_last(priv->ordered) : NULL;
 }
 
 /* Internal.
@@ -278,21 +317,26 @@ gnt_ws_get_last(GntWS *ws)
 void
 gnt_ws_append_widget(GntWS *ws, GntWidget *widget)
 {
+	GntWSPrivate *priv = NULL;
 	g_return_if_fail(GNT_IS_WS(ws));
-	ws->list = g_list_append(ws->list, widget);
-	ws->ordered = g_list_append(ws->ordered, widget);
+	priv = gnt_ws_get_instance_private(ws);
+	priv->list = g_list_append(priv->list, widget);
+	priv->ordered = g_list_append(priv->ordered, widget);
 }
 
 /* Internal. */
 void
 gnt_ws_bring_to_front(GntWS *ws, GntWidget *widget)
 {
-	g_return_if_fail(GNT_IS_WS(ws));
+	GntWSPrivate *priv = NULL;
 
-	if (widget != ws->ordered->data) {
-		GntWidget *old_widget = ws->ordered->data;
-		ws->ordered = g_list_remove(ws->ordered, widget);
-		ws->ordered = g_list_prepend(ws->ordered, widget);
+	g_return_if_fail(GNT_IS_WS(ws));
+	priv = gnt_ws_get_instance_private(ws);
+
+	if (widget != priv->ordered->data) {
+		GntWidget *old_widget = priv->ordered->data;
+		priv->ordered = g_list_remove(priv->ordered, widget);
+		priv->ordered = g_list_prepend(priv->ordered, widget);
 		gnt_widget_set_focus(old_widget, FALSE);
 		gnt_widget_draw(old_widget);
 	}

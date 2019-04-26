@@ -34,32 +34,18 @@
 
 #include <panel.h>
 
-#define GNT_TYPE_WS				(gnt_ws_get_type())
-#define GNT_WS(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_WS, GntWS))
-#define GNT_IS_WS(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_WS))
-#define GNT_IS_WS_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_WS))
-#define GNT_WS_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_WS, GntWSClass))
+G_BEGIN_DECLS
 
-typedef struct _GntWS GntWS;
+#define GNT_TYPE_WS gnt_ws_get_type()
 
 /**
- * GntWS:
+ * gnt_ws_get_type:
  *
- * Access to any fields is deprecated. See inline comments for replacements.
+ * Returns: The GType for GntWS.
+ *
+ * Since: 2.1.0
  */
-struct _GntWS
-{
-	GntBindable inherit;
-	GList *GNTSEAL(list);
-	GList *GNTSEAL(ordered);
-
-	void *GNTSEAL(res1);
-	void *GNTSEAL(res2);
-	void *GNTSEAL(res3);
-	void *GNTSEAL(res4);
-};
-
-typedef struct _GntWSClass GntWSClass;
+G_DECLARE_DERIVABLE_TYPE(GntWS, gnt_ws, GNT, WS, GntBindable)
 
 struct _GntWSClass
 {
@@ -72,17 +58,6 @@ struct _GntWSClass
 	void (*res3)(void);
 	void (*res4)(void);
 };
-
-G_BEGIN_DECLS
-
-/**
- * gnt_ws_get_type:
- *
- * Returns: The GType for GntWS.
- *
- * Since: 2.1.0
- */
-GType gnt_ws_get_type(void);
 
 /**
  * gnt_ws_new:
