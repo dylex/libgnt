@@ -411,6 +411,13 @@ gnt_widget_hide(GntWidget *widget)
 	gnt_widget_set_mapped(widget, FALSE);
 }
 
+WINDOW *
+gnt_widget_get_window(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), NULL);
+	return widget->window;
+}
+
 void
 gnt_widget_set_parent(GntWidget *widget, GntWidget *parent)
 {

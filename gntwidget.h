@@ -187,6 +187,18 @@ void gnt_widget_expose(GntWidget *widget, int x, int y, int width, int height);
 void gnt_widget_hide(GntWidget *widget);
 
 /**
+ * gnt_widget_get_window:
+ * @widget:  The widget.
+ *
+ * Get the window of a widget.
+ *
+ * Returns: (transfer none) (nullable): The widget's window.
+ *
+ * Since: 3.0.0
+ */
+WINDOW *gnt_widget_get_window(GntWidget *widget);
+
+/**
  * gnt_widget_set_parent:
  * @widget:  The widget.
  * @parent:  The parent widget.

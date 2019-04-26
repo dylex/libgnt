@@ -126,7 +126,7 @@ gnt_wm_copy_win(GntWidget *widget, GntNode *node)
 	WINDOW *src, *dst;
 	if (!node)
 		return;
-	src = widget->window;
+	src = gnt_widget_get_window(widget);
 	dst = node->window;
 	copywin(src, dst, node->scroll, 0, 0, 0, getmaxy(dst) - 1, getmaxx(dst) - 1, 0);
 
@@ -134,11 +134,12 @@ gnt_wm_copy_win(GntWidget *widget, GntNode *node)
 	if (GNT_IS_WINDOW(widget) || GNT_IS_BOX(widget)) {
 		GntWidget *active = gnt_box_get_active(GNT_BOX(widget));
 		if (active) {
+			WINDOW *active_window = gnt_widget_get_window(active);
 			gint curx, cury, widgetx, widgety;
 			gnt_widget_get_position(active, &curx, &cury);
 			gnt_widget_get_position(widget, &widgetx, &widgety);
-			curx += getcurx(active->window) - widgetx;
-			cury += getcury(active->window) - widgety;
+			curx += getcurx(active_window) - widgetx;
+			cury += getcury(active_window) - widgety;
 			if (wmove(node->window, cury, curx) != OK) {
 				(void)wmove(node->window, 0, 0);
 			}
@@ -1049,7 +1050,7 @@ window_reverse(GntWidget *win, gboolean set, GntWM *wm)
 	if (!gnt_widget_get_has_border(win))
 		return;
 
-	d = win->window;
+	d = gnt_widget_get_window(win);
 	gnt_widget_get_size(win, &w, &h);
 
 	if (gnt_widget_has_shadow(win)) {
@@ -1184,7 +1185,7 @@ toggle_clipboard(G_GNUC_UNUSED GntBindable *bindable,
 static void
 remove_tag(GntWidget *widget, G_GNUC_UNUSED gpointer data)
 {
-	mvwhline(widget->window, 0, 1,
+	mvwhline(gnt_widget_get_window(widget), 0, 1,
 	         ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL), 3);
 	gnt_widget_draw(widget);
 }
@@ -1209,8 +1210,9 @@ tag_widget(GntBindable *b, G_GNUC_UNUSED GList *params)
 	}
 
 	wm->tagged = g_list_prepend(wm->tagged, widget);
-	wbkgdset(widget->window, ' ' | gnt_color_pair(GNT_COLOR_HIGHLIGHT));
-	mvwprintw(widget->window, 0, 1, "[T]");
+	wbkgdset(gnt_widget_get_window(widget),
+	         ' ' | gnt_color_pair(GNT_COLOR_HIGHLIGHT));
+	mvwprintw(gnt_widget_get_window(widget), 0, 1, "[T]");
 	gnt_widget_draw(widget);
 	return TRUE;
 }
@@ -1770,8 +1772,9 @@ gnt_wm_new_window_real(GntWM *wm, GntWidget *widget)
 	GntNode *node;
 	gboolean transient = FALSE;
 
-	if (widget->window == NULL)
+	if (gnt_widget_get_window(widget) == NULL) {
 		return;
+	}
 
 	node = g_new0(GntNode, 1);
 	node->me = widget;
@@ -1851,7 +1854,7 @@ void gnt_wm_new_window(GntWM *wm, GntWidget *widget)
 		if (title && (p = g_hash_table_lookup(wm->positions, title)) != NULL) {
 			sanitize_position(widget, &p->x, &p->y, TRUE);
 			gnt_widget_set_position(widget, p->x, p->y);
-			mvwin(widget->window, p->y, p->x);
+			mvwin(gnt_widget_get_window(widget), p->y, p->x);
 		}
 	}
 

@@ -59,8 +59,9 @@ set_selection(GntComboBox *box, gpointer key)
 		/* XXX: make sure the key actually does exist */
 		gpointer old = box->selected;
 		box->selected = key;
-		if (GNT_WIDGET(box)->window)
+		if (gnt_widget_get_window(GNT_WIDGET(box))) {
 			gnt_widget_draw(GNT_WIDGET(box));
+		}
 		if (box->dropdown)
 			gnt_tree_set_selected(GNT_TREE(box->dropdown), key);
 		g_signal_emit(box, signals[SIG_SELECTION_CHANGED], 0, old, key);
@@ -84,6 +85,7 @@ static void
 gnt_combo_box_draw(GntWidget *widget)
 {
 	GntComboBox *box = GNT_COMBO_BOX(widget);
+	WINDOW *window = gnt_widget_get_window(widget);
 	char *text = NULL, *s;
 	GntColorType type;
 	gint width;
@@ -100,19 +102,19 @@ gnt_combo_box_draw(GntWidget *widget)
 	else
 		type = GNT_COLOR_NORMAL;
 
-	wbkgdset(widget->window, '\0' | gnt_color_pair(type));
+	wbkgdset(window, '\0' | gnt_color_pair(type));
 
 	gnt_widget_get_internal_size(widget, &width, NULL);
 	s = (char *)gnt_util_onscreen_width_to_pointer(text, width - 4, &len);
 	*s = '\0';
 
-	mvwaddstr(widget->window, 1, 1, C_(text));
-	whline(widget->window, ' ' | gnt_color_pair(type), width - 4 - len);
-	mvwaddch(widget->window, 1, width - 3,
+	mvwaddstr(window, 1, 1, C_(text));
+	whline(window, ' ' | gnt_color_pair(type), width - 4 - len);
+	mvwaddch(window, 1, width - 3,
 	         ACS_VLINE | gnt_color_pair(GNT_COLOR_NORMAL));
-	mvwaddch(widget->window, 1, width - 2,
+	mvwaddch(window, 1, width - 2,
 	         ACS_DARROW | gnt_color_pair(GNT_COLOR_NORMAL));
-	(void)wmove(widget->window, 1, 1);
+	(void)wmove(window, 1, 1);
 
 	g_free(text);
 	GNTDEBUG;
@@ -147,6 +149,7 @@ popup_dropdown(GntComboBox *box)
 {
 	GntWidget *widget = GNT_WIDGET(box);
 	GntWidget *parent = gnt_widget_get_parent(box->dropdown);
+	WINDOW *window;
 	gint widgetx, widgety, widgetwidth, widgetheight;
 	gint height;
 	gint y;
@@ -160,10 +163,10 @@ popup_dropdown(GntComboBox *box)
 	if (y + height + 2 >= getmaxy(stdscr))
 		y = widgety - height - 1;
 	gnt_widget_set_position(parent, widgetx, y);
-	if (parent->window)
-	{
-		mvwin(parent->window, y, widgetx);
-		wresize(parent->window, height + 2, widgetwidth);
+	window = gnt_widget_get_window(parent);
+	if (window) {
+		mvwin(window, y, widgetx);
+		wresize(window, height + 2, widgetwidth);
 	}
 	gnt_widget_set_internal_size(parent, widgetwidth, height + 2);
 

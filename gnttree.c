@@ -456,7 +456,7 @@ tree_mark_columns(GntTree *tree, int pos, int y, chtype type)
 			NEXT_X;
 		}
 		if (!COLUMN_INVISIBLE(priv, i + 1) && notfirst) {
-			mvwaddch(widget->window, y, x, type);
+			mvwaddch(gnt_widget_get_window(widget), y, x, type);
 		}
 	}
 }
@@ -467,6 +467,7 @@ redraw_tree(GntTree *tree)
 	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
 	int start, i;
 	GntWidget *widget = GNT_WIDGET(tree);
+	WINDOW *window = gnt_widget_get_window(widget);
 	GntTreeRow *row;
 	gint width, height;
 	int pos, up, down = 0;
@@ -487,17 +488,17 @@ redraw_tree(GntTree *tree)
 		tree_selection_changed(tree, NULL, priv->current);
 	}
 
-	wbkgd(widget->window, gnt_color_pair(GNT_COLOR_NORMAL));
+	wbkgd(window, gnt_color_pair(GNT_COLOR_NORMAL));
 
 	start = 0;
 	if (priv->show_title) {
 		int i;
 		int x = pos;
 
-		mvwhline(widget->window, pos + 1, pos,
+		mvwhline(window, pos + 1, pos,
 		         ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL),
 		         width - pos - 1);
-		mvwhline(widget->window, pos, pos,
+		mvwhline(window, pos, pos,
 		         ' ' | gnt_color_pair(GNT_COLOR_NORMAL),
 		         width - pos - 1);
 
@@ -505,7 +506,7 @@ redraw_tree(GntTree *tree)
 			if (COLUMN_INVISIBLE(priv, i)) {
 				continue;
 			}
-			mvwaddnstr(widget->window, pos, x + (x != pos),
+			mvwaddnstr(window, pos, x + (x != pos),
 			           priv->columns[i].title,
 			           priv->columns[i].width);
 			NEXT_X;
@@ -606,9 +607,9 @@ redraw_tree(GntTree *tree)
 				attr |= gnt_color_pair(GNT_COLOR_NORMAL);
 		}
 
-		wbkgdset(widget->window, '\0' | attr);
-		mvwaddstr(widget->window, i, pos, C_(str));
-		whline(widget->window, ' ', scrcol - wr);
+		wbkgdset(window, '\0' | attr);
+		mvwaddstr(window, i, pos, C_(str));
+		whline(window, ' ', scrcol - wr);
 		priv->bottom = row;
 		g_free(str);
 		tree_mark_columns(tree, pos, i,
@@ -616,9 +617,9 @@ redraw_tree(GntTree *tree)
 		                          attr);
 	}
 
-	wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_NORMAL));
+	wbkgdset(window, '\0' | gnt_color_pair(GNT_COLOR_NORMAL));
 	while (i < height - pos) {
-		mvwhline(widget->window, i, pos, ' ', width - pos * 2 - 1);
+		mvwhline(window, i, pos, ' ', width - pos * 2 - 1);
 		tree_mark_columns(tree, pos, i,
 		                  (priv->show_separator ? ACS_VLINE : ' '));
 		i++;
@@ -652,17 +653,18 @@ redraw_tree(GntTree *tree)
 
 		position += pos + start + 1;
 
-		mvwvline(widget->window, pos + start + 1, scrcol,
-				' ' | gnt_color_pair(GNT_COLOR_NORMAL), rows);
-		mvwvline(widget->window, position, scrcol,
-				ACS_CKBOARD | gnt_color_pair(GNT_COLOR_HIGHLIGHT_D), showing);
+		mvwvline(window, pos + start + 1, scrcol,
+		         ' ' | gnt_color_pair(GNT_COLOR_NORMAL), rows);
+		mvwvline(window, position, scrcol,
+		         ACS_CKBOARD | gnt_color_pair(GNT_COLOR_HIGHLIGHT_D),
+		         showing);
 	}
 
-	mvwaddch(widget->window, start + pos, scrcol,
+	mvwaddch(window, start + pos, scrcol,
 	         ((priv->top != priv->root) ? ACS_UARROW : ' ') |
 	                 gnt_color_pair(GNT_COLOR_HIGHLIGHT_D));
 
-	mvwaddch(widget->window, height - pos - 1, scrcol,
+	mvwaddch(window, height - pos - 1, scrcol,
 	         (row ? ACS_DARROW : ' ') |
 	                 gnt_color_pair(GNT_COLOR_HIGHLIGHT_D));
 
@@ -670,11 +672,11 @@ redraw_tree(GntTree *tree)
 	if (SEARCHING(priv)) {
 		const char *str = gnt_util_onscreen_width_to_pointer(
 		        priv->search->str, scrcol - 1, NULL);
-		wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_HIGHLIGHT_D));
-		mvwaddnstr(widget->window, height - pos - 1, pos,
-		           priv->search->str, str - priv->search->str);
+		wbkgdset(window, '\0' | gnt_color_pair(GNT_COLOR_HIGHLIGHT_D));
+		mvwaddnstr(window, height - pos - 1, pos, priv->search->str,
+		           str - priv->search->str);
 	}
-	wmove(widget->window, current, pos);
+	wmove(window, current, pos);
 
 	gnt_widget_queue_update(widget);
 }
@@ -2039,8 +2041,9 @@ void gnt_tree_set_expanded(GntTree *tree, void *key, gboolean expanded)
 	row = g_hash_table_lookup(priv->hash, key);
 	if (row) {
 		row->collapsed = !expanded;
-		if (GNT_WIDGET(tree)->window)
+		if (gnt_widget_get_window(GNT_WIDGET(tree))) {
 			gnt_widget_draw(GNT_WIDGET(tree));
+		}
 		g_signal_emit(tree, signals[SIG_COLLAPSED], 0, key, row->collapsed);
 	}
 }

@@ -145,7 +145,7 @@ remove_border_set_position_size(G_GNUC_UNUSED GntWM *wm, GntWidget *win, int x,
 	gnt_widget_set_take_focus(win, TRUE);
 
 	gnt_widget_set_position(win, x, y);
-	mvwin(win->window, y, x);
+	mvwin(gnt_widget_get_window(win), y, x);
 	gnt_widget_set_size(win, (w < 0) ? -1 : w + 2, h + 2);
 }
 
@@ -168,7 +168,7 @@ irssi_new_window(GntWM *wm, GntWidget *win)
 				x = (getmaxx(stdscr) - w) / 2;
 				y = (getmaxy(stdscr) - h) / 2;
 				gnt_widget_set_position(win, x, y);
-				mvwin(win->window, y, x);
+				mvwin(gnt_widget_get_window(win), y, x);
 			} else {
 				gnt_window_set_maximize(GNT_WINDOW(win), GNT_WINDOW_MAXIMIZE_Y);
 				remove_border_set_position_size(wm, win, 0, 0, -1, getmaxy(stdscr) - 1);

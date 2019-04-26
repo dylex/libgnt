@@ -60,13 +60,12 @@ gnt_label_destroy(GntWidget *widget)
 static void
 gnt_label_draw(GntWidget *widget)
 {
+	WINDOW *window = gnt_widget_get_window(widget);
 	GntLabel *label = GNT_LABEL(widget);
 	chtype flag = gnt_text_format_flag_to_chtype(label->flags);
 
-	wbkgdset(widget->window, '\0' | flag);
-	mvwaddstr(widget->window, 0, 0, C_(label->text));
-
-	GNTDEBUG;
+	wbkgdset(window, '\0' | flag);
+	mvwaddstr(window, 0, 0, C_(label->text));
 }
 
 static void
@@ -179,11 +178,13 @@ GntWidget *gnt_label_new_with_format(const char *text, GntTextFormatFlags flags)
 
 void gnt_label_set_text(GntLabel *label, const char *text)
 {
+	WINDOW *window;
+
 	g_object_set(label, "text", text, NULL);
 
-	if (GNT_WIDGET(label)->window)
-	{
-		werase(GNT_WIDGET(label)->window);
+	window = gnt_widget_get_window(GNT_WIDGET(label));
+	if (window) {
+		werase(window);
 		gnt_widget_draw(GNT_WIDGET(label));
 	}
 }

@@ -82,6 +82,7 @@ gnt_slider_draw(GntWidget *widget)
 {
 	GntSlider *slider = GNT_SLIDER(widget);
 	GntSliderPrivate *priv = gnt_slider_get_instance_private(slider);
+	WINDOW *window = gnt_widget_get_window(widget);
 	int attr = 0;
 	int position, size = 0;
 
@@ -101,18 +102,22 @@ gnt_slider_draw(GntWidget *widget)
 	else
 		position = 0;
 	if (priv->vertical) {
-		mvwvline(widget->window, size-position, 0, ACS_VLINE | gnt_color_pair(GNT_COLOR_NORMAL) | A_BOLD,
-				position);
-		mvwvline(widget->window, 0, 0, ACS_VLINE | gnt_color_pair(GNT_COLOR_NORMAL),
-				size-position);
+		mvwvline(window, size - position, 0,
+		         ACS_VLINE | gnt_color_pair(GNT_COLOR_NORMAL) | A_BOLD,
+		         position);
+		mvwvline(window, 0, 0,
+		         ACS_VLINE | gnt_color_pair(GNT_COLOR_NORMAL),
+		         size - position);
 	} else {
-		mvwhline(widget->window, 0, 0, ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL) | A_BOLD,
-				position);
-		mvwhline(widget->window, 0, position, ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL),
-				size - position);
+		mvwhline(window, 0, 0,
+		         ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL) | A_BOLD,
+		         position);
+		mvwhline(window, 0, position,
+		         ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL),
+		         size - position);
 	}
 
-	mvwaddch(widget->window, priv->vertical ? (size - position - 1) : 0,
+	mvwaddch(window, priv->vertical ? (size - position - 1) : 0,
 	         priv->vertical ? 0 : position,
 	         ACS_CKBOARD | gnt_color_pair(attr));
 }

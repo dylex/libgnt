@@ -45,6 +45,7 @@ gnt_check_box_draw(GntWidget *widget)
 {
 	GntCheckBox *cb = GNT_CHECK_BOX(widget);
 	GntCheckBoxPrivate *priv = gnt_check_box_get_instance_private(cb);
+	WINDOW *window = gnt_widget_get_window(widget);
 	GntColorType type;
 	gboolean focus = gnt_widget_has_focus(widget);
 
@@ -53,18 +54,17 @@ gnt_check_box_draw(GntWidget *widget)
 	else
 		type = GNT_COLOR_NORMAL;
 
-	wbkgdset(widget->window, '\0' | gnt_color_pair(type));
+	wbkgdset(window, '\0' | gnt_color_pair(type));
 
-	mvwaddch(widget->window, 0, 0, '[');
-	mvwaddch(widget->window, 0, 1,
+	mvwaddch(window, 0, 0, '[');
+	mvwaddch(window, 0, 1,
 	         (priv->checked ? 'X' : ' ') |
 	                 (focus ? A_UNDERLINE : A_NORMAL));
-	mvwaddch(widget->window, 0, 2, ']');
+	mvwaddch(window, 0, 2, ']');
 
-	wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_NORMAL));
-	mvwaddstr(widget->window, 0, 4,
-	          C_(gnt_button_get_text(GNT_BUTTON(cb))));
-	(void)wmove(widget->window, 0, 1);
+	wbkgdset(window, '\0' | gnt_color_pair(GNT_COLOR_NORMAL));
+	mvwaddstr(window, 0, 4, C_(gnt_button_get_text(GNT_BUTTON(cb))));
+	(void)wmove(window, 0, 1);
 
 	GNTDEBUG;
 }

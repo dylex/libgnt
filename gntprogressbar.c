@@ -47,6 +47,7 @@ gnt_progress_bar_draw (GntWidget *widget)
 {
 	GntProgressBarPrivate *priv = gnt_progress_bar_get_instance_private (
 			GNT_PROGRESS_BAR (widget));
+	WINDOW *window = gnt_widget_get_window(widget);
 	gchar progress[8];
 	gint width, height;
 	gint start, end, i, pos;
@@ -69,24 +70,28 @@ gnt_progress_bar_draw (GntWidget *widget)
 
 			/* background */
 			for (i = 0; i < height; i++) {
-				mvwhline(widget->window, i, 0, ' ' | color,
-				         width);
+				mvwhline(window, i, 0, ' ' | color, width);
 			}
 
 			/* foreground */
 			for (i = 0; i < height; i++) {
-				mvwhline (widget->window, i, start, ACS_CKBOARD | color | A_REVERSE, end);
+				mvwhline(window, i, start,
+				         ACS_CKBOARD | color | A_REVERSE, end);
 			}
 
 			/* text */
 			if (priv->show_value) {
 				pos = width / 2 - strlen(progress) / 2;
 				for (i = 0; i < progress[i]; i++, pos++) {
-					wattrset (widget->window, color | ((pos < start || pos > end) ? A_NORMAL : A_REVERSE));
-					mvwprintw(widget->window, height / 2,
-					          pos, "%c", progress[i]);
+					wattrset(window,
+					         color | ((pos < start ||
+					                   pos > end)
+					                          ? A_NORMAL
+					                          : A_REVERSE));
+					mvwprintw(window, height / 2, pos, "%c",
+					          progress[i]);
 				}
-				wattrset (widget->window, color);
+				wattrset(window, color);
 			}
 
 			break;
@@ -101,25 +106,28 @@ gnt_progress_bar_draw (GntWidget *widget)
 
 			/* background */
 			for (i = 0; i < width; i++) {
-				mvwvline(widget->window, 0, i, ' ' | color,
-				         height);
+				mvwvline(window, 0, i, ' ' | color, height);
 			}
 
 			/* foreground */
 			for (i = 0; i < width; i++) {
-				mvwvline (widget->window, start, i, ACS_CKBOARD | color | A_REVERSE, end);
+				mvwvline(window, start, i,
+				         ACS_CKBOARD | color | A_REVERSE, end);
 			}
 
 			/* text */
 			if (priv->show_value) {
 				pos = height / 2 - strlen(progress) / 2;
 				for (i = 0; i < progress[i]; i++, pos++) {
-					wattrset (widget->window, color | ((pos < start || pos > end) ? A_NORMAL : A_REVERSE));
-					mvwprintw(widget->window, pos,
-					          width / 2, "%c\n",
-					          progress[i]);
+					wattrset(window,
+					         color | ((pos < start ||
+					                   pos > end)
+					                          ? A_NORMAL
+					                          : A_REVERSE));
+					mvwprintw(window, pos, width / 2,
+					          "%c\n", progress[i]);
 				}
-				wattrset (widget->window, color);
+				wattrset(window, color);
 			}
 
 			break;

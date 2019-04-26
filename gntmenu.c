@@ -100,12 +100,13 @@ gnt_menu_draw(GntWidget *widget)
 	guint i;
 
 	if (menu->type == GNT_MENU_TOPLEVEL) {
+		WINDOW *window = gnt_widget_get_window(widget);
 		gint x, y;
 
 		gnt_widget_get_position(widget, &x, &y);
 
-		wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_HIGHLIGHT));
-		werase(widget->window);
+		wbkgdset(window, '\0' | gnt_color_pair(GNT_COLOR_HIGHLIGHT));
+		werase(window);
 
 		for (i = 0, iter = menu->list; iter; iter = iter->next, i++) {
 			GntMenuItem *item = GNT_MENU_ITEM(iter->data);
@@ -120,11 +121,10 @@ gnt_menu_draw(GntWidget *widget)
 			}
 			if (i == menu->selected)
 				type |= A_REVERSE;
-			gnt_menuitem_set_position(
-			        item, getcurx(widget->window) + x,
-			        getcury(widget->window) + y + 1);
-			wbkgdset(widget->window, type);
-			wprintw(widget->window, " %s   ",
+			gnt_menuitem_set_position(item, getcurx(window) + x,
+			                          getcury(window) + y + 1);
+			wbkgdset(window, type);
+			wprintw(window, " %s   ",
 			        C_(gnt_menuitem_get_text(item)));
 		}
 	} else {

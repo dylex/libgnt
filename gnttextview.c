@@ -85,6 +85,7 @@ static void
 gnt_text_view_draw(GntWidget *widget)
 {
 	GntTextView *view = GNT_TEXT_VIEW(widget);
+	WINDOW *window = gnt_widget_get_window(widget);
 	gint width, height;
 	int n;
 	int i = 0;
@@ -95,8 +96,8 @@ gnt_text_view_draw(GntWidget *widget)
 
 	gnt_widget_get_internal_size(widget, &width, &height);
 
-	wbkgd(widget->window, gnt_color_pair(GNT_COLOR_NORMAL));
-	werase(widget->window);
+	wbkgd(window, gnt_color_pair(GNT_COLOR_NORMAL));
+	werase(window);
 
 	n = g_list_length(view->list);
 	if ((view->flags & GNT_TEXT_VIEW_TOP_ALIGN) && n < height) {
@@ -116,7 +117,7 @@ gnt_text_view_draw(GntWidget *widget)
 		GList *iter;
 		GntTextLine *line = lines->data;
 
-		(void)wmove(widget->window, height - 1 - i - comp, 0);
+		(void)wmove(window, height - 1 - i - comp, 0);
 
 		for (iter = line->segments; iter; iter = iter->next)
 		{
@@ -127,8 +128,9 @@ gnt_text_view_draw(GntWidget *widget)
 			*end = '\0';
 			if (select_start && select_start < view->string->str + seg->start && select_end > view->string->str + seg->end) {
 				fl |= A_REVERSE;
-				wattrset(widget->window, fl);
-				wprintw(widget->window, "%s", C_(view->string->str + seg->start));
+				wattrset(window, fl);
+				wprintw(window, "%s",
+				        C_(view->string->str + seg->start));
 			} else if (select_start && select_end &&
 				((select_start >= view->string->str + seg->start && select_start <= view->string->str + seg->end) ||
 				(select_end <= view->string->str + seg->end && select_start <= view->string->str + seg->start))) {
@@ -141,19 +143,20 @@ gnt_text_view_draw(GntWidget *widget)
 					else
 						fl = seg->flags;
 					str = g_strndup(cur, last - cur);
-					wattrset(widget->window, fl);
-					waddstr(widget->window, C_(str));
+					wattrset(window, fl);
+					waddstr(window, C_(str));
 					g_free(str);
 					cur = g_utf8_next_char(cur);
 				}
 			} else {
-				wattrset(widget->window, fl);
-				wprintw(widget->window, "%s", C_(view->string->str + seg->start));
+				wattrset(window, fl);
+				wprintw(window, "%s",
+				        C_(view->string->str + seg->start));
 			}
 			*end = back;
 		}
-		wattroff(widget->window, A_UNDERLINE | A_BLINK | A_REVERSE);
-		whline(widget->window, ' ', width - line->length - has_scroll);
+		wattroff(window, A_UNDERLINE | A_BLINK | A_REVERSE);
+		whline(window, ' ', width - line->length - has_scroll);
 	}
 
 	scrcol = width - 1;
@@ -181,19 +184,21 @@ gnt_text_view_draw(GntWidget *widget)
 		else if (showing + position < rows && view->list && !view->list->prev)
 			position = rows - showing;
 
-		mvwvline(widget->window, position + 1, scrcol,
-				ACS_CKBOARD | gnt_color_pair(GNT_COLOR_HIGHLIGHT_D), showing);
+		mvwvline(window, position + 1, scrcol,
+		         ACS_CKBOARD | gnt_color_pair(GNT_COLOR_HIGHLIGHT_D),
+		         showing);
 	}
 
 	if (has_scroll) {
-		mvwaddch(widget->window, 0, scrcol,
-				(lines ? ACS_UARROW : ' ') | gnt_color_pair(GNT_COLOR_HIGHLIGHT_D));
-		mvwaddch(widget->window, height - 1, scrcol,
+		mvwaddch(window, 0, scrcol,
+		         (lines ? ACS_UARROW : ' ') |
+		                 gnt_color_pair(GNT_COLOR_HIGHLIGHT_D));
+		mvwaddch(window, height - 1, scrcol,
 		         ((view->list && view->list->prev) ? ACS_DARROW : ' ') |
 		                 gnt_color_pair(GNT_COLOR_HIGHLIGHT_D));
 	}
 
-	wmove(widget->window, 0, 0);
+	wmove(window, 0, 0);
 }
 
 static void
@@ -437,8 +442,9 @@ gnt_text_view_reflow(GntTextView *view)
 	}
 	view->list = list;
 	gnt_widget_set_drawing(GNT_WIDGET(view), FALSE);
-	if (GNT_WIDGET(view)->window)
+	if (gnt_widget_get_window(GNT_WIDGET(view))) {
 		gnt_widget_draw(GNT_WIDGET(view));
+	}
 	g_string_free(string, TRUE);
 }
 
@@ -694,8 +700,9 @@ void gnt_text_view_clear(GntTextView *view)
 	g_list_free_full(view->tags, (GDestroyNotify)free_tag);
 	view->tags = NULL;
 
-	if (GNT_WIDGET(view)->window)
+	if (gnt_widget_get_window(GNT_WIDGET(view))) {
 		gnt_widget_draw(GNT_WIDGET(view));
+	}
 }
 
 int gnt_text_view_get_lines_below(GntTextView *view)

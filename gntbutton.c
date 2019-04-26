@@ -49,6 +49,7 @@ gnt_button_draw(GntWidget *widget)
 {
 	GntButton *button = GNT_BUTTON(widget);
 	GntButtonPrivate *priv = gnt_button_get_instance_private(button);
+	WINDOW *window = gnt_widget_get_window(widget);
 	GntColorType type;
 	gboolean focus;
 
@@ -57,14 +58,14 @@ gnt_button_draw(GntWidget *widget)
 	else
 		type = GNT_COLOR_NORMAL;
 
-	wbkgdset(widget->window, '\0' | gnt_color_pair(type));
-	mvwaddstr(widget->window, (small_button) ? 0 : 1, 2, C_(priv->text));
+	wbkgdset(window, '\0' | gnt_color_pair(type));
+	mvwaddstr(window, (small_button) ? 0 : 1, 2, C_(priv->text));
 	if (small_button) {
 		gint width;
 		type = GNT_COLOR_HIGHLIGHT;
 		gnt_widget_get_internal_size(widget, &width, NULL);
-		mvwchgat(widget->window, 0, 0, width,
-		         focus ? A_BOLD : A_REVERSE, type, NULL);
+		mvwchgat(window, 0, 0, width, focus ? A_BOLD : A_REVERSE, type,
+		         NULL);
 	}
 
 	GNTDEBUG;

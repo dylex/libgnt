@@ -312,35 +312,35 @@ gnt_entry_draw(GntWidget *widget)
 {
 	GntEntry *entry = GNT_ENTRY(widget);
 	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+	WINDOW *window = gnt_widget_get_window(widget);
 	gint width;
 	int stop;
 	gboolean focus;
 	int curpos;
 
 	if ((focus = gnt_widget_has_focus(widget)))
-		wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_TEXT_NORMAL));
+		wbkgdset(window, '\0' | gnt_color_pair(GNT_COLOR_TEXT_NORMAL));
 	else
-		wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_HIGHLIGHT_D));
+		wbkgdset(window, '\0' | gnt_color_pair(GNT_COLOR_HIGHLIGHT_D));
 
 	if (priv->masked) {
-		mvwhline(widget->window, 0, 0,
-		         gnt_ascii_only() ? '*' : ACS_BULLET,
+		mvwhline(window, 0, 0, gnt_ascii_only() ? '*' : ACS_BULLET,
 		         g_utf8_pointer_to_offset(priv->scroll, priv->end));
 	} else
-		mvwprintw(widget->window, 0, 0, "%s", C_(priv->scroll));
+		mvwprintw(window, 0, 0, "%s", C_(priv->scroll));
 
 	stop = gnt_util_onscreen_width(priv->scroll, priv->end);
 	gnt_widget_get_internal_size(GNT_WIDGET(entry), &width, NULL);
 	if (stop < width) {
-		mvwhline(widget->window, 0, stop, GNT_ENTRY_CHAR, width - stop);
+		mvwhline(window, 0, stop, GNT_ENTRY_CHAR, width - stop);
 	}
 
 	curpos = gnt_util_onscreen_width(priv->scroll, priv->cursor);
-	if (focus)
-		mvwchgat(widget->window, 0, curpos, 1, A_REVERSE, GNT_COLOR_TEXT_NORMAL, NULL);
-	(void)wmove(widget->window, 0, curpos);
-
-	GNTDEBUG;
+	if (focus) {
+		mvwchgat(window, 0, curpos, 1, A_REVERSE, GNT_COLOR_TEXT_NORMAL,
+		         NULL);
+	}
+	(void)wmove(window, 0, curpos);
 }
 
 static void

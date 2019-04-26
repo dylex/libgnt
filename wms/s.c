@@ -51,24 +51,28 @@ static void (*org_new_window)(GntWM *wm, GntWidget *win);
 static void
 envelope_main_window(GntWidget *win)
 {
+	WINDOW *window;
 	int w, h;
+	window = gnt_widget_get_window(win);
 	gnt_widget_get_size(win, &w, &h);
-	wresize(win->window, h, w + 1);
-	mvwvline(win->window, 0, w, ACS_VLINE | COLOR_PAIR(GNT_COLOR_NORMAL), h);
-	touchwin(win->window);
+	wresize(window, h, w + 1);
+	mvwvline(window, 0, w, ACS_VLINE | COLOR_PAIR(GNT_COLOR_NORMAL), h);
+	touchwin(window);
 }
 
 static void
 envelope_normal_window(GntWidget *win)
 {
+	WINDOW *window;
 	int w, h;
 
 	if (!gnt_widget_get_has_border(win) || gnt_widget_get_transient(win))
 		return;
 
+	window = gnt_widget_get_window(win);
 	gnt_widget_get_size(win, &w, &h);
-	wbkgdset(win->window, ' ' | COLOR_PAIR(GNT_COLOR_NORMAL));
-	mvwprintw(win->window, 0, w - 4, "[X]");
+	wbkgdset(window, ' ' | COLOR_PAIR(GNT_COLOR_NORMAL));
+	mvwprintw(window, 0, w - 4, "[X]");
 }
 
 static void
@@ -120,7 +124,7 @@ s_new_window(GntWM *wm, GntWidget *win)
 			gnt_widget_set_take_focus(win, TRUE);
 
 			gnt_widget_set_position(win, x, y);
-			mvwin(win->window, y, x);
+			mvwin(gnt_widget_get_window(win), y, x);
 
 			gnt_widget_set_size(win, -1, h + 2);  /* XXX: Why is the +2 needed here? -- sadrul */
 		} else if (!gnt_widget_get_transient(win)) {
@@ -131,7 +135,7 @@ s_new_window(GntWM *wm, GntWidget *win)
 				y = (maxy - h) / 2;
 
 				gnt_widget_set_position(win, x, y);
-				mvwin(win->window, y, x);
+				mvwin(gnt_widget_get_window(win), y, x);
 			}
 		}
 	}

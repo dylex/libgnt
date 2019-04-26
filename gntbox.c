@@ -105,6 +105,7 @@ gnt_box_draw(GntWidget *widget)
 {
 	GntBox *box = GNT_BOX(widget);
 	GntBoxPrivate *priv = gnt_box_get_instance_private(box);
+	WINDOW *window = gnt_widget_get_window(widget);
 
 	if (priv->focus == NULL && gnt_widget_get_parent(widget) == NULL) {
 		g_list_foreach(priv->list, (GFunc)add_to_focus, box);
@@ -118,13 +119,18 @@ gnt_box_draw(GntWidget *widget)
 
 		get_title_thingies(box, title, &pos, &right);
 
-		if (gnt_widget_has_focus(widget))
-			wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_TITLE));
-		else
-			wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_TITLE_D));
-		mvwaddch(widget->window, 0, pos-1, ACS_RTEE | gnt_color_pair(GNT_COLOR_NORMAL));
-		mvwaddstr(widget->window, 0, pos, C_(title));
-		mvwaddch(widget->window, 0, right, ACS_LTEE | gnt_color_pair(GNT_COLOR_NORMAL));
+		if (gnt_widget_has_focus(widget)) {
+			wbkgdset(window,
+			         '\0' | gnt_color_pair(GNT_COLOR_TITLE));
+		} else {
+			wbkgdset(window,
+			         '\0' | gnt_color_pair(GNT_COLOR_TITLE_D));
+		}
+		mvwaddch(window, 0, pos - 1,
+		         ACS_RTEE | gnt_color_pair(GNT_COLOR_NORMAL));
+		mvwaddstr(window, 0, pos, C_(title));
+		mvwaddch(window, 0, right,
+		         ACS_LTEE | gnt_color_pair(GNT_COLOR_NORMAL));
 		g_free(title);
 	}
 
@@ -438,7 +444,8 @@ gnt_box_expose(GntWidget *widget, int x, int y, int width, int height)
 
 	gnt_widget_get_position(widget, &widgetx, &widgety);
 	win = newwin(height, width, widgety + y, widgetx + x);
-	copywin(widget->window, win, y, x, 0, 0, height - 1, width - 1, FALSE);
+	copywin(gnt_widget_get_window(widget), win, y, x, 0, 0, height - 1,
+	        width - 1, FALSE);
 	wrefresh(win);
 	delwin(win);
 }
@@ -750,12 +757,13 @@ gnt_box_set_title(GntBox *box, const char *title)
 	prev = priv->title;
 	priv->title = g_strdup(title);
 	w = GNT_WIDGET(box);
-	if (w->window && gnt_widget_get_has_border(w)) {
+	if (gnt_widget_get_window(w) && gnt_widget_get_has_border(w)) {
 		/* Erase the old title */
 		int pos, right;
 		get_title_thingies(box, prev, &pos, &right);
-		mvwhline(w->window, 0, pos - 1, ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL),
-				right - pos + 2);
+		mvwhline(gnt_widget_get_window(w), 0, pos - 1,
+		         ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL),
+		         right - pos + 2);
 	}
 	g_free(prev);
 }
@@ -805,6 +813,7 @@ void gnt_box_sync_children(GntBox *box)
 {
 	GntBoxPrivate *priv = NULL;
 	GntWidget *widget = NULL;
+	WINDOW *widget_window;
 	GList *iter;
 	gint widgetx, widgety, widgetwidth, widgetheight;
 	int pos;
@@ -813,6 +822,7 @@ void gnt_box_sync_children(GntBox *box)
 	priv = gnt_box_get_instance_private(box);
 
 	widget = GNT_WIDGET(box);
+	widget_window = gnt_widget_get_window(widget);
 	gnt_widget_get_position(widget, &widgetx, &widgety);
 	gnt_widget_get_internal_size(widget, &widgetwidth, &widgetheight);
 	pos = gnt_widget_get_has_border(widget) ? 1 : 0;
@@ -823,6 +833,7 @@ void gnt_box_sync_children(GntBox *box)
 
 	for (iter = priv->list; iter; iter = iter->next) {
 		GntWidget *w = GNT_WIDGET(iter->data);
+		WINDOW *wwin;
 		int height, width;
 		gint x, y;
 
@@ -865,11 +876,13 @@ void gnt_box_sync_children(GntBox *box)
 			}
 		}
 
-		copywin(w->window, widget->window, 0, 0,
-				y, x, y + height - 1, x + width - 1, FALSE);
+		wwin = gnt_widget_get_window(w);
+		copywin(wwin, widget_window, 0, 0, y, x, y + height - 1,
+		        x + width - 1, FALSE);
 		gnt_widget_set_position(w, x + widgetx, y + widgety);
 		if (w == priv->active) {
-			wmove(widget->window, y + getcury(w->window), x + getcurx(w->window));
+			wmove(widget_window, y + getcury(wwin),
+			      x + getcurx(wwin));
 		}
 	}
 }
@@ -1013,8 +1026,9 @@ void gnt_box_move_focus(GntBox *box, int dir)
 		gnt_widget_set_focus(priv->active, TRUE);
 	}
 
-	if (GNT_WIDGET(box)->window)
+	if (gnt_widget_get_window(GNT_WIDGET(box))) {
 		gnt_widget_draw(GNT_WIDGET(box));
+	}
 }
 
 void gnt_box_give_focus_to_child(GntBox *box, GntWidget *widget)
@@ -1038,7 +1052,8 @@ void gnt_box_give_focus_to_child(GntBox *box, GntWidget *widget)
 		gnt_widget_set_focus(priv->active, TRUE);
 	}
 
-	if (GNT_WIDGET(box)->window)
+	if (gnt_widget_get_window(GNT_WIDGET(box))) {
 		gnt_widget_draw(GNT_WIDGET(box));
+	}
 }
 

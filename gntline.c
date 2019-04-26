@@ -49,15 +49,16 @@ static void
 gnt_line_draw(GntWidget *widget)
 {
 	GntLine *line = GNT_LINE(widget);
+	WINDOW *window = gnt_widget_get_window(widget);
 	gint width, height;
 
 	gnt_widget_get_internal_size(widget, &width, &height);
 	if (line->vertical) {
-		mvwvline(widget->window, 1, 0,
+		mvwvline(window, 1, 0,
 		         ACS_VLINE | gnt_color_pair(GNT_COLOR_NORMAL),
 		         height - 2);
 	} else {
-		mvwhline(widget->window, 0, 1,
+		mvwhline(window, 0, 1,
 		         ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL),
 		         width - 2);
 	}
