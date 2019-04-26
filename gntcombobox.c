@@ -70,8 +70,9 @@ set_selection(GntComboBox *box, gpointer key)
 static void
 hide_popup(GntComboBox *box, gboolean set)
 {
-	gnt_widget_set_size(box->dropdown,
-		box->dropdown->priv.width - 1, box->dropdown->priv.height);
+	gint width, height;
+	gnt_widget_get_internal_size(box->dropdown, &width, &height);
+	gnt_widget_set_size(box->dropdown, width - 1, height);
 	if (set)
 		set_selection(box, gnt_tree_get_selection_data(GNT_TREE(box->dropdown)));
 	else
@@ -85,6 +86,7 @@ gnt_combo_box_draw(GntWidget *widget)
 	GntComboBox *box = GNT_COMBO_BOX(widget);
 	char *text = NULL, *s;
 	GntColorType type;
+	gint width;
 	int len;
 
 	if (box->dropdown && box->selected)
@@ -100,13 +102,16 @@ gnt_combo_box_draw(GntWidget *widget)
 
 	wbkgdset(widget->window, '\0' | gnt_color_pair(type));
 
-	s = (char*)gnt_util_onscreen_width_to_pointer(text, widget->priv.width - 4, &len);
+	gnt_widget_get_internal_size(widget, &width, NULL);
+	s = (char *)gnt_util_onscreen_width_to_pointer(text, width - 4, &len);
 	*s = '\0';
 
 	mvwaddstr(widget->window, 1, 1, C_(text));
-	whline(widget->window, ' ' | gnt_color_pair(type), widget->priv.width - 4 - len);
-	mvwaddch(widget->window, 1, widget->priv.width - 3, ACS_VLINE | gnt_color_pair(GNT_COLOR_NORMAL));
-	mvwaddch(widget->window, 1, widget->priv.width - 2, ACS_DARROW | gnt_color_pair(GNT_COLOR_NORMAL));
+	whline(widget->window, ' ' | gnt_color_pair(type), width - 4 - len);
+	mvwaddch(widget->window, 1, width - 3,
+	         ACS_VLINE | gnt_color_pair(GNT_COLOR_NORMAL));
+	mvwaddch(widget->window, 1, width - 2,
+	         ACS_DARROW | gnt_color_pair(GNT_COLOR_NORMAL));
 	(void)wmove(widget->window, 1, 1);
 
 	g_free(text);
@@ -118,18 +123,23 @@ gnt_combo_box_size_request(GntWidget *widget)
 {
 	if (!gnt_widget_get_mapped(widget)) {
 		GntWidget *dd = GNT_COMBO_BOX(widget)->dropdown;
+		gint width;
 		gnt_widget_size_request(dd);
-		widget->priv.height = 3;   /* For now, a combobox will have border */
-		widget->priv.width = MAX(10, dd->priv.width + 2);
+		gnt_widget_get_internal_size(dd, &width, NULL);
+		/* For now, a combobox will have border */
+		gnt_widget_set_internal_size(widget, MAX(10, width + 2), 3);
 	}
 }
 
 static void
 gnt_combo_box_map(GntWidget *widget)
 {
-	if (widget->priv.width == 0 || widget->priv.height == 0)
+	gint width, height;
+
+	gnt_widget_get_internal_size(widget, &width, &height);
+	if (width == 0 || height == 0) {
 		gnt_widget_size_request(widget);
-	GNTDEBUG;
+	}
 }
 
 static void
@@ -137,14 +147,15 @@ popup_dropdown(GntComboBox *box)
 {
 	GntWidget *widget = GNT_WIDGET(box);
 	GntWidget *parent = gnt_widget_get_parent(box->dropdown);
-	gint widgetx, widgety;
+	gint widgetx, widgety, widgetwidth, widgetheight;
 	gint height;
 	gint y;
 
 	gnt_widget_get_position(widget, &widgetx, &widgety);
+	gnt_widget_get_internal_size(widget, &widgetwidth, &widgetheight);
 	height = g_list_length(gnt_tree_get_rows(GNT_TREE(box->dropdown)));
-	y = widgety + widget->priv.height - 1;
-	gnt_widget_set_size(box->dropdown, widget->priv.width, height + 2);
+	y = widgety + widgetheight - 1;
+	gnt_widget_set_size(box->dropdown, widgetwidth, height + 2);
 
 	if (y + height + 2 >= getmaxy(stdscr))
 		y = widgety - height - 1;
@@ -152,10 +163,9 @@ popup_dropdown(GntComboBox *box)
 	if (parent->window)
 	{
 		mvwin(parent->window, y, widgetx);
-		wresize(parent->window, height+2, widget->priv.width);
+		wresize(parent->window, height + 2, widgetwidth);
 	}
-	parent->priv.width = widget->priv.width;
-	parent->priv.height = height + 2;
+	gnt_widget_set_internal_size(parent, widgetwidth, height + 2);
 
 	gnt_widget_set_visible(parent, TRUE);
 	gnt_widget_draw(parent);
@@ -270,7 +280,11 @@ gnt_combo_box_size_changed(GntWidget *widget, G_GNUC_UNUSED int oldw,
                            G_GNUC_UNUSED int oldh)
 {
 	GntComboBox *box = GNT_COMBO_BOX(widget);
-	gnt_widget_set_size(box->dropdown, widget->priv.width - 1, box->dropdown->priv.height);
+	gint width, height;
+
+	gnt_widget_get_internal_size(widget, &width, NULL);
+	gnt_widget_get_internal_size(box->dropdown, NULL, &height);
+	gnt_widget_set_size(box->dropdown, width - 1, height);
 }
 
 static gboolean

@@ -468,6 +468,7 @@ redraw_tree(GntTree *tree)
 	int start, i;
 	GntWidget *widget = GNT_WIDGET(tree);
 	GntTreeRow *row;
+	gint width, height;
 	int pos, up, down = 0;
 	int rows, scrcol;
 	int current = 0;
@@ -475,6 +476,7 @@ redraw_tree(GntTree *tree)
 	if (!gnt_widget_get_mapped(GNT_WIDGET(tree)))
 		return;
 
+	gnt_widget_get_internal_size(widget, &width, &height);
 	pos = gnt_widget_get_has_border(widget) ? 1 : 0;
 
 	if (priv->top == NULL) {
@@ -492,10 +494,12 @@ redraw_tree(GntTree *tree)
 		int i;
 		int x = pos;
 
-		mvwhline(widget->window, pos + 1, pos, ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL),
-				widget->priv.width - pos - 1);
-		mvwhline(widget->window, pos, pos, ' ' | gnt_color_pair(GNT_COLOR_NORMAL),
-				widget->priv.width - pos - 1);
+		mvwhline(widget->window, pos + 1, pos,
+		         ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL),
+		         width - pos - 1);
+		mvwhline(widget->window, pos, pos,
+		         ' ' | gnt_color_pair(GNT_COLOR_NORMAL),
+		         width - pos - 1);
 
 		for (i = 0; i < priv->ncol; i++) {
 			if (COLUMN_INVISIBLE(priv, i)) {
@@ -513,7 +517,7 @@ redraw_tree(GntTree *tree)
 			        (priv->show_separator ? ACS_TTEE : ACS_HLINE) |
 			                gnt_color_pair(GNT_COLOR_NORMAL));
 			tree_mark_columns(
-			        tree, pos, widget->priv.height - pos,
+			        tree, pos, height - pos,
 			        (priv->show_separator ? ACS_BTEE : ACS_HLINE) |
 			                gnt_color_pair(GNT_COLOR_NORMAL));
 		}
@@ -527,7 +531,7 @@ redraw_tree(GntTree *tree)
 		start = 2;
 	}
 
-	rows = widget->priv.height - pos * 2 - start - 1;
+	rows = height - pos * 2 - start - 1;
 	priv->bottom = get_next_n_opt(priv->top, rows, &down);
 	if (down < rows)
 	{
@@ -540,14 +544,15 @@ redraw_tree(GntTree *tree)
 	up = get_distance(priv->top, priv->current);
 	if (up < 0)
 		priv->top = priv->current;
-	else if (up >= widget->priv.height - pos)
+	else if (up >= height - pos)
 		priv->top = get_prev_n(priv->current, rows);
 
 	if (priv->top && !row_matches_search(priv->top)) {
 		priv->top = get_next(priv->top);
 	}
 	row = priv->top;
-	scrcol = widget->priv.width - 1 - 2 * pos;  /* exclude the borders and the scrollbar */
+	/* exclude the borders and the scrollbar */
+	scrcol = width - 1 - 2 * pos;
 
 	if (priv->current && !row_matches_search(priv->current)) {
 		GntTreeRow *old = priv->current;
@@ -555,9 +560,8 @@ redraw_tree(GntTree *tree)
 		tree_selection_changed(tree, old, priv->current);
 	}
 
-	for (i = start + pos; row && i < widget->priv.height - pos;
-				i++, row = get_next(row))
-	{
+	for (i = start + pos; row && i < height - pos;
+	     i++, row = get_next(row)) {
 		char *str;
 		int wr;
 
@@ -613,16 +617,14 @@ redraw_tree(GntTree *tree)
 	}
 
 	wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_NORMAL));
-	while (i < widget->priv.height - pos)
-	{
-		mvwhline(widget->window, i, pos, ' ',
-				widget->priv.width - pos * 2 - 1);
+	while (i < height - pos) {
+		mvwhline(widget->window, i, pos, ' ', width - pos * 2 - 1);
 		tree_mark_columns(tree, pos, i,
 		                  (priv->show_separator ? ACS_VLINE : ' '));
 		i++;
 	}
 
-	scrcol = widget->priv.width - pos - 1;  /* position of the scrollbar */
+	scrcol = width - pos - 1; /* position of the scrollbar */
 	rows--;
 	if (rows > 0)
 	{
@@ -660,15 +662,16 @@ redraw_tree(GntTree *tree)
 	         ((priv->top != priv->root) ? ACS_UARROW : ' ') |
 	                 gnt_color_pair(GNT_COLOR_HIGHLIGHT_D));
 
-	mvwaddch(widget->window, widget->priv.height - pos - 1, scrcol,
-			(row ?  ACS_DARROW : ' ') | gnt_color_pair(GNT_COLOR_HIGHLIGHT_D));
+	mvwaddch(widget->window, height - pos - 1, scrcol,
+	         (row ? ACS_DARROW : ' ') |
+	                 gnt_color_pair(GNT_COLOR_HIGHLIGHT_D));
 
 	/* If there's a search-text, show it in the bottom of the tree */
 	if (SEARCHING(priv)) {
 		const char *str = gnt_util_onscreen_width_to_pointer(
 		        priv->search->str, scrcol - 1, NULL);
 		wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_HIGHLIGHT_D));
-		mvwaddnstr(widget->window, widget->priv.height - pos - 1, pos,
+		mvwaddnstr(widget->window, height - pos - 1, pos,
 		           priv->search->str, str - priv->search->str);
 	}
 	wmove(widget->window, current, pos);
@@ -689,13 +692,18 @@ gnt_tree_draw(GntWidget *widget)
 static void
 gnt_tree_size_request(GntWidget *widget)
 {
-	if (widget->priv.height == 0)
-		widget->priv.height = 10;	/* XXX: Why?! */
-	if (widget->priv.width == 0)
-	{
+	gint width, height;
+
+	gnt_widget_get_internal_size(widget, &width, &height);
+
+	if (height == 0) {
+		height = 10; /* XXX: Why?! */
+	}
+
+	if (width == 0) {
 		GntTree *tree = GNT_TREE(widget);
 		GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
-		int i, width = 0;
+		int i;
 		width = gnt_widget_get_has_border(GNT_WIDGET(tree)) ? 3 : 1;
 		for (i = 0; i < priv->ncol; i++) {
 			if (!COLUMN_INVISIBLE(priv, i)) {
@@ -705,8 +713,9 @@ gnt_tree_size_request(GntWidget *widget)
 				}
 			}
 		}
-		widget->priv.width = width;
 	}
+
+	gnt_widget_set_internal_size(widget, width, height);
 }
 
 static void
@@ -714,8 +723,10 @@ gnt_tree_map(GntWidget *widget)
 {
 	GntTree *tree = GNT_TREE(widget);
 	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
-	if (widget->priv.width == 0 || widget->priv.height == 0)
-	{
+	gint width, height;
+
+	gnt_widget_get_internal_size(widget, &width, &height);
+	if (width == 0 || height == 0) {
 		gnt_widget_size_request(widget);
 	}
 	priv->top = priv->root;
@@ -831,10 +842,11 @@ action_page_up(GntBindable *bind, G_GNUC_UNUSED GList *unused)
 
 	if (priv->top != priv->root) {
 		int dist = get_distance(priv->top, priv->current);
-		row = get_prev_n(
-		        priv->top,
-		        widget->priv.height - 1 - priv->show_title * 2 -
-		                (gnt_widget_get_has_border(widget) ? 2 : 0));
+		gint height;
+		gnt_widget_get_internal_size(widget, NULL, &height);
+		height -= 1 + priv->show_title * 2 +
+		          (gnt_widget_get_has_border(widget) ? 2 : 0);
+		row = get_prev_n(priv->top, height);
 		if (row == NULL)
 			row = priv->root;
 		priv->top = row;
@@ -1003,8 +1015,12 @@ gnt_tree_size_changed(GntWidget *widget, G_GNUC_UNUSED int w,
                       G_GNUC_UNUSED int h)
 {
 	GntTree *tree = GNT_TREE(widget);
-	if (widget->priv.width <= 0)
+	gint width;
+
+	gnt_widget_get_internal_size(widget, &width, NULL);
+	if (width <= 0) {
 		return;
+	}
 
 	readjust_columns(tree);
 }
@@ -1260,16 +1276,23 @@ GntWidget *gnt_tree_new()
 void gnt_tree_set_visible_rows(GntTree *tree, int rows)
 {
 	GntWidget *widget = GNT_WIDGET(tree);
-	widget->priv.height = rows;
+	gint width, height;
+
+	height = rows;
 	if (gnt_widget_get_has_border(widget)) {
-		widget->priv.height += 2;
+		height += 2;
 	}
+
+	gnt_widget_get_internal_size(widget, &width, NULL);
+	gnt_widget_set_internal_size(widget, width, height);
 }
 
 int gnt_tree_get_visible_rows(GntTree *tree)
 {
 	GntWidget *widget = GNT_WIDGET(tree);
-	int ret = widget->priv.height;
+	gint ret;
+
+	gnt_widget_get_internal_size(widget, NULL, &ret);
 	if (gnt_widget_get_has_border(widget)) {
 		ret -= 2;
 	}

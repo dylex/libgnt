@@ -25,6 +25,7 @@
 #include "gntmenuitemcheck.h"
 
 #include "gntmenuitemprivate.h"
+#include "gntwidgetprivate.h"
 
 #include <ctype.h>
 #include <string.h>
@@ -139,11 +140,13 @@ gnt_menu_size_request(GntWidget *widget)
 	GntMenu *menu = GNT_MENU(widget);
 
 	if (menu->type == GNT_MENU_TOPLEVEL) {
-		widget->priv.height = 1;
-		widget->priv.width = getmaxx(stdscr);
+		gnt_widget_set_internal_size(widget, getmaxx(stdscr), 1);
 	} else {
+		gint width;
 		org_size_request(widget);
-		widget->priv.height = g_list_length(menu->list) + 2;
+		gnt_widget_get_internal_size(widget, &width, NULL);
+		gnt_widget_set_internal_size(widget, width,
+		                             g_list_length(menu->list) + 2);
 	}
 }
 
@@ -269,9 +272,12 @@ menuitem_activate(GntMenu *menu, GntMenuItem *item)
 			sub->parentmenu = menu;
 			if (menu->type != GNT_MENU_TOPLEVEL) {
 				GntWidget *widget = GNT_WIDGET(menu);
+				gint width;
 				gnt_widget_get_position(widget, &x, &y);
+				gnt_widget_get_internal_size(widget, &width,
+				                             NULL);
 				gnt_menuitem_set_position(
-				        item, x + widget->priv.width - 1,
+				        item, x + width - 1,
 				        y + gnt_tree_get_selection_visible_line(
 				                    GNT_TREE(menu)));
 			}

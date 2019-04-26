@@ -60,8 +60,11 @@ gnt_button_draw(GntWidget *widget)
 	wbkgdset(widget->window, '\0' | gnt_color_pair(type));
 	mvwaddstr(widget->window, (small_button) ? 0 : 1, 2, C_(priv->text));
 	if (small_button) {
+		gint width;
 		type = GNT_COLOR_HIGHLIGHT;
-		mvwchgat(widget->window, 0, 0, widget->priv.width, focus ? A_BOLD : A_REVERSE, type, NULL);
+		gnt_widget_get_internal_size(widget, &width, NULL);
+		mvwchgat(widget->window, 0, 0, width,
+		         focus ? A_BOLD : A_REVERSE, type, NULL);
 	}
 
 	GNTDEBUG;
@@ -72,21 +75,25 @@ gnt_button_size_request(GntWidget *widget)
 {
 	GntButton *button = GNT_BUTTON(widget);
 	GntButtonPrivate *priv = gnt_button_get_instance_private(button);
+	gint width, height;
 
-	gnt_util_get_text_bound(priv->text, &widget->priv.width,
-	                        &widget->priv.height);
-	widget->priv.width += 4;
+	gnt_util_get_text_bound(priv->text, &width, &height);
+	width += 4;
 	if (gnt_widget_get_has_border(widget)) {
-		widget->priv.height += 2;
+		height += 2;
 	}
+	gnt_widget_set_internal_size(widget, width, height);
 }
 
 static void
 gnt_button_map(GntWidget *widget)
 {
-	if (widget->priv.width == 0 || widget->priv.height == 0)
+	gint width, height;
+
+	gnt_widget_get_internal_size(widget, &width, &height);
+	if (width == 0 || height == 0) {
 		gnt_widget_size_request(widget);
-	GNTDEBUG;
+	}
 }
 
 static gboolean

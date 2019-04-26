@@ -468,6 +468,21 @@ gnt_widget_get_size(GntWidget *wid, int *width, int *height)
 		*height = wid->priv.height + shadow;
 }
 
+/* Internal.
+ * Different from gnt_widget_get_size in that it ignores shadows.
+ */
+void
+gnt_widget_get_internal_size(GntWidget *widget, gint *width, gint *height)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+	if (width) {
+		*width = widget->priv.width;
+	}
+	if (height) {
+		*height = widget->priv.height;
+	}
+}
+
 static void
 init_widget(GntWidget *widget)
 {
@@ -556,6 +571,17 @@ gnt_widget_set_size(GntWidget *widget, int width, int height)
 	}
 
 	return ret;
+}
+
+/* Internal.
+ * Different from gnt_widget_set_size in that it sets the values directly.
+ */
+void
+gnt_widget_set_internal_size(GntWidget *widget, gint width, gint height)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+	widget->priv.width = width;
+	widget->priv.height = height;
 }
 
 /* Internal. */

@@ -22,6 +22,8 @@
 
 #include "gnt-skel.h"
 
+#include "gntwidgetprivate.h"
+
 struct _GntSkel
 {
 	GntWidget parent;
@@ -50,9 +52,12 @@ gnt_skel_size_request(GntWidget *widget)
 static void
 gnt_skel_map(GntWidget *widget)
 {
-	if (widget->priv.width == 0 || widget->priv.height == 0)
+	gint width, height;
+
+	gnt_widget_get_internal_size(widget, &width, &height);
+	if (width == 0 || height == 0) {
 		gnt_widget_size_request(widget);
-	GNTDEBUG;
+	}
 }
 
 static gboolean

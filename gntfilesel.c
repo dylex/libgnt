@@ -31,6 +31,8 @@
 #include "gntstyle.h"
 #include "gnttree.h"
 
+#include "gntwidgetprivate.h"
+
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -513,13 +515,21 @@ static void
 gnt_file_sel_size_request(GntWidget *widget)
 {
 	GntFileSelPrivate *priv = NULL;
+	gint width, height;
 
-	if (widget->priv.height > 0)
+	gnt_widget_get_internal_size(widget, NULL, &height);
+	if (height > 0) {
 		return;
+	}
 
 	priv = gnt_file_sel_get_instance_private(GNT_FILE_SEL(widget));
-	priv->dirs->priv.height = 16;
-	priv->files->priv.height = 16;
+
+	gnt_widget_get_internal_size(priv->dirs, &width, NULL);
+	gnt_widget_set_internal_size(priv->dirs, width, 16);
+
+	gnt_widget_get_internal_size(priv->files, &width, NULL);
+	gnt_widget_set_internal_size(priv->files, width, 16);
+
 	orig_size_request(widget);
 }
 

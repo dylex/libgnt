@@ -86,9 +86,9 @@ gnt_slider_draw(GntWidget *widget)
 	int position, size = 0;
 
 	if (priv->vertical)
-		size = widget->priv.height;
+		gnt_widget_get_internal_size(widget, NULL, &size);
 	else
-		size = widget->priv.width;
+		gnt_widget_get_internal_size(widget, &size, NULL);
 
 	if (gnt_widget_has_focus(widget))
 		attr |= GNT_COLOR_HIGHLIGHT;
@@ -123,20 +123,21 @@ gnt_slider_size_request(GntWidget *widget)
 	GntSliderPrivate *priv =
 	        gnt_slider_get_instance_private(GNT_SLIDER(widget));
 	if (priv->vertical) {
-		widget->priv.width = 1;
-		widget->priv.height = 5;
+		gnt_widget_set_internal_size(widget, 1, 5);
 	} else {
-		widget->priv.width = 5;
-		widget->priv.height = 1;
+		gnt_widget_set_internal_size(widget, 5, 1);
 	}
 }
 
 static void
 gnt_slider_map(GntWidget *widget)
 {
-	if (widget->priv.width == 0 || widget->priv.height == 0)
+	gint width, height;
+
+	gnt_widget_get_internal_size(widget, &width, &height);
+	if (width == 0 || height == 0) {
 		gnt_widget_size_request(widget);
-	GNTDEBUG;
+	}
 }
 
 static gboolean

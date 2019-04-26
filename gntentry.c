@@ -312,6 +312,7 @@ gnt_entry_draw(GntWidget *widget)
 {
 	GntEntry *entry = GNT_ENTRY(widget);
 	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+	gint width;
 	int stop;
 	gboolean focus;
 	int curpos;
@@ -329,8 +330,9 @@ gnt_entry_draw(GntWidget *widget)
 		mvwprintw(widget->window, 0, 0, "%s", C_(priv->scroll));
 
 	stop = gnt_util_onscreen_width(priv->scroll, priv->end);
-	if (stop < widget->priv.width) {
-		mvwhline(widget->window, 0, stop, GNT_ENTRY_CHAR, widget->priv.width - stop);
+	gnt_widget_get_internal_size(GNT_WIDGET(entry), &width, NULL);
+	if (stop < width) {
+		mvwhline(widget->window, 0, stop, GNT_ENTRY_CHAR, width - stop);
 	}
 
 	curpos = gnt_util_onscreen_width(priv->scroll, priv->cursor);
@@ -345,17 +347,19 @@ static void
 gnt_entry_size_request(GntWidget *widget)
 {
 	if (!gnt_widget_get_mapped(widget)) {
-		widget->priv.height = 1;
-		widget->priv.width = 20;
+		gnt_widget_set_internal_size(widget, 20, 1);
 	}
 }
 
 static void
 gnt_entry_map(GntWidget *widget)
 {
-	if (widget->priv.width == 0 || widget->priv.height == 0)
+	gint width, height;
+
+	gnt_widget_get_internal_size(widget, &width, &height);
+	if (width == 0 || height == 0) {
 		gnt_widget_size_request(widget);
-	GNTDEBUG;
+	}
 }
 
 static void
@@ -395,9 +399,10 @@ static void
 scroll_to_fit(GntEntry *entry)
 {
 	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+	gint width;
 
-	while (gnt_util_onscreen_width(priv->scroll, priv->cursor) >=
-	       GNT_WIDGET(entry)->priv.width) {
+	gnt_widget_get_internal_size(GNT_WIDGET(entry), &width, NULL);
+	while (gnt_util_onscreen_width(priv->scroll, priv->cursor) >= width) {
 		priv->scroll = g_utf8_find_next_char(priv->scroll, NULL);
 	}
 }
@@ -803,7 +808,9 @@ del_prev_word(GntBindable *bind, G_GNUC_UNUSED GList *params)
 	priv->end -= count;
 	priv->cursor = iter;
 	if (priv->cursor <= priv->scroll) {
-		priv->scroll = priv->cursor - widget->priv.width + 2;
+		gint width;
+		gnt_widget_get_internal_size(widget, &width, NULL);
+		priv->scroll = priv->cursor - width + 2;
 		if (priv->scroll < priv->start) {
 			priv->scroll = priv->start;
 		}

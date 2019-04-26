@@ -49,35 +49,39 @@ static void
 gnt_line_draw(GntWidget *widget)
 {
 	GntLine *line = GNT_LINE(widget);
-	if (line->vertical)
-		mvwvline(widget->window, 1, 0, ACS_VLINE | gnt_color_pair(GNT_COLOR_NORMAL),
-				widget->priv.height - 2);
-	else
-		mvwhline(widget->window, 0, 1, ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL),
-				widget->priv.width - 2);
+	gint width, height;
+
+	gnt_widget_get_internal_size(widget, &width, &height);
+	if (line->vertical) {
+		mvwvline(widget->window, 1, 0,
+		         ACS_VLINE | gnt_color_pair(GNT_COLOR_NORMAL),
+		         height - 2);
+	} else {
+		mvwhline(widget->window, 0, 1,
+		         ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL),
+		         width - 2);
+	}
 }
 
 static void
 gnt_line_size_request(GntWidget *widget)
 {
-	if (GNT_LINE(widget)->vertical)
-	{
-		widget->priv.width = 1;
-		widget->priv.height = 5;
-	}
-	else
-	{
-		widget->priv.width = 5;
-		widget->priv.height = 1;
+	if (GNT_LINE(widget)->vertical) {
+		gnt_widget_set_internal_size(widget, 1, 5);
+	} else {
+		gnt_widget_set_internal_size(widget, 5, 1);
 	}
 }
 
 static void
 gnt_line_map(GntWidget *widget)
 {
-	if (widget->priv.width == 0 || widget->priv.height == 0)
+	gint width, height;
+
+	gnt_widget_get_internal_size(widget, &width, &height);
+	if (width == 0 || height == 0) {
 		gnt_widget_size_request(widget);
-	GNTDEBUG;
+	}
 }
 
 static void

@@ -62,6 +62,7 @@
 
 #include "gntboxprivate.h"
 #include "gntmenuprivate.h"
+#include "gntwidgetprivate.h"
 #include "gntwsprivate.h"
 
 #define IDLE_CHECK_INTERVAL 5 /* 5 seconds */
@@ -133,10 +134,14 @@ gnt_wm_copy_win(GntWidget *widget, GntNode *node)
 	if (GNT_IS_WINDOW(widget) || GNT_IS_BOX(widget)) {
 		GntWidget *active = gnt_box_get_active(GNT_BOX(widget));
 		if (active) {
-			int curx = active->priv.x + getcurx(active->window);
-			int cury = active->priv.y + getcury(active->window);
-			if (wmove(node->window, cury - widget->priv.y, curx - widget->priv.x) != OK)
+			gint curx, cury, widgetx, widgety;
+			gnt_widget_get_position(active, &curx, &cury);
+			gnt_widget_get_position(widget, &widgetx, &widgety);
+			curx += getcurx(active->window) - widgetx;
+			cury += getcury(active->window) - widgety;
+			if (wmove(node->window, cury, curx) != OK) {
 				(void)wmove(node->window, 0, 0);
+			}
 		}
 	}
 }
@@ -1781,13 +1786,9 @@ gnt_wm_new_window_real(GntWM *wm, GntWidget *widget)
 #if 1
 	{
 		int x, y, w, h, maxx, maxy;
-		gboolean shadow = TRUE;
 
-		if (!gnt_widget_has_shadow(widget))
-			shadow = FALSE;
 		gnt_widget_get_position(widget, &x, &y);
-		w = widget->priv.width + shadow;
-		h = widget->priv.height + shadow;
+		gnt_widget_get_size(widget, &w, &h);
 
 		maxx = getmaxx(stdscr);
 		maxy = getmaxy(stdscr) - 1;              /* room for the taskbar */

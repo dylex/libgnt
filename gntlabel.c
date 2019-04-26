@@ -73,9 +73,10 @@ static void
 gnt_label_size_request(GntWidget *widget)
 {
 	GntLabel *label = GNT_LABEL(widget);
+	gint width, height;
 
-	gnt_util_get_text_bound(label->text,
-			&widget->priv.width, &widget->priv.height);
+	gnt_util_get_text_bound(label->text, &width, &height);
+	gnt_widget_set_internal_size(widget, width, height);
 }
 
 static void

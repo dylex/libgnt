@@ -85,6 +85,7 @@ static void
 gnt_text_view_draw(GntWidget *widget)
 {
 	GntTextView *view = GNT_TEXT_VIEW(widget);
+	gint width, height;
 	int n;
 	int i = 0;
 	GList *lines;
@@ -92,29 +93,30 @@ gnt_text_view_draw(GntWidget *widget)
 	int comp = 0;          /* Used for top-aligned text */
 	gboolean has_scroll = !(view->flags & GNT_TEXT_VIEW_NO_SCROLL);
 
+	gnt_widget_get_internal_size(widget, &width, &height);
+
 	wbkgd(widget->window, gnt_color_pair(GNT_COLOR_NORMAL));
 	werase(widget->window);
 
 	n = g_list_length(view->list);
-	if ((view->flags & GNT_TEXT_VIEW_TOP_ALIGN) &&
-			n < widget->priv.height) {
+	if ((view->flags & GNT_TEXT_VIEW_TOP_ALIGN) && n < height) {
 		GList *now = view->list;
-		comp = widget->priv.height - n;
+		comp = height - n;
 		view->list = g_list_nth_prev(view->list, comp);
 		if (!view->list) {
 			view->list = g_list_first(now);
-			comp = widget->priv.height - g_list_length(view->list);
+			comp = height - g_list_length(view->list);
 		} else {
 			comp = 0;
 		}
 	}
 
-	for (i = 0, lines = view->list; i < widget->priv.height && lines; i++, lines = lines->next)
-	{
+	for (i = 0, lines = view->list; i < height && lines;
+	     i++, lines = lines->next) {
 		GList *iter;
 		GntTextLine *line = lines->data;
 
-		(void)wmove(widget->window, widget->priv.height - 1 - i - comp, 0);
+		(void)wmove(widget->window, height - 1 - i - comp, 0);
 
 		for (iter = line->segments; iter; iter = iter->next)
 		{
@@ -151,11 +153,11 @@ gnt_text_view_draw(GntWidget *widget)
 			*end = back;
 		}
 		wattroff(widget->window, A_UNDERLINE | A_BLINK | A_REVERSE);
-		whline(widget->window, ' ', widget->priv.width - line->length - has_scroll);
+		whline(widget->window, ' ', width - line->length - has_scroll);
 	}
 
-	scrcol = widget->priv.width - 1;
-	rows = widget->priv.height - 2;
+	scrcol = width - 1;
+	rows = height - 2;
 	if (has_scroll && rows > 0)
 	{
 		int total = g_list_length(g_list_first(view->list));
@@ -186,9 +188,9 @@ gnt_text_view_draw(GntWidget *widget)
 	if (has_scroll) {
 		mvwaddch(widget->window, 0, scrcol,
 				(lines ? ACS_UARROW : ' ') | gnt_color_pair(GNT_COLOR_HIGHLIGHT_D));
-		mvwaddch(widget->window, widget->priv.height - 1, scrcol,
-				((view->list && view->list->prev) ? ACS_DARROW : ' ') |
-					gnt_color_pair(GNT_COLOR_HIGHLIGHT_D));
+		mvwaddch(widget->window, height - 1, scrcol,
+		         ((view->list && view->list->prev) ? ACS_DARROW : ' ') |
+		                 gnt_color_pair(GNT_COLOR_HIGHLIGHT_D));
 	}
 
 	wmove(widget->window, 0, 0);
@@ -205,9 +207,12 @@ gnt_text_view_size_request(GntWidget *widget)
 static void
 gnt_text_view_map(GntWidget *widget)
 {
-	if (widget->priv.width == 0 || widget->priv.height == 0)
+	gint width, height;
+
+	gnt_widget_get_internal_size(widget, &width, &height);
+	if (width == 0 || height == 0) {
 		gnt_widget_size_request(widget);
-	GNTDEBUG;
+	}
 }
 
 static gboolean
@@ -244,6 +249,7 @@ gnt_text_view_destroy(GntWidget *widget)
 static char *
 gnt_text_view_get_p(GntTextView *view, int x, int y)
 {
+	gint height;
 	int n;
 	int i = 0;
 	GntWidget *wid = GNT_WIDGET(view);
@@ -254,7 +260,8 @@ gnt_text_view_get_p(GntTextView *view, int x, int y)
 	gchar *pos;
 
 	n = g_list_length(view->list);
-	y = wid->priv.height - y;
+	gnt_widget_get_internal_size(wid, NULL, &height);
+	y = height - y;
 	if (n < y) {
 		x = 0;
 		y = n - 1;
@@ -438,7 +445,9 @@ gnt_text_view_reflow(GntTextView *view)
 static void
 gnt_text_view_size_changed(GntWidget *widget, int w, G_GNUC_UNUSED int h)
 {
-	if (w != widget->priv.width && gnt_widget_get_mapped(widget)) {
+	gint width;
+	gnt_widget_get_internal_size(widget, &width, NULL);
+	if (w != width && gnt_widget_get_mapped(widget)) {
 		gnt_text_view_reflow(GNT_TEXT_VIEW(widget));
 	}
 }
@@ -493,6 +502,7 @@ void gnt_text_view_append_text_with_tag(GntTextView *view, const char *text,
 			GntTextFormatFlags flags, const char *tagname)
 {
 	GntWidget *widget = GNT_WIDGET(view);
+	gint widget_width;
 	chtype fl = 0;
 	const char *start, *end;
 	GList *list = view->list;
@@ -504,6 +514,7 @@ void gnt_text_view_append_text_with_tag(GntTextView *view, const char *text,
 	if (text == NULL || *text == '\0')
 		return;
 
+	gnt_widget_get_internal_size(widget, &widget_width, NULL);
 	fl = gnt_text_format_flag_to_chtype(flags);
 
 	len = view->string->len;
@@ -536,7 +547,7 @@ void gnt_text_view_append_text_with_tag(GntTextView *view, const char *text,
 		}
 
 		line = view->list->data;
-		if (line->length == widget->priv.width - has_scroll) {
+		if (line->length == widget_width - has_scroll) {
 			/* The last added line was exactly the same width as the widget */
 			line = g_new0(GntTextLine, 1);
 			line->soft = TRUE;
@@ -546,15 +557,16 @@ void gnt_text_view_append_text_with_tag(GntTextView *view, const char *text,
 		if ((end = strchr(start, '\r')) != NULL ||
 			(end = strchr(start, '\n')) != NULL) {
 			len = gnt_util_onscreen_width(start, end - has_scroll);
-			if (widget->priv.width > 0 &&
-					len >= widget->priv.width - line->length - has_scroll) {
+			if (widget_width > 0 &&
+			    len >= widget_width - line->length - has_scroll) {
 				end = NULL;
 			}
 		}
 
 		if (end == NULL)
-			end = gnt_util_onscreen_width_to_pointer(start,
-					widget->priv.width - line->length - has_scroll, &len);
+			end = gnt_util_onscreen_width_to_pointer(
+			        start, widget_width - line->length - has_scroll,
+			        &len);
 
 		/* Try to append to the previous segment if possible */
 		if (line->segments) {
@@ -698,8 +710,10 @@ int gnt_text_view_get_lines_below(GntTextView *view)
 int gnt_text_view_get_lines_above(GntTextView *view)
 {
 	int above = 0;
+	gint height;
 	GList *list;
-	list = g_list_nth(view->list, GNT_WIDGET(view)->priv.height);
+	gnt_widget_get_internal_size(GNT_WIDGET(view), NULL, &height);
+	list = g_list_nth(view->list, height);
 	if (!list)
 		return 0;
 	while ((list = list->next))
@@ -817,9 +831,13 @@ static gboolean
 scroll_tv(G_GNUC_UNUSED GntWidget *wid, const char *key, GntTextView *tv)
 {
 	if (strcmp(key, GNT_KEY_PGUP) == 0) {
-		gnt_text_view_scroll(tv, -(GNT_WIDGET(tv)->priv.height - 2));
+		gint height;
+		gnt_widget_get_internal_size(GNT_WIDGET(tv), NULL, &height);
+		gnt_text_view_scroll(tv, -(height - 2));
 	} else if (strcmp(key, GNT_KEY_PGDOWN) == 0) {
-		gnt_text_view_scroll(tv, GNT_WIDGET(tv)->priv.height - 2);
+		gint height;
+		gnt_widget_get_internal_size(GNT_WIDGET(tv), NULL, &height);
+		gnt_text_view_scroll(tv, height - 2);
 	} else if (strcmp(key, GNT_KEY_DOWN) == 0) {
 		gnt_text_view_scroll(tv, 1);
 	} else if (strcmp(key, GNT_KEY_UP) == 0) {

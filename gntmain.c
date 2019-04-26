@@ -54,6 +54,8 @@
 #include "gntmenuprivate.h"
 #include "gntwsprivate.h"
 
+#include "gntwidgetprivate.h"
+
 #include <panel.h>
 
 #include <stdio.h>
@@ -180,13 +182,14 @@ detect_mouse_action(const char *buffer)
 	while ((p = panel_below(p)) != NULL) {
 		const GntNode *node = panel_userptr(p);
 		GntWidget *wid;
-		gint widx, widy;
+		gint widx, widy, width, height;
 		if (!node)
 			continue;
 		wid = node->me;
 		gnt_widget_get_position(wid, &widx, &widy);
-		if (widx <= x && x < widx + wid->priv.width) {
-			if (widy <= y && y < widy + wid->priv.height) {
+		gnt_widget_get_internal_size(wid, &width, &height);
+		if (widx <= x && x < widx + width) {
+			if (widy <= y && y < widy + height) {
 				widget = wid;
 				break;
 			}

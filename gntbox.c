@@ -25,6 +25,8 @@
 #include "gntstyle.h"
 #include "gntutils.h"
 
+#include "gntwidgetprivate.h"
+
 #include <string.h>
 
 typedef struct
@@ -77,14 +79,18 @@ add_to_focus(GntWidget *w, GntBox *box)
 static void
 get_title_thingies(GntBox *box, char *title, int *p, int *r)
 {
-	GntWidget *widget = GNT_WIDGET(box);
+	gint width;
 	int len;
-	char *end = (char*)gnt_util_onscreen_width_to_pointer(title, widget->priv.width - 4, &len);
+	char *end;
+
+	gnt_widget_get_internal_size(GNT_WIDGET(box), &width, NULL);
+	end = (char *)gnt_util_onscreen_width_to_pointer(title, width - 4,
+	                                                 &len);
 
 	if (p)
-		*p = (widget->priv.width - len) / 2;
+		*p = (width - len) / 2;
 	if (r)
-		*r = (widget->priv.width + len) / 2;
+		*r = (width + len) / 2;
 	*end = '\0';
 }
 
@@ -183,13 +189,11 @@ reposition_children(GntWidget *widget)
 	if (priv->vertical) {
 		gint widgety;
 		gnt_widget_get_position(widget, NULL, &widgety);
-		widget->priv.width = max;
-		widget->priv.height = cury - widgety;
+		gnt_widget_set_internal_size(widget, max, cury - widgety);
 	} else {
 		gint widgetx;
 		gnt_widget_get_position(widget, &widgetx, NULL);
-		widget->priv.width = curx - widgetx;
-		widget->priv.height = max;
+		gnt_widget_set_internal_size(widget, curx - widgetx, max);
 	}
 }
 
@@ -264,8 +268,10 @@ gnt_box_size_request(GntWidget *widget)
 static void
 gnt_box_map(GntWidget *widget)
 {
-	if (widget->priv.width == 0 || widget->priv.height == 0)
-	{
+	gint width, height;
+
+	gnt_widget_get_internal_size(widget, &width, &height);
+	if (width == 0 || height == 0) {
 		gnt_widget_size_request(widget);
 		find_focusable_widget(GNT_BOX(widget));
 	}
@@ -443,6 +449,7 @@ gnt_box_confirm_size(GntWidget *widget, int width, int height)
 	GList *iter;
 	GntBox *box = GNT_BOX(widget);
 	GntBoxPrivate *priv = gnt_box_get_instance_private(box);
+	gint widget_width, widget_height;
 	int wchange, hchange;
 	GntWidget *child, *last;
 
@@ -450,8 +457,9 @@ gnt_box_confirm_size(GntWidget *widget, int width, int height)
 		return TRUE;
 	}
 
-	wchange = widget->priv.width - width;
-	hchange = widget->priv.height - height;
+	gnt_widget_get_internal_size(widget, &widget_width, &widget_height);
+	wchange = widget_width - width;
+	hchange = widget_height - height;
 
 	if (wchange == 0 && hchange == 0)
 		return TRUE;		/* Quit playing games with my size */
@@ -486,26 +494,30 @@ gnt_box_confirm_size(GntWidget *widget, int width, int height)
 	if (child) {
 		for (iter = priv->list; iter; iter = iter->next) {
 			GntWidget *wid = iter->data;
+			gint cw, ch;
 			int w, h;
 
 			if (wid == child)
 				continue;
 
 			gnt_widget_get_size(wid, &w, &h);
+			gnt_widget_get_internal_size(child, &cw, &ch);
 			if (priv->vertical) {
 				/* For a vertical box, if we are changing the width, make sure the widgets
 				 * in the box will fit after resizing the width. */
-				if (wchange > 0 &&
-						w >= child->priv.width &&
-						!gnt_widget_confirm_size(wid, w - wchange, h))
+				if (wchange > 0 && w >= cw &&
+				    !gnt_widget_confirm_size(wid, w - wchange,
+				                             h)) {
 					return FALSE;
+				}
 			} else {
 				/* If we are changing the height, make sure the widgets in the box fit after
 				 * the resize. */
-				if (hchange > 0 &&
-						h >= child->priv.height &&
-						!gnt_widget_confirm_size(wid, w, h - hchange))
+				if (hchange > 0 && h >= ch &&
+				    !gnt_widget_confirm_size(wid, w,
+				                             h - hchange)) {
 					return FALSE;
+				}
 			}
 		}
 	}
@@ -516,6 +528,7 @@ gnt_box_confirm_size(GntWidget *widget, int width, int height)
 static void
 gnt_box_size_changed(GntWidget *widget, int oldw, int oldh)
 {
+	gint widget_width, widget_height;
 	int wchange, hchange;
 	GList *i;
 	GntBox *box = GNT_BOX(widget);
@@ -523,8 +536,9 @@ gnt_box_size_changed(GntWidget *widget, int oldw, int oldh)
 	GntWidget *wid;
 	int tw, th;
 
-	wchange = widget->priv.width - oldw;
-	hchange = widget->priv.height - oldh;
+	gnt_widget_get_internal_size(widget, &widget_width, &widget_height);
+	wchange = widget_width - oldw;
+	hchange = widget_height - oldh;
 
 	wid = priv->size_queued;
 	if (wid) {
@@ -792,7 +806,7 @@ void gnt_box_sync_children(GntBox *box)
 	GntBoxPrivate *priv = NULL;
 	GntWidget *widget = NULL;
 	GList *iter;
-	gint widgetx, widgety;
+	gint widgetx, widgety, widgetwidth, widgetheight;
 	int pos;
 
 	g_return_if_fail(GNT_IS_BOX(box));
@@ -800,6 +814,7 @@ void gnt_box_sync_children(GntBox *box)
 
 	widget = GNT_WIDGET(box);
 	gnt_widget_get_position(widget, &widgetx, &widgety);
+	gnt_widget_get_internal_size(widget, &widgetwidth, &widgetheight);
 	pos = gnt_widget_get_has_border(widget) ? 1 : 0;
 
 	if (!priv->active) {
@@ -831,21 +846,23 @@ void gnt_box_sync_children(GntBox *box)
 		if (priv->vertical) {
 			x = pos;
 			if (priv->alignment == GNT_ALIGN_RIGHT) {
-				x += widget->priv.width - width;
+				x += widgetwidth - width;
 			} else if (priv->alignment == GNT_ALIGN_MID) {
-				x += (widget->priv.width - width)/2;
+				x += (widgetwidth - width) / 2;
 			}
-			if (x + width > widget->priv.width - pos)
-				x -= x + width - (widget->priv.width - pos);
+			if (x + width > widgetwidth - pos) {
+				x -= x + width - (widgetwidth - pos);
+			}
 		} else {
 			y = pos;
 			if (priv->alignment == GNT_ALIGN_BOTTOM) {
-				y += widget->priv.height - height;
+				y += widgetheight - height;
 			} else if (priv->alignment == GNT_ALIGN_MID) {
-				y += (widget->priv.height - height)/2;
+				y += (widgetheight - height) / 2;
 			}
-			if (y + height >= widget->priv.height - pos)
-				y = widget->priv.height - height - pos;
+			if (y + height >= widgetheight - pos) {
+				y = widgetheight - height - pos;
+			}
 		}
 
 		copywin(w->window, widget->window, 0, 0,
@@ -902,8 +919,7 @@ void gnt_box_remove_all(GntBox *box)
 	g_list_free(priv->focus);
 	priv->list = NULL;
 	priv->focus = NULL;
-	GNT_WIDGET(box)->priv.width = 0;
-	GNT_WIDGET(box)->priv.height = 0;
+	gnt_widget_set_internal_size(GNT_WIDGET(box), 0, 0);
 }
 
 void gnt_box_readjust(GntBox *box)
@@ -933,15 +949,13 @@ void gnt_box_readjust(GntBox *box)
 		else
 		{
 			gnt_widget_set_mapped(w, FALSE);
-			w->priv.width = 0;
-			w->priv.height = 0;
+			gnt_widget_set_internal_size(w, 0, 0);
 		}
 	}
 
 	wid = GNT_WIDGET(box);
 	gnt_widget_set_mapped(wid, FALSE);
-	wid->priv.width = 0;
-	wid->priv.height = 0;
+	gnt_widget_set_internal_size(wid, 0, 0);
 
 	if (gnt_widget_get_parent(wid) == NULL) {
 		g_list_free(priv->focus);
