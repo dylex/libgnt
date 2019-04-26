@@ -722,7 +722,7 @@ gnt_box_add_widget(GntBox *box, GntWidget *widget)
 	priv = gnt_box_get_instance_private(box);
 
 	priv->list = g_list_append(priv->list, widget);
-	widget->parent = GNT_WIDGET(box);
+	gnt_widget_set_parent(widget, GNT_WIDGET(box));
 }
 
 void
@@ -734,7 +734,7 @@ gnt_box_add_widget_in_front(GntBox *box, GntWidget *widget)
 	priv = gnt_box_get_instance_private(box);
 
 	priv->list = g_list_prepend(priv->list, widget);
-	widget->parent = GNT_WIDGET(box);
+	gnt_widget_set_parent(widget, GNT_WIDGET(box));
 }
 
 void

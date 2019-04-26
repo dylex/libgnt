@@ -187,6 +187,19 @@ void gnt_widget_expose(GntWidget *widget, int x, int y, int width, int height);
 void gnt_widget_hide(GntWidget *widget);
 
 /**
+ * gnt_widget_set_parent:
+ * @widget:  The widget.
+ * @parent:  The parent widget.
+ *
+ * Set the parent of a widget.
+ *
+ * This is generally only useful when implementing subclasses of #GntBox.
+ *
+ * Since: 3.0.0
+ */
+void gnt_widget_set_parent(GntWidget *widget, GntWidget *parent);
+
+/**
  * gnt_widget_get_parent:
  * @widget:  The widget.
  *
