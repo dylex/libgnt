@@ -389,6 +389,17 @@ move_back(GntBindable *bind, G_GNUC_UNUSED GList *params)
 	return TRUE;
 }
 
+static void
+scroll_to_fit(GntEntry *entry)
+{
+	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
+
+	while (gnt_util_onscreen_width(priv->scroll, priv->cursor) >=
+	       GNT_WIDGET(entry)->priv.width) {
+		priv->scroll = g_utf8_find_next_char(priv->scroll, NULL);
+	}
+}
+
 static gboolean
 move_forward(GntBindable *bind, G_GNUC_UNUSED GList *params)
 {
@@ -400,10 +411,7 @@ move_forward(GntBindable *bind, G_GNUC_UNUSED GList *params)
 	}
 
 	priv->cursor = g_utf8_find_next_char(priv->cursor, NULL);
-	while (gnt_util_onscreen_width(priv->scroll, priv->cursor) >=
-	       GNT_WIDGET(entry)->priv.width) {
-		priv->scroll = g_utf8_find_next_char(priv->scroll, NULL);
-	}
+	scroll_to_fit(entry);
 
 	update_kill_ring(priv, ENTRY_JAIL, NULL, 0);
 	entry_redraw(GNT_WIDGET(entry));
@@ -487,10 +495,7 @@ move_end(GntBindable *bind, G_GNUC_UNUSED GList *params)
 	priv->cursor = priv->end;
 
 	/* This should be better than this */
-	while (gnt_util_onscreen_width(priv->scroll, priv->cursor) >=
-	       GNT_WIDGET(entry)->priv.width) {
-		priv->scroll = g_utf8_find_next_char(priv->scroll, NULL);
-	}
+	scroll_to_fit(entry);
 
 	entry_redraw(GNT_WIDGET(entry));
 	update_kill_ring(priv, ENTRY_JAIL, NULL, 0);
@@ -815,10 +820,7 @@ move_forward_word(GntBindable *bind, G_GNUC_UNUSED GList *params)
 	GntEntryPrivate *priv = gnt_entry_get_instance_private(entry);
 	GntWidget *widget = GNT_WIDGET(bind);
 	priv->cursor = (char *)next_begin_word(priv->cursor, priv->end);
-	while (gnt_util_onscreen_width(priv->scroll, priv->cursor) >=
-	       widget->priv.width) {
-		priv->scroll = g_utf8_find_next_char(priv->scroll, NULL);
-	}
+	scroll_to_fit(entry);
 	update_kill_ring(priv, ENTRY_JAIL, NULL, 0);
 	entry_redraw(widget);
 	return TRUE;
@@ -972,12 +974,7 @@ gnt_entry_key_pressed(GntWidget *widget, const char *text)
 				str++;
 			}
 
-			while (gnt_util_onscreen_width(priv->scroll,
-			                               priv->cursor) >=
-			       widget->priv.width) {
-				priv->scroll = g_utf8_find_next_char(
-				        priv->scroll, NULL);
-			}
+			scroll_to_fit(entry);
 
 			if (priv->ddown) {
 				show_suggest_dropdown(entry);
