@@ -60,6 +60,7 @@
 #include "gntutils.h"
 #include "gntwindow.h"
 
+#include "gntmenuprivate.h"
 #include "gntwsprivate.h"
 
 #define IDLE_CHECK_INTERVAL 5 /* 5 seconds */
@@ -237,7 +238,7 @@ update_screen(GntWM *wm)
 			GntNode *node = g_hash_table_lookup(wm->nodes, top);
 			if (node)
 				top_panel(node->panel);
-			top = top->submenu;
+			top = gnt_menu_get_submenu(top);
 		}
 	}
 	work_around_for_ncurses_bug();

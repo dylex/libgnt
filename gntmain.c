@@ -50,6 +50,7 @@
 #include "gntwindow.h"
 #include "gntwm.h"
 
+#include "gntmenuprivate.h"
 #include "gntwsprivate.h"
 
 #include <panel.h>
@@ -497,7 +498,7 @@ ask_before_exit(void)
 		do {
 			gnt_widget_hide(GNT_WIDGET(wm->menu));
 			if (wm->menu)
-				wm->menu = wm->menu->parentmenu;
+				wm->menu = gnt_menu_get_parent_menu(wm->menu);
 		} while (wm->menu);
 	}
 
