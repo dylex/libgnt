@@ -182,10 +182,8 @@ gnt_bindable_rebinding_activate(GntBindable *data, gpointer bindable)
 }
 
 static void
-add_binding(gpointer key, gpointer value, gpointer data)
+add_binding(const gchar *key, GntBindableActionParam *act, BindingView *bv)
 {
-	BindingView *bv = data;
-	GntBindableActionParam *act = value;
 	const char *name = g_hash_table_lookup(bv->hash, act->action);
 	if (name && *name) {
 		const char *k = gnt_key_lookup(key);
@@ -197,9 +195,8 @@ add_binding(gpointer key, gpointer value, gpointer data)
 }
 
 static void
-add_action(gpointer key, gpointer value, gpointer data)
+add_action(gpointer key, gpointer value, BindingView *bv)
 {
-	BindingView *bv = data;
 	g_hash_table_insert(bv->hash, value, key);
 }
 
@@ -444,8 +441,8 @@ GntBindable * gnt_bindable_bindings_view(GntBindable *bind)
 	BindingView bv = {hash, GNT_TREE(tree)};
 
 	gnt_tree_set_compare_func(bv.tree, (GCompareFunc)g_utf8_collate);
-	g_hash_table_foreach(klass->actions, add_action, &bv);
-	g_hash_table_foreach(klass->bindings, add_binding, &bv);
+	g_hash_table_foreach(klass->actions, (GHFunc)add_action, &bv);
+	g_hash_table_foreach(klass->bindings, (GHFunc)add_binding, &bv);
 	if (gnt_tree_get_rows(GNT_TREE(tree)) == NULL) {
 		gnt_widget_destroy(GNT_WIDGET(tree));
 		tree = NULL;

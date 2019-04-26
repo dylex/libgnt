@@ -152,9 +152,8 @@ struct duplicate_fns
 };
 
 static void
-duplicate_values(gpointer key, gpointer value, gpointer data)
+duplicate_values(gpointer key, gpointer value, struct duplicate_fns *fns)
 {
-	struct duplicate_fns *fns = data;
 	g_hash_table_insert(fns->table, fns->key_dup ? fns->key_dup(key) : key,
 			fns->value_dup ? fns->value_dup(value) : value);
 }
@@ -165,7 +164,7 @@ GHashTable *gnt_hash_table_duplicate(GHashTable *src, GHashFunc hash,
 {
 	GHashTable *dest = g_hash_table_new_full(hash, equal, key_d, value_d);
 	struct duplicate_fns fns = {key_dup, value_dup, dest};
-	g_hash_table_foreach(src, duplicate_values, &fns);
+	g_hash_table_foreach(src, (GHFunc)duplicate_values, &fns);
 	return dest;
 }
 

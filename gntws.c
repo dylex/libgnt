@@ -42,9 +42,8 @@ G_DEFINE_TYPE_WITH_PRIVATE(GntWS, gnt_ws, GNT_TYPE_BINDABLE)
  * Helpers
  *****************************************************************************/
 static void
-widget_hide(gpointer data, gpointer nodes)
+widget_hide(GntWidget *widget, GHashTable *nodes)
 {
-	GntWidget *widget = GNT_WIDGET(data);
 	GntNode *node = g_hash_table_lookup(nodes, widget);
 	if (GNT_IS_WINDOW(widget))
 		gnt_window_workspace_hiding(GNT_WINDOW(widget));
@@ -193,7 +192,7 @@ gnt_ws_hide(GntWS *ws, GHashTable *nodes)
 	g_return_if_fail(GNT_IS_WS(ws));
 	priv = gnt_ws_get_instance_private(ws);
 
-	g_list_foreach(priv->ordered, widget_hide, nodes);
+	g_list_foreach(priv->ordered, (GFunc)widget_hide, nodes);
 }
 
 void gnt_ws_widget_hide(GntWidget *widget, GHashTable *nodes)

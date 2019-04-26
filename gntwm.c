@@ -1176,13 +1176,13 @@ toggle_clipboard(G_GNUC_UNUSED GntBindable *bindable,
 	return TRUE;
 }
 
-static void remove_tag(gpointer wid, gpointer wim)
+static void
+remove_tag(GntWidget *widget, GntWM *wm)
 {
-	GntWM *wm = GNT_WM(wim);
-	GntWidget *w = GNT_WIDGET(wid);
-	wm->tagged = g_list_remove(wm->tagged, w);
-	mvwhline(w->window, 0, 1, ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL), 3);
-	gnt_widget_draw(w);
+	wm->tagged = g_list_remove(wm->tagged, widget);
+	mvwhline(widget->window, 0, 1,
+	         ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL), 3);
+	gnt_widget_draw(widget);
 }
 
 static gboolean
@@ -1209,18 +1209,17 @@ tag_widget(GntBindable *b, G_GNUC_UNUSED GList *params)
 }
 
 static void
-widget_move_ws(gpointer wid, gpointer w)
+widget_move_ws(GntWidget *wid, GntWM *wm)
 {
-	GntWM *wm = GNT_WM(w);
-	gnt_wm_widget_move_workspace(wm, wm->cws, GNT_WIDGET(wid));
+	gnt_wm_widget_move_workspace(wm, wm->cws, wid);
 }
 
 static gboolean
 place_tagged(GntBindable *b, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(b);
-	g_list_foreach(wm->tagged, widget_move_ws, wm);
-	g_list_foreach(wm->tagged, remove_tag, wm);
+	g_list_foreach(wm->tagged, (GFunc)widget_move_ws, wm);
+	g_list_foreach(wm->tagged, (GFunc)remove_tag, wm);
 	g_list_free(wm->tagged);
 	wm->tagged = NULL;
 	return TRUE;
@@ -1387,11 +1386,11 @@ help_for_widget(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 }
 
 static void
-accumulate_windows(gpointer window, G_GNUC_UNUSED gpointer node, gpointer p)
+accumulate_windows(GntWidget *window, G_GNUC_UNUSED gpointer node, GList **p)
 {
-	GList *list = *(GList**)p;
+	GList *list = *p;
 	list = g_list_prepend(list, window);
-	*(GList**)p = list;
+	*p = list;
 }
 
 static void
@@ -1399,7 +1398,7 @@ gnt_wm_destroy(GObject *obj)
 {
 	GntWM *wm = GNT_WM(obj);
 	GList *list = NULL;
-	g_hash_table_foreach(wm->nodes, accumulate_windows, &list);
+	g_hash_table_foreach(wm->nodes, (GHFunc)accumulate_windows, &list);
 	g_list_free_full(list, (GDestroyNotify)gnt_widget_destroy);
 	g_hash_table_destroy(wm->nodes);
 	wm->nodes = NULL;
@@ -2089,9 +2088,8 @@ void gnt_wm_resize_window(GntWM *wm, GntWidget *widget, int width, int height)
 }
 
 static void
-write_gdi(gpointer key, gpointer value, gpointer data)
+write_gdi(gpointer key, GntPosition *p, gpointer data)
 {
-	GntPosition *p = value;
 	fprintf(data, ".%s = %d;%d\n", (char *)key, p->x, p->y);
 }
 
@@ -2109,7 +2107,7 @@ write_already(gpointer data)
 		gnt_warning("error opening file (%s) to save positions", filename);
 	} else {
 		fprintf(file, "[positions]\n");
-		g_hash_table_foreach(wm->positions, write_gdi, file);
+		g_hash_table_foreach(wm->positions, (GHFunc)write_gdi, file);
 		fclose(file);
 	}
 

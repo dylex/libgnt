@@ -185,9 +185,8 @@ typedef struct {
 } gntkey;
 
 static void
-get_key_name(gpointer key, gpointer value, gpointer data)
+get_key_name(gpointer key, const gchar *value, gntkey *k)
 {
-	gntkey *k = data;
 	if (k->name)
 		return;
 	if (g_utf8_collate(value, k->key) == 0)
@@ -197,7 +196,7 @@ get_key_name(gpointer key, gpointer value, gpointer data)
 const char *gnt_key_lookup(const char *key)
 {
 	gntkey k = {NULL, key};
-	g_hash_table_foreach(specials, get_key_name, &k);
+	g_hash_table_foreach(specials, (GHFunc)get_key_name, &k);
 	return k.name;
 }
 
