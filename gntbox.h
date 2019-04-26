@@ -105,20 +105,21 @@ G_BEGIN_DECLS
  */
 GType gnt_box_get_type(void);
 
-#define gnt_vbox_new(homo) gnt_box_new(homo, TRUE)
-#define gnt_hbox_new(homo) gnt_box_new(homo, FALSE)
+#define gnt_vbox_new(homogeneous) gnt_box_new(homogeneous, TRUE)
+#define gnt_hbox_new(homogeneous) gnt_box_new(homogeneous, FALSE)
 
 /**
  * gnt_box_new:
- * @homo:  If %TRUE, all the widgets in it will have the same width (or height)
- * @vert:  Whether the widgets in it should be stacked vertically (if %TRUE)
- *              or horizontally (if %FALSE).
+ * @homogeneous: If %TRUE, all the widgets in it will have the same width (or
+ *               height)
+ * @vert: Whether the widgets in it should be stacked vertically (if %TRUE) or
+ *        horizontally (if %FALSE).
  *
  * Create a new GntBox.
  *
  * Returns: The new GntBox.
  */
-GntWidget * gnt_box_new(gboolean homo, gboolean vert);
+GntWidget *gnt_box_new(gboolean homogeneous, gboolean vert);
 
 /**
  * gnt_box_get_children:
