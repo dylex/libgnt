@@ -117,7 +117,6 @@ gnt_combo_box_draw(GntWidget *widget)
 	(void)wmove(window, 1, 1);
 
 	g_free(text);
-	GNTDEBUG;
 }
 
 static void
@@ -331,8 +330,6 @@ gnt_combo_box_class_init(GntComboBoxClass *klass)
 	gnt_bindable_register_binding(bindable, "dropdown", GNT_KEY_UP, NULL);
 
 	gnt_style_read_actions(G_OBJECT_CLASS_TYPE(klass), bindable);
-
-	GNTDEBUG;
 }
 
 static void

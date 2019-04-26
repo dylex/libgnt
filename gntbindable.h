@@ -35,8 +35,6 @@
 
 #define GNT_TYPE_BINDABLE gnt_bindable_get_type()
 
-#define	GNTDEBUG
-
 typedef struct _GntBindable GntBindable;
 
 struct _GntBindableClass

@@ -41,7 +41,6 @@ G_DEFINE_TYPE(GntSkel, gnt_skel, GNT_TYPE_WIDGET)
 static void
 gnt_skel_draw(GntWidget *widget)
 {
-	GNTDEBUG;
 }
 
 static void
@@ -92,8 +91,6 @@ gnt_skel_class_init(GntSkelClass *klass)
 				(GDestroyNotify)gnt_widget_action_param_free);
 
 	gnt_widget_actions_read(G_OBJECT_CLASS_TYPE(klass), klass);
-
-	GNTDEBUG;
 }
 
 static void

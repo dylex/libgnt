@@ -1607,8 +1607,6 @@ gnt_wm_class_init(GntWMClass *klass)
 		str[1] = i;
 		gnt_keys_add_combination(str);
 	}
-
-	GNTDEBUG;
 }
 
 /******************************************************************************

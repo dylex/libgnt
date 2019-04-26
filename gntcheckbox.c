@@ -65,8 +65,6 @@ gnt_check_box_draw(GntWidget *widget)
 	wbkgdset(window, '\0' | gnt_color_pair(GNT_COLOR_NORMAL));
 	mvwaddstr(window, 0, 4, C_(gnt_button_get_text(GNT_BUTTON(cb))));
 	(void)wmove(window, 0, 1);
-
-	GNTDEBUG;
 }
 
 static void
@@ -118,7 +116,6 @@ gnt_check_box_class_init(GntCheckBoxClass *klass)
 					 G_STRUCT_OFFSET(GntCheckBoxClass, toggled),
 					 NULL, NULL, NULL,
 					 G_TYPE_NONE, 0);
-	GNTDEBUG;
 }
 
 static void

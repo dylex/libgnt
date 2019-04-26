@@ -281,7 +281,6 @@ gnt_box_map(GntWidget *widget)
 		gnt_widget_size_request(widget);
 		find_focusable_widget(GNT_BOX(widget));
 	}
-	GNTDEBUG;
 }
 
 /* Ensures that the current widget can take focus */

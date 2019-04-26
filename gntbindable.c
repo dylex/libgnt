@@ -241,8 +241,6 @@ gnt_bindable_base_init(GntBindableClass *klass)
 		klass->bindings = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
 					(GDestroyNotify)gnt_bindable_action_param_free);
 	}
-
-	GNTDEBUG;
 }
 
 static void

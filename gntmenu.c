@@ -130,8 +130,6 @@ gnt_menu_draw(GntWidget *widget)
 	} else {
 		org_draw(widget);
 	}
-
-	GNTDEBUG;
 }
 
 static void
@@ -252,7 +250,6 @@ gnt_menu_map(GntWidget *widget)
 		org_map(widget);
 		gnt_tree_adjust_columns(GNT_TREE(widget));
 	}
-	GNTDEBUG;
 }
 
 static void

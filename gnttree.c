@@ -687,8 +687,6 @@ gnt_tree_draw(GntWidget *widget)
 	GntTree *tree = GNT_TREE(widget);
 
 	redraw_tree(tree);
-
-	GNTDEBUG;
 }
 
 static void
@@ -1228,7 +1226,6 @@ gnt_tree_class_init(GntTreeClass *klass)
 			GNT_KEY_END, NULL);
 
 	gnt_style_read_actions(G_OBJECT_CLASS_TYPE(klass), bindable);
-	GNTDEBUG;
 }
 
 static void
