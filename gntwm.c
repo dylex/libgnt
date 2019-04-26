@@ -1785,8 +1785,7 @@ gnt_wm_new_window_real(GntWM *wm, GntWidget *widget)
 
 		if (!gnt_widget_has_shadow(widget))
 			shadow = FALSE;
-		x = widget->priv.x;
-		y = widget->priv.y;
+		gnt_widget_get_position(widget, &x, &y);
 		w = widget->priv.width + shadow;
 		h = widget->priv.height + shadow;
 
@@ -2154,8 +2153,7 @@ void gnt_wm_move_window(GntWM *wm, GntWidget *widget, int x, int y)
 		if (title) {
 			GntPosition *p = g_new0(GntPosition, 1);
 			GntWidget *wid = node->me;
-			p->x = wid->priv.x;
-			p->y = wid->priv.y;
+			gnt_widget_get_position(wid, &p->x, &p->y);
 			g_hash_table_replace(wm->positions, g_strdup(title), p);
 			write_positions_to_file(wm);
 		}

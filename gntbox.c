@@ -136,8 +136,7 @@ reposition_children(GntWidget *widget)
 
 	w = h = 0;
 	max = 0;
-	curx = widget->priv.x;
-	cury = widget->priv.y;
+	gnt_widget_get_position(widget, &curx, &cury);
 	if (gnt_widget_get_has_border(widget)) {
 		has_border = TRUE;
 		curx += 1;
@@ -182,10 +181,14 @@ reposition_children(GntWidget *widget)
 	}
 
 	if (priv->vertical) {
+		gint widgety;
+		gnt_widget_get_position(widget, NULL, &widgety);
 		widget->priv.width = max;
-		widget->priv.height = cury - widget->priv.y;
+		widget->priv.height = cury - widgety;
 	} else {
-		widget->priv.width = curx - widget->priv.x;
+		gint widgetx;
+		gnt_widget_get_position(widget, &widgetx, NULL);
+		widget->priv.width = curx - widgetx;
 		widget->priv.height = max;
 	}
 }
@@ -196,15 +199,18 @@ gnt_box_set_position(GntWidget *widget, int x, int y)
 	GntBox *box = GNT_BOX(widget);
 	GntBoxPrivate *priv = gnt_box_get_instance_private(box);
 	GList *iter;
-	int changex, changey;
+	gint widgetx, widgety;
+	gint changex, changey;
 
-	changex = widget->priv.x - x;
-	changey = widget->priv.y - y;
+	gnt_widget_get_position(widget, &widgetx, &widgety);
+	changex = widgetx - x;
+	changey = widgety - y;
 
 	for (iter = priv->list; iter; iter = iter->next) {
 		GntWidget *w = GNT_WIDGET(iter->data);
-		gnt_widget_set_position(w, w->priv.x - changex,
-				w->priv.y - changey);
+		gint wx, wy;
+		gnt_widget_get_position(w, &wx, &wy);
+		gnt_widget_set_position(w, wx - changex, wy - changey);
 	}
 }
 
@@ -421,7 +427,11 @@ gnt_box_destroy(GntWidget *w)
 static void
 gnt_box_expose(GntWidget *widget, int x, int y, int width, int height)
 {
-	WINDOW *win = newwin(height, width, widget->priv.y + y, widget->priv.x + x);
+	WINDOW *win;
+	gint widgetx, widgety;
+
+	gnt_widget_get_position(widget, &widgetx, &widgety);
+	win = newwin(height, width, widgety + y, widgetx + x);
 	copywin(widget->window, win, y, x, 0, 0, height - 1, width - 1, FALSE);
 	wrefresh(win);
 	delwin(win);
@@ -782,12 +792,14 @@ void gnt_box_sync_children(GntBox *box)
 	GntBoxPrivate *priv = NULL;
 	GntWidget *widget = NULL;
 	GList *iter;
+	gint widgetx, widgety;
 	int pos;
 
 	g_return_if_fail(GNT_IS_BOX(box));
 	priv = gnt_box_get_instance_private(box);
 
 	widget = GNT_WIDGET(box);
+	gnt_widget_get_position(widget, &widgetx, &widgety);
 	pos = gnt_widget_get_has_border(widget) ? 1 : 0;
 
 	if (!priv->active) {
@@ -797,7 +809,7 @@ void gnt_box_sync_children(GntBox *box)
 	for (iter = priv->list; iter; iter = iter->next) {
 		GntWidget *w = GNT_WIDGET(iter->data);
 		int height, width;
-		int x, y;
+		gint x, y;
 
 		if (G_UNLIKELY(w == NULL)) {
 			g_warn_if_reached();
@@ -812,8 +824,9 @@ void gnt_box_sync_children(GntBox *box)
 
 		gnt_widget_get_size(w, &width, &height);
 
-		x = w->priv.x - widget->priv.x;
-		y = w->priv.y - widget->priv.y;
+		gnt_widget_get_position(w, &x, &y);
+		x -= widgetx;
+		y -= widgety;
 
 		if (priv->vertical) {
 			x = pos;
@@ -837,7 +850,7 @@ void gnt_box_sync_children(GntBox *box)
 
 		copywin(w->window, widget->window, 0, 0,
 				y, x, y + height - 1, x + width - 1, FALSE);
-		gnt_widget_set_position(w, x + widget->priv.x, y + widget->priv.y);
+		gnt_widget_set_position(w, x + widgetx, y + widgety);
 		if (w == priv->active) {
 			wmove(widget->window, y + getcury(w->window), x + getcurx(w->window));
 		}

@@ -953,7 +953,7 @@ gnt_tree_destroy(GntWidget *widget)
 
 static gboolean
 gnt_tree_clicked(GntWidget *widget, GntMouseEvent event, G_GNUC_UNUSED int x,
-                 G_GNUC_UNUSED int y)
+                 int y)
 {
 	GntTree *tree = GNT_TREE(widget);
 	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
@@ -965,11 +965,13 @@ gnt_tree_clicked(GntWidget *widget, GntMouseEvent event, G_GNUC_UNUSED int x,
 		action_down(GNT_BINDABLE(widget), NULL);
 	} else if (event == GNT_LEFT_MOUSE_DOWN) {
 		GntTreeRow *row;
+		gint widgety;
 		int pos = gnt_widget_get_has_border(widget) ? 1 : 0;
 		if (priv->show_title) {
 			pos += 2;
 		}
-		pos = y - widget->priv.y - pos;
+		gnt_widget_get_position(widget, NULL, &widgety);
+		pos = y - widgety - pos;
 		row = get_next_n(priv->top, pos);
 		if (row && priv->current != row) {
 			GntTreeRow *old = priv->current;

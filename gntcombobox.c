@@ -135,16 +135,21 @@ popup_dropdown(GntComboBox *box)
 {
 	GntWidget *widget = GNT_WIDGET(box);
 	GntWidget *parent = gnt_widget_get_parent(box->dropdown);
-	int height = g_list_length(gnt_tree_get_rows(GNT_TREE(box->dropdown)));
-	int y = widget->priv.y + widget->priv.height - 1;
+	gint widgetx, widgety;
+	gint height;
+	gint y;
+
+	gnt_widget_get_position(widget, &widgetx, &widgety);
+	height = g_list_length(gnt_tree_get_rows(GNT_TREE(box->dropdown)));
+	y = widgety + widget->priv.height - 1;
 	gnt_widget_set_size(box->dropdown, widget->priv.width, height + 2);
 
 	if (y + height + 2 >= getmaxy(stdscr))
-		y = widget->priv.y - height - 1;
-	gnt_widget_set_position(parent, widget->priv.x, y);
+		y = widgety - height - 1;
+	gnt_widget_set_position(parent, widgetx, y);
 	if (parent->window)
 	{
-		mvwin(parent->window, y, widget->priv.x);
+		mvwin(parent->window, y, widgetx);
 		wresize(parent->window, height+2, widget->priv.width);
 	}
 	parent->priv.width = widget->priv.width;

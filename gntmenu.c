@@ -99,6 +99,10 @@ gnt_menu_draw(GntWidget *widget)
 	guint i;
 
 	if (menu->type == GNT_MENU_TOPLEVEL) {
+		gint x, y;
+
+		gnt_widget_get_position(widget, &x, &y);
+
 		wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_HIGHLIGHT));
 		werase(widget->window);
 
@@ -116,8 +120,8 @@ gnt_menu_draw(GntWidget *widget)
 			if (i == menu->selected)
 				type |= A_REVERSE;
 			gnt_menuitem_set_position(
-			        item, getcurx(widget->window) + widget->priv.x,
-			        getcury(widget->window) + widget->priv.y + 1);
+			        item, getcurx(widget->window) + x,
+			        getcury(widget->window) + y + 1);
 			wbkgdset(widget->window, type);
 			wprintw(widget->window, " %s   ",
 			        C_(gnt_menuitem_get_text(item)));
@@ -265,12 +269,11 @@ menuitem_activate(GntMenu *menu, GntMenuItem *item)
 			sub->parentmenu = menu;
 			if (menu->type != GNT_MENU_TOPLEVEL) {
 				GntWidget *widget = GNT_WIDGET(menu);
+				gnt_widget_get_position(widget, &x, &y);
 				gnt_menuitem_set_position(
-				        item,
-				        widget->priv.x + widget->priv.width - 1,
-				        widget->priv.y +
-				                gnt_tree_get_selection_visible_line(
-				                        GNT_TREE(menu)));
+				        item, x + widget->priv.width - 1,
+				        y + gnt_tree_get_selection_visible_line(
+				                    GNT_TREE(menu)));
 			}
 			gnt_menuitem_get_position(item, &x, &y);
 			gnt_widget_set_position(GNT_WIDGET(sub), x, y);
@@ -517,8 +520,7 @@ GntWidget *gnt_menu_new(GntMenuType type)
 	menu->type = type;
 
 	if (type == GNT_MENU_TOPLEVEL) {
-		widget->priv.x = 0;
-		widget->priv.y = 0;
+		gnt_widget_set_position(widget, 0, 0);
 	} else {
 		gnt_tree_set_show_separator(GNT_TREE(widget), FALSE);
 		g_object_set(G_OBJECT(widget), "columns", NUM_COLUMNS, NULL);

@@ -324,16 +324,22 @@ gnt_text_view_clicked(GntWidget *widget, GntMouseEvent event, int x, int y)
 	} else if (event == GNT_MOUSE_SCROLL_DOWN) {
 		gnt_text_view_scroll(GNT_TEXT_VIEW(widget), 1);
 	} else if (event == GNT_LEFT_MOUSE_DOWN) {
-		select_start = gnt_text_view_get_p(GNT_TEXT_VIEW(widget), x - widget->priv.x, y - widget->priv.y);
+		gint widgetx, widgety;
+		gnt_widget_get_position(widget, &widgetx, &widgety);
+		select_start = gnt_text_view_get_p(GNT_TEXT_VIEW(widget),
+		                                   x - widgetx, y - widgety);
 		g_timeout_add(500, too_slow, NULL);
 	} else if (event == GNT_MOUSE_UP) {
 		GntTextView *view = GNT_TEXT_VIEW(widget);
 		if (text_view_contains(view, select_start)) {
 			GString *clip;
+			gint widgetx, widgety;
 
 			g_return_val_if_fail(select_start != NULL, TRUE);
 
-			select_end = gnt_text_view_get_p(view, x - widget->priv.x, y - widget->priv.y);
+			gnt_widget_get_position(widget, &widgetx, &widgety);
+			select_end = gnt_text_view_get_p(view, x - widgetx,
+			                                 y - widgety);
 
 			g_return_val_if_fail(select_end != NULL, TRUE);
 

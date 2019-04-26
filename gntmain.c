@@ -180,11 +180,13 @@ detect_mouse_action(const char *buffer)
 	while ((p = panel_below(p)) != NULL) {
 		const GntNode *node = panel_userptr(p);
 		GntWidget *wid;
+		gint widx, widy;
 		if (!node)
 			continue;
 		wid = node->me;
-		if (x >= wid->priv.x && x < wid->priv.x + wid->priv.width) {
-			if (y >= wid->priv.y && y < wid->priv.y + wid->priv.height) {
+		gnt_widget_get_position(wid, &widx, &widy);
+		if (widx <= x && x < widx + wid->priv.width) {
+			if (widy <= y && y < widy + wid->priv.height) {
 				widget = wid;
 				break;
 			}
@@ -219,11 +221,13 @@ detect_mouse_action(const char *buffer)
 
 	if (event == GNT_LEFT_MOUSE_DOWN && widget &&
 	    widget != wm->_list.window && !gnt_widget_get_transient(widget)) {
+		gint widgetx, widgety;
 		if (!gnt_ws_is_top_widget(wm->cws, widget)) {
 			gnt_wm_raise_window(wm, widget);
 		}
-		if (y == widget->priv.y) {
-			offset = x - widget->priv.x;
+		gnt_widget_get_position(widget, &widgetx, &widgety);
+		if (y == widgety) {
+			offset = x - widgetx;
 			remember = widget;
 			button = MOUSE_LEFT;
 		}

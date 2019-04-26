@@ -122,6 +122,7 @@ gnt_bindable_rebinding_activate(GntBindable *data, gpointer bindable)
 	const char *widget_name = g_type_name(G_OBJECT_TYPE(bindable));
 	char *keys;
 	GntWidget *key_textview;
+	gint x;
 	GntWidget *label;
 	GntWidget *bind_button, *cancel_button;
 	GntWidget *button_box;
@@ -154,7 +155,8 @@ gnt_bindable_rebinding_activate(GntBindable *data, gpointer bindable)
 
 	tmp = g_strdup_printf("KEY: \"%s\"", keys);
 	key_textview = gnt_text_view_new();
-	gnt_widget_set_size(key_textview, key_textview->priv.x, 2);
+	gnt_widget_get_position(key_textview, &x, NULL);
+	gnt_widget_set_size(key_textview, x, 2);
 	gnt_text_view_append_text_with_flags(GNT_TEXT_VIEW(key_textview), tmp, GNT_TEXT_FLAG_NORMAL);
 	g_free(tmp);
 	gnt_widget_set_name(key_textview, "keystroke");
