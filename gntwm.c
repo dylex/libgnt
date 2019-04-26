@@ -1177,9 +1177,8 @@ toggle_clipboard(G_GNUC_UNUSED GntBindable *bindable,
 }
 
 static void
-remove_tag(GntWidget *widget, GntWM *wm)
+remove_tag(GntWidget *widget, G_GNUC_UNUSED gpointer data)
 {
-	wm->tagged = g_list_remove(wm->tagged, widget);
 	mvwhline(widget->window, 0, 1,
 	         ACS_HLINE | gnt_color_pair(GNT_COLOR_NORMAL), 3);
 	gnt_widget_draw(widget);
@@ -1190,13 +1189,16 @@ tag_widget(GntBindable *b, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(b);
 	GntWidget *widget;
+	GList *link;
 
 	if (gnt_ws_is_empty(wm->cws)) {
 		return FALSE;
 	}
 	widget = gnt_ws_get_top_widget(wm->cws);
 
-	if (g_list_find(wm->tagged, widget)) {
+	link = g_list_find(wm->tagged, widget);
+	if (link) {
+		wm->tagged = g_list_delete_link(wm->tagged, link);
 		remove_tag(widget, wm);
 		return TRUE;
 	}
@@ -1208,19 +1210,18 @@ tag_widget(GntBindable *b, G_GNUC_UNUSED GList *params)
 	return TRUE;
 }
 
-static void
-widget_move_ws(GntWidget *wid, GntWM *wm)
-{
-	gnt_wm_widget_move_workspace(wm, wm->cws, wid);
-}
-
 static gboolean
 place_tagged(GntBindable *b, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(b);
-	g_list_foreach(wm->tagged, (GFunc)widget_move_ws, wm);
-	g_list_foreach(wm->tagged, (GFunc)remove_tag, wm);
-	g_list_free(wm->tagged);
+	GList *iter;
+
+	for (iter = wm->tagged; iter; iter = g_list_delete_link(iter, iter)) {
+		GntWidget *widget = GNT_WIDGET(iter->data);
+		gnt_wm_widget_move_workspace(wm, wm->cws, widget);
+		remove_tag(widget, wm);
+	}
+
 	wm->tagged = NULL;
 	return TRUE;
 }
