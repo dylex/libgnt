@@ -28,6 +28,8 @@
 #include "gnttextview.h"
 #include "gntutils.h"
 
+#include "gntwidgetprivate.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -465,8 +467,7 @@ gnt_text_view_init(GntTextView *view)
 	gnt_widget_set_has_shadow(widget, FALSE);
 	gnt_widget_set_grow_x(widget, TRUE);
 	gnt_widget_set_grow_y(widget, TRUE);
-	widget->priv.minw = 5;
-	widget->priv.minh = 2;
+	gnt_widget_set_minimum_size(widget, 5, 2);
 	view->string = g_string_new(NULL);
 	view->list = g_list_append(view->list, line);
 

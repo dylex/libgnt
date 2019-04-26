@@ -28,6 +28,8 @@
 #include "gntstyle.h"
 #include "gntutils.h"
 
+#include "gntwidgetprivate.h"
+
 #include <string.h>
 
 struct _GntComboBox
@@ -334,9 +336,7 @@ gnt_combo_box_init(GntComboBox *combo)
 	gnt_box_set_pad(GNT_BOX(box), 0);
 	gnt_box_add_widget(GNT_BOX(box), combo->dropdown);
 
-	widget->priv.minw = 4;
-	widget->priv.minh = 3;
-	GNTDEBUG;
+	gnt_widget_set_minimum_size(widget, 4, 3);
 }
 
 /******************************************************************************

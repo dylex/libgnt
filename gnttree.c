@@ -25,6 +25,8 @@
 #include "gnttree.h"
 #include "gntutils.h"
 
+#include "gntwidgetprivate.h"
+
 #include <string.h>
 #include <ctype.h>
 
@@ -1223,9 +1225,7 @@ gnt_tree_init(GntTree *tree)
 	gnt_widget_set_grow_y(widget, TRUE);
 	gnt_widget_set_has_shadow(widget, FALSE);
 	gnt_widget_set_take_focus(widget, TRUE);
-	widget->priv.minw = 4;
-	widget->priv.minh = 1;
-	GNTDEBUG;
+	gnt_widget_set_minimum_size(widget, 4, 1);
 }
 
 /******************************************************************************
@@ -1985,12 +1985,14 @@ void gnt_tree_set_column_titles(GntTree *tree, ...)
 void gnt_tree_set_show_title(GntTree *tree, gboolean set)
 {
 	GntTreePrivate *priv = NULL;
+	gint minw;
 
 	g_return_if_fail(GNT_IS_TREE(tree));
 	priv = gnt_tree_get_instance_private(tree);
 
 	priv->show_title = set;
-	GNT_WIDGET(tree)->priv.minh = (set ? 6 : 4);
+	gnt_widget_get_minimum_size(GNT_WIDGET(tree), &minw, NULL);
+	gnt_widget_set_minimum_size(GNT_WIDGET(tree), minw, set ? 6 : 4);
 }
 
 void gnt_tree_set_compare_func(GntTree *tree, GCompareFunc func)

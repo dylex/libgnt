@@ -558,6 +558,28 @@ gnt_widget_set_size(GntWidget *widget, int width, int height)
 	return ret;
 }
 
+/* Internal. */
+void
+gnt_widget_get_minimum_size(GntWidget *widget, gint *width, gint *height)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+	if (width) {
+		*width = widget->priv.minw;
+	}
+	if (height) {
+		*height = widget->priv.minh;
+	}
+}
+
+/* Internal. */
+void
+gnt_widget_set_minimum_size(GntWidget *widget, gint width, gint height)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+	widget->priv.minw = width;
+	widget->priv.minh = height;
+}
+
 gboolean
 gnt_widget_set_focus(GntWidget *widget, gboolean set)
 {

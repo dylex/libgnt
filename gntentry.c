@@ -30,6 +30,8 @@
 #include "gnttree.h"
 #include "gntutils.h"
 
+#include "gntwidgetprivate.h"
+
 enum
 {
 	SIG_TEXT_CHANGED,
@@ -1170,10 +1172,7 @@ gnt_entry_init(GntEntry *entry)
 	gnt_widget_set_take_focus(widget, TRUE);
 	gnt_widget_set_grow_x(widget, TRUE);
 
-	widget->priv.minw = 3;
-	widget->priv.minh = 1;
-
-	GNTDEBUG;
+	gnt_widget_set_minimum_size(widget, 3, 1);
 }
 
 /******************************************************************************

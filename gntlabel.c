@@ -24,6 +24,8 @@
 #include "gntlabel.h"
 #include "gntutils.h"
 
+#include "gntwidgetprivate.h"
+
 #include <string.h>
 
 struct _GntLabel
@@ -157,9 +159,7 @@ gnt_label_init(GntLabel *label)
 	gnt_widget_set_has_border(widget, FALSE);
 	gnt_widget_set_has_shadow(widget, FALSE);
 	gnt_widget_set_grow_x(widget, TRUE);
-	widget->priv.minw = 3;
-	widget->priv.minh = 1;
-	GNTDEBUG;
+	gnt_widget_set_minimum_size(widget, 3, 1);
 }
 
 /******************************************************************************

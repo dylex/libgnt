@@ -24,6 +24,8 @@
 #include "gntprogressbar.h"
 #include "gntutils.h"
 
+#include "gntwidgetprivate.h"
+
 #include <string.h>
 
 typedef struct _GntProgressBarPrivate
@@ -109,7 +111,9 @@ gnt_progress_bar_draw (GntWidget *widget)
 static void
 gnt_progress_bar_size_request (GntWidget *widget)
 {
-	gnt_widget_set_size (widget, widget->priv.minw, widget->priv.minh);
+	gint width, height;
+	gnt_widget_get_minimum_size(widget, &width, &height);
+	gnt_widget_set_size(widget, width, height);
 }
 
 static void
@@ -133,8 +137,7 @@ gnt_progress_bar_init (GntProgressBar *progress_bar)
 	gnt_widget_set_has_shadow(widget, FALSE);
 	gnt_widget_set_grow_x(widget, TRUE);
 
-	widget->priv.minw = 8;
-	widget->priv.minh = 1;
+	gnt_widget_set_minimum_size(widget, 8, 1);
 
 	priv->show_value = TRUE;
 }
@@ -177,13 +180,11 @@ gnt_progress_bar_set_orientation (GntProgressBar *pbar,
 			orientation == GNT_PROGRESS_RIGHT_TO_LEFT) {
 		gnt_widget_set_grow_x(widget, TRUE);
 		gnt_widget_set_grow_y(widget, FALSE);
-		widget->priv.minw = 8;
-		widget->priv.minh = 1;
+		gnt_widget_set_minimum_size(widget, 8, 1);
 	} else {
 		gnt_widget_set_grow_x(widget, FALSE);
 		gnt_widget_set_grow_y(widget, TRUE);
-		widget->priv.minw = 1;
-		widget->priv.minh = 8;
+		gnt_widget_set_minimum_size(widget, 1, 8);
 	}
 
 	if (gnt_widget_get_mapped(widget)) {

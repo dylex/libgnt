@@ -26,6 +26,8 @@
 #include "gntslider.h"
 #include "gntstyle.h"
 
+#include "gntwidgetprivate.h"
+
 typedef struct
 {
 	gboolean vertical;
@@ -250,9 +252,7 @@ gnt_slider_init(GntSlider *slider)
 	gnt_widget_set_has_shadow(widget, FALSE);
 	gnt_widget_set_has_border(widget, FALSE);
 	gnt_widget_set_take_focus(widget, TRUE);
-	widget->priv.minw = 1;
-	widget->priv.minh = 1;
-	GNTDEBUG;
+	gnt_widget_set_minimum_size(widget, 1, 1);
 }
 
 /******************************************************************************

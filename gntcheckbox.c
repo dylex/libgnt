@@ -23,6 +23,8 @@
 #include "gntinternal.h"
 #include "gntcheckbox.h"
 
+#include "gntwidgetprivate.h"
+
 typedef struct
 {
 	gboolean checked;
@@ -123,8 +125,7 @@ static void
 gnt_check_box_init(GntCheckBox *box)
 {
 	GntWidget *widget = GNT_WIDGET(box);
-	widget->priv.minh = 1;
-	widget->priv.minw = 4;
+	gnt_widget_set_minimum_size(widget, 4, 1);
 	gnt_widget_set_has_border(widget, FALSE);
 	gnt_widget_set_has_shadow(widget, FALSE);
 }

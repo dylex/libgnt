@@ -28,6 +28,8 @@
 #include "gntstyle.h"
 #include "gntutils.h"
 
+#include "gntwidgetprivate.h"
+
 typedef struct
 {
 	gchar *text;
@@ -142,8 +144,7 @@ gnt_button_init(GntButton *button)
 {
 	GntWidget *widget = GNT_WIDGET(button);
 
-	widget->priv.minw = 4;
-	widget->priv.minh = small_button ? 1 : 3;
+	gnt_widget_set_minimum_size(widget, 4, small_button ? 1 : 3);
 	if (small_button) {
 		gnt_widget_set_has_border(widget, FALSE);
 		gnt_widget_set_has_shadow(widget, FALSE);

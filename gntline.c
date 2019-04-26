@@ -23,6 +23,8 @@
 #include "gntinternal.h"
 #include "gntline.h"
 
+#include "gntwidgetprivate.h"
+
 struct _GntLine
 {
 	GntWidget parent;
@@ -139,9 +141,7 @@ gnt_line_init(GntLine *line)
 	GntWidget *widget = GNT_WIDGET(line);
 	gnt_widget_set_has_shadow(widget, FALSE);
 	gnt_widget_set_has_border(widget, FALSE);
-	widget->priv.minw = 1;
-	widget->priv.minh = 1;
-	GNTDEBUG;
+	gnt_widget_set_minimum_size(widget, 1, 1);
 }
 
 /******************************************************************************
