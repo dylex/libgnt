@@ -30,7 +30,6 @@ G_BEGIN_DECLS
 
 /* Private access to some internals. Contact us if you need these. */
 GntWidget *gnt_box_get_active(GntBox *box);
-const gchar *gnt_box_get_title(GntBox *box);
 
 G_END_DECLS
 

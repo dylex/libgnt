@@ -43,7 +43,6 @@
 #include "gntwindow.h"
 #include "gntlabel.h"
 
-#include "gntboxprivate.h"
 #include "gntwsprivate.h"
 
 #define GNT_TYPE_IRSSI_WM gnt_irssi_wm_get_type()

@@ -128,6 +128,18 @@ void gnt_box_add_widget_in_front(GntBox *box, GntWidget *widget);
 void gnt_box_set_title(GntBox *box, const char *title);
 
 /**
+ * gnt_box_get_title:
+ * @box: The box
+ *
+ * Get the title for a box.
+ *
+ * Returns: The title of the box
+ *
+ * Since: 3.0.0
+ */
+const gchar *gnt_box_get_title(GntBox *box);
+
+/**
  * gnt_box_set_pad:
  * @box: The box
  * @pad: The padding to use

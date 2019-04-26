@@ -29,8 +29,6 @@
 #include "gntwm.h"
 #include "gntws.h"
 
-#include "gntboxprivate.h"
-
 typedef struct
 {
 	gchar *name;
