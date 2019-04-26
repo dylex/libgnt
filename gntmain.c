@@ -533,6 +533,21 @@ static void (*org_winch_handler)(int);
 static void (*org_winch_handler_sa)(int, siginfo_t *, void *);
 #endif
 
+#ifdef _WIN32
+static BOOL WINAPI
+CtrlHandler(DWORD fdwCtrlType)
+{
+	switch (fdwCtrlType) {
+	case CTRL_C_EVENT:
+	case CTRL_CLOSE_EVENT:
+		ask_before_exit();
+		return TRUE;
+
+	default:
+		return FALSE;
+	}
+}
+#else
 static void
 sighandler(int sig, siginfo_t *info, void *data)
 {
@@ -557,6 +572,7 @@ sighandler(int sig, siginfo_t *info, void *data)
 		break;
 	}
 }
+#endif
 
 static void
 init_wm(void)
@@ -581,9 +597,11 @@ void gnt_init()
 {
 	char *filename;
 	const char *locale;
+#ifndef _WIN32
 	struct sigaction act;
 #ifdef SIGWINCH
 	struct sigaction oact;
+#endif
 #endif
 
 	if (channel)
@@ -636,6 +654,9 @@ void gnt_init()
 	werase(stdscr);
 	wrefresh(stdscr);
 
+#ifdef _WIN32
+	SetConsoleCtrlHandler(CtrlHandler, TRUE);
+#else
 	act.sa_sigaction = sighandler;
 	sigemptyset(&act.sa_mask);
 	act.sa_flags = SA_SIGINFO;
@@ -656,6 +677,7 @@ void gnt_init()
 	sigaction(SIGCHLD, &act, NULL);
 	sigaction(SIGINT, &act, NULL);
 	signal(SIGPIPE, SIG_IGN);
+#endif
 
 	init_wm();
 	refresh_screen();
