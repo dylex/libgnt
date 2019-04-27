@@ -1732,12 +1732,11 @@ update_window_in_list(GntWM *wm, GntWidget *wid)
 }
 
 static gboolean
-match_title(gpointer title, G_GNUC_UNUSED gpointer n, gpointer wid_title)
+match_title(const gchar *title, G_GNUC_UNUSED gpointer n,
+            const gchar *wid_title)
 {
 	/* XXX: do any regex magic here. */
-	if (g_strrstr((gchar *)wid_title, (gchar *)title))
-		return TRUE;
-	return FALSE;
+	return g_strrstr(wid_title, title) != NULL;
 }
 
 static GntWS *
@@ -1746,13 +1745,17 @@ new_widget_find_workspace(GntWM *wm, GntWidget *widget)
 	GntWS *ret = NULL;
 	const gchar *name, *title;
 	title = gnt_box_get_title(GNT_BOX(widget));
-	if (title)
-		ret = g_hash_table_find(wm->title_places, match_title, (gpointer)title);
+	if (title) {
+		ret = g_hash_table_find(wm->title_places, (GHRFunc)match_title,
+		                        (gpointer)title);
+	}
 	if (ret)
 		return ret;
 	name = gnt_widget_get_name(widget);
-	if (name)
-		ret = g_hash_table_find(wm->name_places, match_title, (gpointer)name);
+	if (name) {
+		ret = g_hash_table_find(wm->name_places, (GHRFunc)match_title,
+		                        (gpointer)name);
+	}
 	return ret ? ret : wm->cws;
 }
 
