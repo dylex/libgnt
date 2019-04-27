@@ -89,6 +89,12 @@ get_title_thingies(GntBox *box, char *title, int *p, int *r)
 }
 
 static void
+draw_a_widget(GntWidget *widget, G_GNUC_UNUSED gpointer data)
+{
+	gnt_widget_draw(widget);
+}
+
+static void
 gnt_box_draw(GntWidget *widget)
 {
 	GntBox *box = GNT_BOX(widget);
@@ -98,7 +104,7 @@ gnt_box_draw(GntWidget *widget)
 		g_list_foreach(priv->list, (GFunc)add_to_focus, box);
 	}
 
-	g_list_foreach(priv->list, (GFunc)gnt_widget_draw, NULL);
+	g_list_foreach(priv->list, (GFunc)draw_a_widget, NULL);
 
 	if (priv->title && gnt_widget_get_has_border(widget)) {
 		int pos, right;
@@ -210,11 +216,11 @@ gnt_box_size_request(GntWidget *widget)
 	GList *iter;
 	int maxw = 0, maxh = 0;
 
-	g_list_foreach(priv->list, (GFunc)gnt_widget_size_request, NULL);
-
 	for (iter = priv->list; iter; iter = iter->next) {
+		GntWidget *widget = GNT_WIDGET(iter->data);
 		int w, h;
-		gnt_widget_get_size(GNT_WIDGET(iter->data), &w, &h);
+		gnt_widget_size_request(widget);
+		gnt_widget_get_size(widget, &w, &h);
 		if (maxh < h)
 			maxh = h;
 		if (maxw < w)
