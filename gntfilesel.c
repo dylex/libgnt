@@ -193,7 +193,7 @@ local_read_fn(const char *path, GList **files, GError **error)
 
 	while ((str = g_dir_read_name(dir)) != NULL) {
 		char *fp = g_build_filename(path, str, NULL);
-		struct stat st;
+		GStatBuf st;
 
 		if (g_stat(fp, &st)) {
 			gnt_warning("Error stating location %s", fp);
