@@ -112,8 +112,6 @@ struct _GntWM
 	GntWS *GNTSEAL(cws);
 
 	GntListWindow GNTSEAL(_list);
-	GntListWindow *GNTSEAL(windows);         /* Window-list window */
-	GntListWindow *GNTSEAL(actions);         /* Action-list window */
 
 	GHashTable *GNTSEAL(nodes);    /* GntWidget -> GntNode */
 	GHashTable *GNTSEAL(name_places);    /* window name -> ws*/
