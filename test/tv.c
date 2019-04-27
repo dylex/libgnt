@@ -26,20 +26,19 @@ key_pressed(GntWidget *w, const char *key, GntWidget *view)
 		gnt_entry_remove_suggest(GNT_ENTRY(w), "acb");
 
 		return TRUE;
-	}
-    else if (strcmp(key, "\033" "e") == 0)
-    {
-        if (fork() == 0) {
-            endwin();
-            printf("%s\n", GNT_TEXT_VIEW(view)->string->str);
-            fflush(stdout);
-            getch();
-            refresh();
-            exit(0);
-        }
-    }
-	else if (key[0] == 27)
-	{
+
+	} else if (strcmp(key, "\033e") == 0) {
+		if (fork() == 0) {
+			endwin();
+			printf("%s\n",
+			       gnt_text_view_get_text(GNT_TEXT_VIEW(view)));
+			fflush(stdout);
+			getch();
+			refresh();
+			exit(0);
+		}
+
+	} else if (key[0] == 27) {
 		if (strcmp(key, GNT_KEY_UP) == 0)
 			gnt_text_view_scroll(GNT_TEXT_VIEW(view), -1);
 		else if (strcmp(key, GNT_KEY_DOWN) == 0)
@@ -55,8 +54,9 @@ key_pressed(GntWidget *w, const char *key, GntWidget *view)
 static void
 completion_cb(GntEntry *entry, const char *start, G_GNUC_UNUSED const char *end)
 {
-	if (start == entry->start)
+	if (start == gnt_entry_get_text(entry)) {
 		gnt_widget_key_pressed(GNT_WIDGET(entry), ": ");
+	}
 }
 
 int

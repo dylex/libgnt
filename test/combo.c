@@ -22,8 +22,10 @@ button_activated(GntWidget *b, GntComboBox *combo)
 static void
 update_label(GntSlider *slider, int current_value, GntEntry *entry)
 {
+	gint min, max;
 	char value[256];
-	g_snprintf(value, sizeof(value), "%d/%d", current_value, slider->max);
+	gnt_slider_get_range(slider, &max, &min);
+	g_snprintf(value, sizeof(value), "%d/%d", current_value, max);
 	/*gnt_label_set_text(label, value);*/
 	/*gnt_widget_draw(GNT_WIDGET(label));*/
 	gnt_entry_set_text(entry, value);
