@@ -109,7 +109,6 @@ struct _GntWM
 	/*< public >*/
 	GMainLoop *GNTSEAL(loop);
 
-	GList *GNTSEAL(tagged); /* tagged windows */
 	GntWS *GNTSEAL(cws);
 
 	GntListWindow GNTSEAL(_list);

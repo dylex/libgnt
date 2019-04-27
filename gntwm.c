@@ -70,6 +70,7 @@
 typedef struct
 {
 	GList *workspaces;
+	GList *tagged; /* tagged windows */
 } GntWMPrivate;
 
 enum
@@ -404,7 +405,6 @@ gnt_wm_init(GntWM *wm)
 		wm->cws = priv->workspaces->data;
 	}
 	wm->event_stack = FALSE;
-	wm->tagged = NULL;
 	wm->windows = NULL;
 	wm->actions = NULL;
 	wm->nodes = g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL, free_node);
@@ -1203,6 +1203,7 @@ static gboolean
 tag_widget(GntBindable *b, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(b);
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GntWidget *widget;
 	GList *link;
 
@@ -1211,14 +1212,14 @@ tag_widget(GntBindable *b, G_GNUC_UNUSED GList *params)
 	}
 	widget = gnt_ws_get_top_widget(wm->cws);
 
-	link = g_list_find(wm->tagged, widget);
+	link = g_list_find(priv->tagged, widget);
 	if (link) {
-		wm->tagged = g_list_delete_link(wm->tagged, link);
+		priv->tagged = g_list_delete_link(priv->tagged, link);
 		remove_tag(widget, wm);
 		return TRUE;
 	}
 
-	wm->tagged = g_list_prepend(wm->tagged, widget);
+	priv->tagged = g_list_prepend(priv->tagged, widget);
 	wbkgdset(gnt_widget_get_window(widget),
 	         ' ' | gnt_color_pair(GNT_COLOR_HIGHLIGHT));
 	mvwprintw(gnt_widget_get_window(widget), 0, 1, "[T]");
@@ -1230,15 +1231,16 @@ static gboolean
 place_tagged(GntBindable *b, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(b);
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GList *iter;
 
-	for (iter = wm->tagged; iter; iter = g_list_delete_link(iter, iter)) {
+	for (iter = priv->tagged; iter; iter = g_list_delete_link(iter, iter)) {
 		GntWidget *widget = GNT_WIDGET(iter->data);
 		gnt_wm_widget_move_workspace(wm, wm->cws, widget);
 		remove_tag(widget, wm);
 	}
 
-	wm->tagged = NULL;
+	priv->tagged = NULL;
 	return TRUE;
 }
 
