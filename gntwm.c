@@ -67,6 +67,15 @@
 
 #define IDLE_CHECK_INTERVAL 5 /* 5 seconds */
 
+typedef struct
+{
+	GList *workspaces;
+	GList *tagged; /* tagged windows */
+
+	GntListWindow *windows; /* Window-list window */
+	GntListWindow *actions; /* Action-list window */
+} GntWMPrivate;
+
 enum
 {
 	SIG_NEW_WIN,
@@ -109,7 +118,7 @@ static gboolean ignore_keys = FALSE;
 static gboolean started_python = FALSE;
 #endif
 
-G_DEFINE_TYPE(GntWM, gnt_wm, GNT_TYPE_BINDABLE)
+G_DEFINE_TYPE_WITH_PRIVATE(GntWM, gnt_wm, GNT_TYPE_BINDABLE)
 
 static void
 free_node(gpointer data)
@@ -387,20 +396,18 @@ check_idle(G_GNUC_UNUSED gpointer n)
 static void
 gnt_wm_init(GntWM *wm)
 {
-	wm->workspaces = NULL;
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
+
 	wm->name_places = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
 	wm->title_places = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
 	gnt_style_read_workspaces(wm);
-	if (wm->workspaces == NULL) {
+	if (priv->workspaces == NULL) {
 		wm->cws = gnt_ws_new("default");
 		gnt_wm_add_workspace(wm, wm->cws);
 	} else {
-		wm->cws = wm->workspaces->data;
+		wm->cws = priv->workspaces->data;
 	}
 	wm->event_stack = FALSE;
-	wm->tagged = NULL;
-	wm->windows = NULL;
-	wm->actions = NULL;
 	wm->nodes = g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL, free_node);
 	wm->positions = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
 	if (gnt_style_get_bool(GNT_STYLE_REMPOS, TRUE))
@@ -558,10 +565,11 @@ window_close(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 static void
 destroy__list(G_GNUC_UNUSED GntWidget *widget, GntWM *wm)
 {
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	wm->_list.window = NULL;
 	wm->_list.tree = NULL;
-	wm->windows = NULL;
-	wm->actions = NULL;
+	priv->windows = NULL;
+	priv->actions = NULL;
 	update_screen(wm);
 }
 
@@ -584,6 +592,7 @@ setup__list(GntWM *wm)
 static void
 window_list_activate(GntTree *tree, GntWM *wm)
 {
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GntBindable *sel = gnt_tree_get_selection_data(GNT_TREE(tree));
 
 	gnt_widget_destroy(wm->_list.window);
@@ -592,7 +601,8 @@ window_list_activate(GntTree *tree, GntWM *wm)
 		return;
 
 	if (GNT_IS_WS(sel)) {
-		gnt_wm_switch_workspace(wm, g_list_index(wm->workspaces, sel));
+		gnt_wm_switch_workspace(wm,
+		                        g_list_index(priv->workspaces, sel));
 	} else {
 		gnt_wm_raise_window(wm, GNT_WIDGET(sel));
 	}
@@ -601,8 +611,9 @@ window_list_activate(GntTree *tree, GntWM *wm)
 static void
 populate_window_list(GntWM *wm, gboolean workspace)
 {
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GList *iter;
-	GntTree *tree = GNT_TREE(wm->windows->tree);
+	GntTree *tree = GNT_TREE(priv->windows->tree);
 	if (!workspace) {
 		for (iter = gnt_ws_get_list(wm->cws); iter; iter = iter->next) {
 			GntBox *box = GNT_BOX(iter->data);
@@ -615,7 +626,7 @@ populate_window_list(GntWM *wm, gboolean workspace)
 			update_window_in_list(wm, GNT_WIDGET(box));
 		}
 	} else {
-		GList *ws = wm->workspaces;
+		GList *ws = priv->workspaces;
 		for (; ws; ws = ws->next) {
 			gnt_tree_add_row_last(tree, ws->data,
 					gnt_tree_create_row(tree, gnt_ws_get_name(GNT_WS(ws->data))), NULL);
@@ -668,12 +679,13 @@ window_list_key_pressed(GntWidget *widget, const char *text, GntWM *wm)
 static void
 list_of_windows(GntWM *wm, gboolean workspace)
 {
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GntWidget *tree, *win;
 	setup__list(wm);
-	wm->windows = &wm->_list;
+	priv->windows = &wm->_list;
 
-	win = wm->windows->window;
-	tree = wm->windows->tree;
+	win = priv->windows->window;
+	tree = priv->windows->tree;
 
 	gnt_box_set_title(GNT_BOX(win), workspace ? "Workspace List" : "Window List");
 
@@ -967,6 +979,7 @@ list_actions(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 	GntWidget *tree, *win;
 	GList *iter;
 	GntWM *wm = GNT_WM(bindable);
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	int n;
 	if (wm->_list.window || wm->menu)
 		return TRUE;
@@ -975,10 +988,10 @@ list_actions(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 		return TRUE;
 
 	setup__list(wm);
-	wm->actions = &wm->_list;
+	priv->actions = &wm->_list;
 
-	win = wm->actions->window;
-	tree = wm->actions->tree;
+	win = priv->actions->window;
+	tree = priv->actions->tree;
 
 	gnt_box_set_title(GNT_BOX(win), "Actions");
 	gnt_widget_set_has_border(tree, FALSE);
@@ -1194,6 +1207,7 @@ static gboolean
 tag_widget(GntBindable *b, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(b);
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GntWidget *widget;
 	GList *link;
 
@@ -1202,14 +1216,14 @@ tag_widget(GntBindable *b, G_GNUC_UNUSED GList *params)
 	}
 	widget = gnt_ws_get_top_widget(wm->cws);
 
-	link = g_list_find(wm->tagged, widget);
+	link = g_list_find(priv->tagged, widget);
 	if (link) {
-		wm->tagged = g_list_delete_link(wm->tagged, link);
+		priv->tagged = g_list_delete_link(priv->tagged, link);
 		remove_tag(widget, wm);
 		return TRUE;
 	}
 
-	wm->tagged = g_list_prepend(wm->tagged, widget);
+	priv->tagged = g_list_prepend(priv->tagged, widget);
 	wbkgdset(gnt_widget_get_window(widget),
 	         ' ' | gnt_color_pair(GNT_COLOR_HIGHLIGHT));
 	mvwprintw(gnt_widget_get_window(widget), 0, 1, "[T]");
@@ -1221,15 +1235,16 @@ static gboolean
 place_tagged(GntBindable *b, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(b);
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GList *iter;
 
-	for (iter = wm->tagged; iter; iter = g_list_delete_link(iter, iter)) {
+	for (iter = priv->tagged; iter; iter = g_list_delete_link(iter, iter)) {
 		GntWidget *widget = GNT_WIDGET(iter->data);
 		gnt_wm_widget_move_workspace(wm, wm->cws, widget);
 		remove_tag(widget, wm);
 	}
 
-	wm->tagged = NULL;
+	priv->tagged = NULL;
 	return TRUE;
 }
 
@@ -1250,9 +1265,10 @@ static gboolean
 workspace_new(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GntWS *ws = gnt_ws_new(NULL);
 	gnt_wm_add_workspace(wm, ws);
-	gnt_wm_switch_workspace(wm, g_list_index(wm->workspaces, ws));
+	gnt_wm_switch_workspace(wm, g_list_index(priv->workspaces, ws));
 	return TRUE;
 }
 
@@ -1405,14 +1421,17 @@ static void
 gnt_wm_destroy(GObject *obj)
 {
 	GntWM *wm = GNT_WM(obj);
-	GList *list = NULL;
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
+	GList *list;
+
+	list = NULL;
 	g_hash_table_foreach(wm->nodes, (GHFunc)accumulate_windows, &list);
 	g_list_free_full(list, (GDestroyNotify)gnt_widget_destroy);
 	g_hash_table_destroy(wm->nodes);
 	wm->nodes = NULL;
 
-	g_list_free_full(wm->workspaces, g_object_unref);
-	wm->workspaces = NULL;
+	g_list_free_full(priv->workspaces, g_object_unref);
+	priv->workspaces = NULL;
 
 #ifdef USE_PYTHON
 	if (started_python) {
@@ -1615,13 +1634,25 @@ gnt_wm_class_init(GntWMClass *klass)
 void
 gnt_wm_add_workspace(GntWM *wm, GntWS *ws)
 {
-	wm->workspaces = g_list_append(wm->workspaces, ws);
+	GntWMPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WM(wm));
+	g_return_if_fail(GNT_IS_WS(ws));
+
+	priv = gnt_wm_get_instance_private(wm);
+	priv->workspaces = g_list_append(priv->workspaces, ws);
 }
 
 gboolean
 gnt_wm_switch_workspace(GntWM *wm, gint n)
 {
-	GntWS *s = g_list_nth_data(wm->workspaces, n);
+	GntWMPrivate *priv = NULL;
+	GntWS *s;
+
+	g_return_val_if_fail(GNT_IS_WM(wm), FALSE);
+	priv = gnt_wm_get_instance_private(wm);
+
+	s = g_list_nth_data(priv->workspaces, n);
 	if (!s)
 		return FALSE;
 
@@ -1649,14 +1680,26 @@ gnt_wm_switch_workspace(GntWM *wm, gint n)
 gboolean
 gnt_wm_switch_workspace_prev(GntWM *wm)
 {
-	int n = g_list_index(wm->workspaces, wm->cws);
+	GntWMPrivate *priv = NULL;
+	gint n;
+
+	g_return_val_if_fail(GNT_IS_WM(wm), FALSE);
+	priv = gnt_wm_get_instance_private(wm);
+
+	n = g_list_index(priv->workspaces, wm->cws);
 	return gnt_wm_switch_workspace(wm, --n);
 }
 
 gboolean
 gnt_wm_switch_workspace_next(GntWM *wm)
 {
-	int n = g_list_index(wm->workspaces, wm->cws);
+	GntWMPrivate *priv = NULL;
+	gint n;
+
+	g_return_val_if_fail(GNT_IS_WM(wm), FALSE);
+	priv = gnt_wm_get_instance_private(wm);
+
+	n = g_list_index(priv->workspaces, wm->cws);
 	return gnt_wm_switch_workspace(wm, ++n);
 }
 
@@ -1707,7 +1750,13 @@ static gint widget_in_workspace(gconstpointer workspace, gconstpointer wid)
 
 GntWS *gnt_wm_widget_find_workspace(GntWM *wm, GntWidget *widget)
 {
-	GList *l = g_list_find_custom(wm->workspaces, widget, widget_in_workspace);
+	GntWMPrivate *priv = NULL;
+	GList *l;
+
+	g_return_val_if_fail(GNT_IS_WM(wm), NULL);
+	priv = gnt_wm_get_instance_private(wm);
+
+	l = g_list_find_custom(priv->workspaces, widget, widget_in_workspace);
 	if (l)
 		return l->data;
 	return NULL;
@@ -1715,17 +1764,24 @@ GntWS *gnt_wm_widget_find_workspace(GntWM *wm, GntWidget *widget)
 
 void gnt_wm_set_workspaces(GntWM *wm, GList *workspaces)
 {
-	wm->workspaces = workspaces;
+	GntWMPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WM(wm));
+	priv = gnt_wm_get_instance_private(wm);
+
+	priv->workspaces = workspaces;
 	gnt_wm_switch_workspace(wm, 0);
 }
 
 static void
 update_window_in_list(GntWM *wm, GntWidget *wid)
 {
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GntTextFormatFlags flag = 0;
 
-	if (wm->windows == NULL)
+	if (priv->windows == NULL) {
 		return;
+	}
 
 	if (gnt_ws_is_top_widget(wm->cws, wid)) {
 		flag |= GNT_TEXT_FLAG_DIM;
@@ -1733,7 +1789,7 @@ update_window_in_list(GntWM *wm, GntWidget *wid)
 		flag |= GNT_TEXT_FLAG_BOLD;
 	}
 
-	gnt_tree_set_row_flags(GNT_TREE(wm->windows->tree), wid, flag);
+	gnt_tree_set_row_flags(GNT_TREE(priv->windows->tree), wid, flag);
 }
 
 static gboolean
@@ -1838,6 +1894,11 @@ gnt_wm_new_window_real(GntWM *wm, GntWidget *widget)
 
 void gnt_wm_new_window(GntWM *wm, GntWidget *widget)
 {
+	GntWMPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WM(wm));
+	priv = gnt_wm_get_instance_private(wm);
+
 	widget = gnt_widget_get_toplevel(widget);
 
 	if (!gnt_widget_get_visible(widget) ||
@@ -1859,17 +1920,17 @@ void gnt_wm_new_window(GntWM *wm, GntWidget *widget)
 	g_signal_emit(wm, signals[SIG_NEW_WIN], 0, widget);
 	g_signal_emit(wm, signals[SIG_DECORATE_WIN], 0, widget);
 
-	if (wm->windows && !gnt_widget_get_transient(widget)) {
+	if (priv->windows && !gnt_widget_get_transient(widget)) {
 		if ((GNT_IS_BOX(widget) &&
 		     gnt_box_get_title(GNT_BOX(widget))) &&
 		    wm->_list.window != widget &&
 		    gnt_widget_get_take_focus(widget)) {
 			gnt_tree_add_row_last(
-			        GNT_TREE(wm->windows->tree), widget,
+			        GNT_TREE(priv->windows->tree), widget,
 			        gnt_tree_create_row(
-			                GNT_TREE(wm->windows->tree),
+			                GNT_TREE(priv->windows->tree),
 			                gnt_box_get_title(GNT_BOX(widget))),
-			        g_object_get_data(G_OBJECT(wm->windows->tree),
+			        g_object_get_data(G_OBJECT(priv->windows->tree),
 			                          "workspace")
 			                ? wm->cws
 			                : NULL);
@@ -1888,9 +1949,15 @@ void gnt_wm_window_decorate(GntWM *wm, GntWidget *widget)
 
 void gnt_wm_window_close(GntWM *wm, GntWidget *widget)
 {
+	GntWMPrivate *priv = NULL;
 	GntWS *s;
 	int pos;
-	gboolean transient = gnt_widget_get_transient(widget);
+	gboolean transient;
+
+	g_return_if_fail(GNT_IS_WM(wm));
+	priv = gnt_wm_get_instance_private(wm);
+
+	transient = gnt_widget_get_transient(widget);
 
 	s = gnt_wm_widget_find_workspace(wm, widget);
 
@@ -1900,8 +1967,8 @@ void gnt_wm_window_close(GntWM *wm, GntWidget *widget)
 	g_signal_emit(wm, signals[SIG_CLOSE_WIN], 0, widget);
 	g_hash_table_remove(wm->nodes, widget);
 
-	if (wm->windows) {
-		gnt_tree_remove(GNT_TREE(wm->windows->tree), widget);
+	if (priv->windows) {
+		gnt_tree_remove(GNT_TREE(priv->windows->tree), widget);
 	}
 
 	if (s) {
@@ -2228,12 +2295,16 @@ gboolean gnt_wm_process_click(GntWM *wm, GntMouseEvent event, int x, int y, GntW
 
 void gnt_wm_raise_window(GntWM *wm, GntWidget *widget)
 {
-	GntWS *ws = gnt_wm_widget_find_workspace(wm, widget);
+	GntWMPrivate *priv = NULL;
+	GntWS *ws;
 
-	g_return_if_fail(wm != NULL);
+	g_return_if_fail(GNT_IS_WM(wm));
+	priv = gnt_wm_get_instance_private(wm);
+
+	ws = gnt_wm_widget_find_workspace(wm, widget);
 
 	if (wm->cws != ws)
-		gnt_wm_switch_workspace(wm, g_list_index(wm->workspaces, ws));
+		gnt_wm_switch_workspace(wm, g_list_index(priv->workspaces, ws));
 
 	g_return_if_fail(wm->cws != NULL);
 
