@@ -209,7 +209,6 @@ gnt_s_wm_class_init(GntSWMClass *klass)
 			"raise-main-window", raise_main_window,
 			"\033" "b", NULL);
 	gnt_style_read_actions(G_OBJECT_CLASS_TYPE(klass), GNT_BINDABLE_CLASS(klass));
-	GNTDEBUG;
 }
 
 static void

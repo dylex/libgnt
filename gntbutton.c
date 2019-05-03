@@ -67,8 +67,6 @@ gnt_button_draw(GntWidget *widget)
 		mvwchgat(window, 0, 0, width, focus ? A_BOLD : A_REVERSE, type,
 		         NULL);
 	}
-
-	GNTDEBUG;
 }
 
 static void

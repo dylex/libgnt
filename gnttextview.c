@@ -485,8 +485,6 @@ gnt_text_view_init(GntTextView *view)
 	gnt_widget_set_minimum_size(widget, 5, 2);
 	view->string = g_string_new(NULL);
 	view->list = g_list_append(view->list, line);
-
-	GNTDEBUG;
 }
 
 /******************************************************************************

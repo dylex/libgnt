@@ -104,7 +104,6 @@ static void
 gnt_widget_map(GntWidget *widget)
 {
 	/* Get some default size for the widget */
-	GNTDEBUG;
 	g_signal_emit(widget, signals[SIG_MAP], 0);
 	gnt_widget_set_mapped(widget, TRUE);
 }
@@ -293,7 +292,6 @@ gnt_widget_class_init(GntWidgetClass *klass)
 	gnt_bindable_register_binding(GNT_BINDABLE_CLASS(klass), "context-menu", GNT_KEY_CTRL_X, NULL);
 
 	gnt_style_read_actions(G_OBJECT_CLASS_TYPE(klass), GNT_BINDABLE_CLASS(klass));
-	GNTDEBUG;
 }
 
 /******************************************************************************
@@ -337,7 +335,6 @@ gnt_widget_destroy(GntWidget *widget)
 		delwin(priv->window);
 		g_object_run_dispose(G_OBJECT(widget));
 	}
-	GNTDEBUG;
 }
 
 void

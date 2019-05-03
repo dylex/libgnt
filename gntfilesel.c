@@ -585,8 +585,6 @@ gnt_file_sel_class_init(GntFileSelClass *klass)
 	gnt_bindable_class_register_action(bindable, "clear-tags", clear_tags, "c", NULL);
 	gnt_bindable_class_register_action(bindable, "up-directory", up_directory, GNT_KEY_BACKSPACE, NULL);
 	gnt_style_read_actions(G_OBJECT_CLASS_TYPE(klass), GNT_BINDABLE_CLASS(klass));
-
-	GNTDEBUG;
 }
 
 static void

@@ -148,7 +148,6 @@ gnt_label_class_init(GntLabelClass *klass)
 				G_PARAM_READWRITE|G_PARAM_STATIC_STRINGS
 			)
 		);
-	GNTDEBUG;
 }
 
 static void
