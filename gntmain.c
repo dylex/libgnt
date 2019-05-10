@@ -303,8 +303,9 @@ io_invoke(GIOChannel *source, G_GNUC_UNUSED GIOCondition cond,
 	gboolean is_special = FALSE;
 	gboolean is_escape = FALSE;
 
-	if (wm->mode == GNT_KP_MODE_WAIT_ON_CHILD)
+	if (gnt_wm_get_keypress_mode(wm) == GNT_KP_MODE_WAIT_ON_CHILD) {
 		return FALSE;
+	}
 
 	if (HOLDING_ESCAPE) {
 		is_escape = TRUE;
@@ -374,8 +375,9 @@ io_invoke(GIOChannel *source, G_GNUC_UNUSED GIOCondition cond,
 	char *k;
 	char *cvrt = NULL;
 
-	if (wm->mode == GNT_KP_MODE_WAIT_ON_CHILD)
+	if (gnt_wm_get_keypress_mode(wm) == GNT_KP_MODE_WAIT_ON_CHILD) {
 		return FALSE;
+	}
 
 	rd = read(STDIN_FILENO, keys + HOLDING_ESCAPE, sizeof(keys) - 1 - HOLDING_ESCAPE);
 	if (rd < 0)
@@ -878,7 +880,7 @@ reap_child(G_GNUC_UNUSED GPid pid, gint status, gpointer data)
 #ifndef _WIN32
 	clean_pid();
 #endif
-	wm->mode = GNT_KP_MODE_NORMAL;
+	gnt_wm_set_keypress_mode(wm, GNT_KP_MODE_NORMAL);
 	endwin();
 	setup_io();
 	refresh();
@@ -902,7 +904,7 @@ gboolean gnt_giveup_console(const char *wd, char **argv, char **envp,
 	cp->callback = callback;
 	cp->data = data;
 	g_source_remove(channel_read_callback);
-	wm->mode = GNT_KP_MODE_WAIT_ON_CHILD;
+	gnt_wm_set_keypress_mode(wm, GNT_KP_MODE_WAIT_ON_CHILD);
 	g_child_watch_add(pid, reap_child, cp);
 
 	return TRUE;
@@ -910,7 +912,8 @@ gboolean gnt_giveup_console(const char *wd, char **argv, char **envp,
 
 gboolean gnt_is_refugee()
 {
-	return (wm && wm->mode == GNT_KP_MODE_WAIT_ON_CHILD);
+	return (wm &&
+	        gnt_wm_get_keypress_mode(wm) == GNT_KP_MODE_WAIT_ON_CHILD);
 }
 
 const char *C_(const char *x)

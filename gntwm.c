@@ -91,6 +91,8 @@ typedef struct
 	 * determine whether to give focus to a new window.
 	 */
 	gboolean event_stack;
+
+	GntKeyPressMode mode;
 } GntWMPrivate;
 
 enum
@@ -263,8 +265,11 @@ update_act_msg(void)
 static gboolean
 update_screen(GntWM *wm)
 {
-	if (wm->mode == GNT_KP_MODE_WAIT_ON_CHILD)
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
+
+	if (priv->mode == GNT_KP_MODE_WAIT_ON_CHILD) {
 		return TRUE;
+	}
 
 	if (wm->menu) {
 		GntMenu *top = wm->menu;
@@ -450,7 +455,7 @@ switch_window(GntWM *wm, int direction, gboolean urgent)
 		return;
 	}
 
-	if (wm->mode != GNT_KP_MODE_NORMAL) {
+	if (priv->mode != GNT_KP_MODE_NORMAL) {
 		ensure_normal_mode(wm);
 	}
 
@@ -1127,11 +1132,12 @@ static void
 ensure_normal_mode(GntWM *wm)
 {
 	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
-	if (wm->mode != GNT_KP_MODE_NORMAL) {
+
+	if (priv->mode != GNT_KP_MODE_NORMAL) {
 		if (!gnt_ws_is_empty(priv->cws)) {
 			window_reverse(gnt_ws_get_top_widget(priv->cws), FALSE, wm);
 		}
-		wm->mode = GNT_KP_MODE_NORMAL;
+		priv->mode = GNT_KP_MODE_NORMAL;
 	}
 }
 
@@ -1148,7 +1154,7 @@ start_move(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 		return TRUE;
 	}
 
-	wm->mode = GNT_KP_MODE_MOVE;
+	priv->mode = GNT_KP_MODE_MOVE;
 	window_reverse(gnt_ws_get_top_widget(priv->cws), TRUE, wm);
 
 	return TRUE;
@@ -1167,7 +1173,7 @@ start_resize(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 		return TRUE;
 	}
 
-	wm->mode = GNT_KP_MODE_RESIZE;
+	priv->mode = GNT_KP_MODE_RESIZE;
 	window_reverse(gnt_ws_get_top_widget(priv->cws), TRUE, wm);
 
 	return TRUE;
@@ -1328,7 +1334,8 @@ ignore_keys_start(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 	GntWM *wm = GNT_WM(bindable);
 	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 
-	if (!wm->menu && !priv->list.window && wm->mode == GNT_KP_MODE_NORMAL) {
+	if (!wm->menu && !priv->list.window &&
+	    priv->mode == GNT_KP_MODE_NORMAL) {
 		ignore_keys = TRUE;
 		return TRUE;
 	}
@@ -2092,7 +2099,7 @@ gboolean gnt_wm_process_input(GntWM *wm, const char *keys)
 	}
 
 	/* Do some manual checking */
-	if (!gnt_ws_is_empty(priv->cws) && wm->mode != GNT_KP_MODE_NORMAL) {
+	if (!gnt_ws_is_empty(priv->cws) && priv->mode != GNT_KP_MODE_NORMAL) {
 		int xmin = 0, ymin = 0, xmax = getmaxx(stdscr), ymax = getmaxy(stdscr) - 1;
 		int x, y, w, h;
 		GntWidget *widget = gnt_ws_get_top_widget(priv->cws);
@@ -2103,7 +2110,7 @@ gboolean gnt_wm_process_input(GntWM *wm, const char *keys)
 		ox = x;	oy = y;
 		ow = w;	oh = h;
 
-		if (wm->mode == GNT_KP_MODE_MOVE) {
+		if (priv->mode == GNT_KP_MODE_MOVE) {
 			if (strcmp(keys, GNT_KEY_LEFT) == 0) {
 				if (x > xmin)
 					x--;
@@ -2122,7 +2129,7 @@ gboolean gnt_wm_process_input(GntWM *wm, const char *keys)
 				window_reverse(widget, TRUE, wm);
 				return TRUE;
 			}
-		} else if (wm->mode == GNT_KP_MODE_RESIZE) {
+		} else if (priv->mode == GNT_KP_MODE_RESIZE) {
 			if (strcmp(keys, GNT_KEY_LEFT) == 0) {
 				w--;
 			} else if (strcmp(keys, GNT_KEY_RIGHT) == 0) {
@@ -2142,7 +2149,7 @@ gboolean gnt_wm_process_input(GntWM *wm, const char *keys)
 		}
 		if (strcmp(keys, "\r") == 0 || strcmp(keys, "\033") == 0) {
 			window_reverse(widget, FALSE, wm);
-			wm->mode = GNT_KP_MODE_NORMAL;
+			priv->mode = GNT_KP_MODE_NORMAL;
 		}
 		return TRUE;
 	}
@@ -2438,4 +2445,28 @@ gnt_wm_set_event_stack(GntWM *wm, gboolean set)
 	priv = gnt_wm_get_instance_private(wm);
 
 	priv->event_stack = set;
+}
+
+/* Private. */
+GntKeyPressMode
+gnt_wm_get_keypress_mode(GntWM *wm)
+{
+	GntWMPrivate *priv = NULL;
+
+	g_return_val_if_fail(GNT_IS_WM(wm), GNT_KP_MODE_NORMAL);
+	priv = gnt_wm_get_instance_private(wm);
+
+	return priv->mode;
+}
+
+/* Private. */
+void
+gnt_wm_set_keypress_mode(GntWM *wm, GntKeyPressMode mode)
+{
+	GntWMPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WM(wm));
+	priv = gnt_wm_get_instance_private(wm);
+
+	priv->mode = mode;
 }

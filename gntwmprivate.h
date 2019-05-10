@@ -26,6 +26,14 @@
 #include "gnt.h"
 #include "gntwm.h"
 
+typedef enum
+{
+	GNT_KP_MODE_NORMAL,
+	GNT_KP_MODE_RESIZE,
+	GNT_KP_MODE_MOVE,
+	GNT_KP_MODE_WAIT_ON_CHILD
+} GntKeyPressMode;
+
 G_BEGIN_DECLS
 /* Private access to some internals. Contact us if you need these. */
 
@@ -46,6 +54,9 @@ void gnt_wm_add_action(GntWM *wm, GntAction *action);
 
 gboolean gnt_wm_get_event_stack(GntWM *wm);
 void gnt_wm_set_event_stack(GntWM *wm, gboolean set);
+
+GntKeyPressMode gnt_wm_get_keypress_mode(GntWM *wm);
+void gnt_wm_set_keypress_mode(GntWM *wm, GntKeyPressMode mode);
 
 G_END_DECLS
 
