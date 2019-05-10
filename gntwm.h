@@ -359,20 +359,6 @@ void gnt_wm_update_window(GntWM *wm, GntWidget *widget);
 void gnt_wm_raise_window(GntWM *wm, GntWidget *widget);
 
 /**
- * gnt_wm_set_event_stack:
- *
- * Internal function -- do not use.
- */
-void gnt_wm_set_event_stack(GntWM *wm, gboolean set);
-
-/**
- * gnt_wm_copy_win:
- *
- * Internal function -- do not use.
- */
-void gnt_wm_copy_win(GntWidget *widget, GntNode *node);
-
-/**
  * gnt_wm_get_idle_time:
  *
  * Returns:  The idle time of the user.

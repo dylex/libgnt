@@ -29,6 +29,8 @@
 G_BEGIN_DECLS
 /* Private access to some internals. Contact us if you need these. */
 
+void gnt_wm_copy_win(GntWidget *widget, GntNode *node);
+
 /*
  * gnt_wm_is_list_window:
  * @wm:     The window-manager.
@@ -41,6 +43,8 @@ G_BEGIN_DECLS
 gboolean gnt_wm_is_list_window(GntWM *wm, GntWidget *widget);
 
 void gnt_wm_add_action(GntWM *wm, GntAction *action);
+
+void gnt_wm_set_event_stack(GntWM *wm, gboolean set);
 
 G_END_DECLS
 

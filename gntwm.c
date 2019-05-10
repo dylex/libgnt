@@ -140,6 +140,7 @@ free_node(gpointer data)
 	g_free(node);
 }
 
+/* Private. */
 void
 gnt_wm_copy_win(GntWidget *widget, GntNode *node)
 {
@@ -2410,7 +2411,9 @@ gnt_wm_add_action(GntWM *wm, GntAction *action)
 	priv->acts = g_list_append(priv->acts, action);
 }
 
-void gnt_wm_set_event_stack(GntWM *wm, gboolean set)
+/* Private. */
+void
+gnt_wm_set_event_stack(GntWM *wm, gboolean set)
 {
 	wm->event_stack = set;
 }
