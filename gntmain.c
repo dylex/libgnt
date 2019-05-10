@@ -701,8 +701,9 @@ void gnt_init()
 
 void gnt_main()
 {
-	wm->loop = g_main_loop_new(NULL, FALSE);
-	g_main_loop_run(wm->loop);
+	GMainLoop *loop = g_main_loop_new(NULL, FALSE);
+	gnt_wm_set_mainloop(wm, loop);
+	g_main_loop_run(loop);
 }
 
 /*********************************

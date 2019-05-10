@@ -86,8 +86,6 @@ struct _GntWM
 	GntBindable inherit;
 
 	/*< public >*/
-	GMainLoop *GNTSEAL(loop);
-
 	GHashTable *GNTSEAL(nodes);    /* GntWidget -> GntNode */
 	GHashTable *GNTSEAL(name_places);    /* window name -> ws*/
 	GHashTable *GNTSEAL(title_places);    /* window title -> ws */

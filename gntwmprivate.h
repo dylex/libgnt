@@ -39,6 +39,8 @@ G_BEGIN_DECLS
 
 void gnt_wm_copy_win(GntWidget *widget, GntNode *node);
 
+void gnt_wm_set_mainloop(GntWM *wm, GMainLoop *loop);
+
 /*
  * gnt_wm_is_list_window:
  * @wm:     The window-manager.

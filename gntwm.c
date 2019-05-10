@@ -76,6 +76,8 @@ typedef struct _GntListWindow
 
 typedef struct
 {
+	GMainLoop *loop;
+
 	GList *workspaces;
 	GList *tagged; /* tagged windows */
 	GntWS *cws;
@@ -1190,9 +1192,11 @@ static gboolean
 wm_quit(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
+
 	if (write_timeout)
 		write_already(wm);
-	g_main_loop_quit(wm->loop);
+	g_main_loop_quit(priv->loop);
 	return TRUE;
 }
 
@@ -2404,6 +2408,18 @@ void gnt_wm_raise_window(GntWM *wm, GntWidget *widget)
 
 	gnt_ws_bring_to_front(priv->cws, widget);
 	g_signal_emit(wm, signals[SIG_GIVE_FOCUS], 0, widget);
+}
+
+/* Private. */
+void
+gnt_wm_set_mainloop(GntWM *wm, GMainLoop *loop)
+{
+	GntWMPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WM(wm));
+	priv = gnt_wm_get_instance_private(wm);
+
+	priv->loop = loop;
 }
 
 /* Private. */
