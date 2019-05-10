@@ -507,15 +507,15 @@ static void
 ask_before_exit(void)
 {
 	static GntWidget *win = NULL;
+	GntMenu *menu;
 	GntWidget *bbox, *button;
 
-	if (wm->menu) {
-		do {
-			gnt_widget_hide(GNT_WIDGET(wm->menu));
-			if (wm->menu)
-				wm->menu = gnt_menu_get_parent_menu(wm->menu);
-		} while (wm->menu);
+	menu = gnt_wm_get_menu(wm);
+	while (menu) {
+		gnt_widget_hide(GNT_WIDGET(menu));
+		menu = gnt_menu_get_parent_menu(menu);
 	}
+	gnt_wm_set_menu(wm, NULL);
 
 	if (win)
 		goto raise;
@@ -827,23 +827,25 @@ void gnt_register_action(const char *label, void (*callback)(void))
 static void
 reset_menu(G_GNUC_UNUSED GntWidget *widget, G_GNUC_UNUSED gpointer data)
 {
-	wm->menu = NULL;
+	gnt_wm_set_menu(wm, NULL);
 }
 
 gboolean gnt_screen_menu_show(gpointer newmenu)
 {
-	if (wm->menu) {
+	if (gnt_wm_get_menu(wm)) {
 		/* For now, if a menu is being displayed, then another menu
 		 * can NOT take over. */
 		return FALSE;
 	}
 
-	wm->menu = newmenu;
-	gnt_widget_set_visible(GNT_WIDGET(wm->menu), TRUE);
-	gnt_widget_draw(GNT_WIDGET(wm->menu));
+	gnt_wm_set_menu(wm, GNT_MENU(newmenu));
+	gnt_widget_set_visible(GNT_WIDGET(newmenu), TRUE);
+	gnt_widget_draw(GNT_WIDGET(newmenu));
 
-	g_signal_connect(G_OBJECT(wm->menu), "hide", G_CALLBACK(reset_menu), NULL);
-	g_signal_connect(G_OBJECT(wm->menu), "destroy", G_CALLBACK(reset_menu), NULL);
+	g_signal_connect(G_OBJECT(newmenu), "hide", G_CALLBACK(reset_menu),
+	                 NULL);
+	g_signal_connect(G_OBJECT(newmenu), "destroy", G_CALLBACK(reset_menu),
+	                 NULL);
 
 	return TRUE;
 }

@@ -86,6 +86,13 @@ typedef struct
 
 	GList *acts; /* List of actions */
 
+	/* Currently active menu. There can be at most one menu at a time on
+	 * the screen. If there is a menu being displayed, then all the
+	 * keystrokes will be sent to the menu until it is closed, either when
+	 * the user activates a menuitem, or presses Escape to cancel the menu.
+	 */
+	GntMenu *menu;
+
 	/* Will be set to %TRUE when a user-event, ie. a mouse-click or a
 	 * key-press is being processed. This variable will be used to
 	 * determine whether to give focus to a new window.
@@ -271,8 +278,8 @@ update_screen(GntWM *wm)
 		return TRUE;
 	}
 
-	if (wm->menu) {
-		GntMenu *top = wm->menu;
+	if (priv->menu) {
+		GntMenu *top = priv->menu;
 		while (top) {
 			GntNode *node = g_hash_table_lookup(wm->nodes, top);
 			if (node)
@@ -447,7 +454,7 @@ switch_window(GntWM *wm, int direction, gboolean urgent)
 	GList *list;
 	int pos, orgpos;
 
-	if (priv->list.window || wm->menu) {
+	if (priv->list.window || priv->menu) {
 		return;
 	}
 
@@ -747,7 +754,7 @@ window_list(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 	GntWM *wm = GNT_WM(bindable);
 	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 
-	if (priv->list.window || wm->menu) {
+	if (priv->list.window || priv->menu) {
 		return TRUE;
 	}
 
@@ -1024,7 +1031,7 @@ list_actions(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	int n;
 
-	if (priv->list.window || wm->menu) {
+	if (priv->list.window || priv->menu) {
 		return TRUE;
 	}
 
@@ -1147,7 +1154,7 @@ start_move(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 	GntWM *wm = GNT_WM(bindable);
 	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 
-	if (priv->list.window || wm->menu) {
+	if (priv->list.window || priv->menu) {
 		return TRUE;
 	}
 	if (gnt_ws_is_empty(priv->cws)) {
@@ -1166,7 +1173,7 @@ start_resize(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 	GntWM *wm = GNT_WM(bindable);
 	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 
-	if (priv->list.window || wm->menu) {
+	if (priv->list.window || priv->menu) {
 		return TRUE;
 	}
 	if (gnt_ws_is_empty(priv->cws)) {
@@ -1308,7 +1315,7 @@ workspace_list(GntBindable *b, G_GNUC_UNUSED GList *params)
 	GntWM *wm = GNT_WM(b);
 	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 
-	if (priv->list.window || wm->menu) {
+	if (priv->list.window || priv->menu) {
 		return TRUE;
 	}
 
@@ -1334,7 +1341,7 @@ ignore_keys_start(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 	GntWM *wm = GNT_WM(bindable);
 	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 
-	if (!wm->menu && !priv->list.window &&
+	if (!priv->menu && !priv->list.window &&
 	    priv->mode == GNT_KP_MODE_NORMAL) {
 		ignore_keys = TRUE;
 		return TRUE;
@@ -2174,8 +2181,8 @@ gboolean gnt_wm_process_input(GntWM *wm, const char *keys)
 		return TRUE;
 	}
 
-	if (wm->menu) {
-		ret = gnt_widget_key_pressed(GNT_WIDGET(wm->menu), keys);
+	if (priv->menu) {
+		ret = gnt_widget_key_pressed(GNT_WIDGET(priv->menu), keys);
 	} else if (priv->list.window) {
 		ret = gnt_widget_key_pressed(priv->list.window, keys);
 	} else if (!gnt_ws_is_empty(priv->cws)) {
@@ -2421,6 +2428,30 @@ gnt_wm_add_action(GntWM *wm, GntAction *action)
 	priv = gnt_wm_get_instance_private(wm);
 
 	priv->acts = g_list_append(priv->acts, action);
+}
+
+/* Private. */
+GntMenu *
+gnt_wm_get_menu(GntWM *wm)
+{
+	GntWMPrivate *priv = NULL;
+
+	g_return_val_if_fail(GNT_IS_WM(wm), NULL);
+	priv = gnt_wm_get_instance_private(wm);
+
+	return priv->menu;
+}
+
+/* Private. */
+void
+gnt_wm_set_menu(GntWM *wm, GntMenu *menu)
+{
+	GntWMPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WM(wm));
+	priv = gnt_wm_get_instance_private(wm);
+
+	priv->menu = menu;
 }
 
 /* Private. */

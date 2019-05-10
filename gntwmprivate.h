@@ -52,6 +52,9 @@ gboolean gnt_wm_is_list_window(GntWM *wm, GntWidget *widget);
 
 void gnt_wm_add_action(GntWM *wm, GntAction *action);
 
+GntMenu *gnt_wm_get_menu(GntWM *wm);
+void gnt_wm_set_menu(GntWM *wm, GntMenu *menu);
+
 gboolean gnt_wm_get_event_stack(GntWM *wm);
 void gnt_wm_set_event_stack(GntWM *wm, gboolean set);
 

@@ -77,10 +77,6 @@ typedef struct _GntAction
 
 /**
  * GntWM:
- * @menu: Currently active menu. There can be at most one menu at a time on the
- *        screen. If there is a menu being displayed, then all the keystrokes
- *        will be sent to the menu until it is closed, either when the user
- *        activates a menuitem, or presses Escape to cancel the menu.
  *
  * Access to any fields is deprecated. See inline comments for replacements.
  *
@@ -95,8 +91,6 @@ struct _GntWM
 	GHashTable *GNTSEAL(nodes);    /* GntWidget -> GntNode */
 	GHashTable *GNTSEAL(name_places);    /* window name -> ws*/
 	GHashTable *GNTSEAL(title_places);    /* window title -> ws */
-
-	GntMenu *GNTSEAL(menu);
 
 	GHashTable *GNTSEAL(positions);
 
