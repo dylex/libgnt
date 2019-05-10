@@ -37,12 +37,7 @@
 #include <panel.h>
 #include <time.h>
 
-#define GNT_TYPE_WM				(gnt_wm_get_type())
-#define GNT_WM(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_WM, GntWM))
-#define GNT_WM_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), GNT_TYPE_WM, GntWMClass))
-#define GNT_IS_WM(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), GNT_TYPE_WM))
-#define GNT_IS_WM_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_WM))
-#define GNT_WM_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_WM, GntWMClass))
+#define GNT_TYPE_WM gnt_wm_get_type()
 
 typedef struct _GntNode GntNode;
 
@@ -55,8 +50,6 @@ struct _GntNode
 	PANEL *panel;
 	GntWS *ws;
 };
-
-typedef struct _GntWM GntWM;
 
 typedef struct _GntPosition
 {
@@ -75,24 +68,14 @@ typedef struct _GntAction
 	void (*callback)(void);
 } GntAction;
 
+G_BEGIN_DECLS
+
 /**
- * GntWM:
+ * gnt_wm_get_type:
  *
- * Access to any fields is deprecated. See inline comments for replacements.
- *
+ * Returns: GType for GntWM.
  */
-struct _GntWM
-{
-	GntBindable inherit;
-
-	/*< private >*/
-	void *res1;
-	void *res2;
-	void *res3;
-	void *res4;
-};
-
-typedef struct _GntWMClass GntWMClass;
+G_DECLARE_DERIVABLE_TYPE(GntWM, gnt_wm, GNT, WM, GntBindable)
 
 struct _GntWMClass
 {
@@ -148,15 +131,6 @@ struct _GntWMClass
 	void (*res2)(void);
 	void (*res3)(void);
 };
-
-G_BEGIN_DECLS
-
-/**
- * gnt_wm_get_type:
- *
- * Returns: GType for GntWM.
- */
-GType gnt_wm_get_type(void);
 
 /**
  * gnt_wm_get_current_workspace:
