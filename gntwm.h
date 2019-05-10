@@ -103,8 +103,6 @@ struct _GntWM
 	/*< public >*/
 	GMainLoop *GNTSEAL(loop);
 
-	GntWS *GNTSEAL(cws);
-
 	GHashTable *GNTSEAL(nodes);    /* GntWidget -> GntNode */
 	GHashTable *GNTSEAL(name_places);    /* window name -> ws*/
 	GHashTable *GNTSEAL(title_places);    /* window title -> ws */
@@ -189,6 +187,18 @@ G_BEGIN_DECLS
  * Returns: GType for GntWM.
  */
 GType gnt_wm_get_type(void);
+
+/**
+ * gnt_wm_get_current_workspace:
+ * @wm: The window-manager.
+ *
+ * Gets the current workspace.
+ *
+ * Returns: (transfer none): The @GntWS that is currently active.
+ *
+ * Since: 3.0.0
+ */
+GntWS *gnt_wm_get_current_workspace(GntWM *wm);
 
 /**
  * gnt_wm_add_workspace:

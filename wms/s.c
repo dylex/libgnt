@@ -148,7 +148,7 @@ s_new_window(GntWM *wm, GntWidget *win)
 static GntWidget *
 find_widget(GntWM *wm, const char *wname)
 {
-	GList *iter = gnt_ws_get_list(wm->cws);
+	GList *iter = gnt_ws_get_list(gnt_wm_get_current_workspace(wm));
 	for (; iter; iter = iter->next) {
 		GntWidget *widget = iter->data;
 		const char *name = gnt_widget_get_name(widget);

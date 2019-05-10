@@ -165,7 +165,8 @@ detect_mouse_action(const char *buffer)
 	GntWidget *widget = NULL;
 	PANEL *p = NULL;
 
-	if (gnt_ws_is_empty(wm->cws) || buffer[0] != 27) {
+	if (gnt_ws_is_empty(gnt_wm_get_current_workspace(wm)) ||
+	    buffer[0] != 27) {
 		return FALSE;
 	}
 
@@ -227,7 +228,8 @@ detect_mouse_action(const char *buffer)
 	    !gnt_wm_is_list_window(wm, widget) &&
 	    !gnt_widget_get_transient(widget)) {
 		gint widgetx, widgety;
-		if (!gnt_ws_is_top_widget(wm->cws, widget)) {
+		if (!gnt_ws_is_top_widget(gnt_wm_get_current_workspace(wm),
+		                          widget)) {
 			gnt_wm_raise_window(wm, widget);
 		}
 		gnt_widget_get_position(widget, &widgetx, &widgety);
@@ -239,7 +241,8 @@ detect_mouse_action(const char *buffer)
 	} else if (event == GNT_MOUSE_UP) {
 		if (button == MOUSE_NONE && y == getmaxy(stdscr) - 1) {
 			/* Clicked on the taskbar */
-			int n = g_list_length(gnt_ws_get_list(wm->cws));
+			int n = g_list_length(gnt_ws_get_list(
+			        gnt_wm_get_current_workspace(wm)));
 			if (n) {
 				int width = getmaxx(stdscr) / n;
 				gnt_bindable_perform_action_named(GNT_BINDABLE(wm), "switch-window-n", x/width, NULL);
@@ -744,7 +747,7 @@ gboolean gnt_widget_has_focus(GntWidget *widget)
 	if (gnt_wm_is_list_window(wm, widget)) {
 		return TRUE;
 	}
-	if (gnt_ws_is_top_widget(wm->cws, widget)) {
+	if (gnt_ws_is_top_widget(gnt_wm_get_current_workspace(wm), widget)) {
 		if (GNT_IS_BOX(widget) &&
 		    (gnt_box_get_active(GNT_BOX(widget)) == w || widget == w)) {
 			return TRUE;
@@ -757,7 +760,7 @@ void gnt_widget_set_urgent(GntWidget *widget)
 {
 	widget = gnt_widget_get_toplevel(widget);
 
-	if (gnt_ws_is_top_widget(wm->cws, widget)) {
+	if (gnt_ws_is_top_widget(gnt_wm_get_current_workspace(wm), widget)) {
 		return;
 	}
 

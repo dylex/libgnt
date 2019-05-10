@@ -245,7 +245,9 @@ irssi_update_window(GntWM *wm, GntNode *node)
 		return;
 	g_object_set_data(
 	        G_OBJECT(win), "irssi-index",
-	        GINT_TO_POINTER(g_list_index(gnt_ws_get_list(wm->cws), win)));
+	        GINT_TO_POINTER(g_list_index(
+	                gnt_ws_get_list(gnt_wm_get_current_workspace(wm)),
+	                win)));
 	g_timeout_add(0, (GSourceFunc)update_conv_window_title, node);
 }
 
@@ -270,12 +272,14 @@ move_direction(GntBindable *bindable, GList *list)
 {
 	GntWM *wm = GNT_WM(bindable);
 	GntIrssiWM *irssi = GNT_IRSSI_WM(wm);
+	GntWS *ws = NULL;
 	int vert, hor;
 	int x, y, w, h;
 	GntWidget *win;
 
-	if (gnt_ws_is_empty(wm->cws) ||
-	    is_buddylist(win = gnt_ws_get_top_widget(wm->cws))) {
+	ws = gnt_wm_get_current_workspace(wm);
+	if (gnt_ws_is_empty(ws) ||
+	    is_buddylist(win = gnt_ws_get_top_widget(ws))) {
 		return FALSE;
 	}
 
