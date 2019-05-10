@@ -83,11 +83,6 @@ typedef struct _GntAction
 	void (*callback)(void);
 } GntAction;
 
-typedef struct _GntListWindow {
-		GntWidget *window;
-		GntWidget *tree;
-} GntListWindow;
-
 /**
  * GntWM:
  * @acts: List of actions
@@ -110,8 +105,6 @@ struct _GntWM
 	GMainLoop *GNTSEAL(loop);
 
 	GntWS *GNTSEAL(cws);
-
-	GntListWindow GNTSEAL(_list);
 
 	GHashTable *GNTSEAL(nodes);    /* GntWidget -> GntNode */
 	GHashTable *GNTSEAL(name_places);    /* window name -> ws*/

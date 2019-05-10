@@ -63,15 +63,23 @@
 #include "gntboxprivate.h"
 #include "gntmenuprivate.h"
 #include "gntwidgetprivate.h"
+#include "gntwmprivate.h"
 #include "gntwsprivate.h"
 
 #define IDLE_CHECK_INTERVAL 5 /* 5 seconds */
+
+typedef struct _GntListWindow
+{
+	GntWidget *window;
+	GntWidget *tree;
+} GntListWindow;
 
 typedef struct
 {
 	GList *workspaces;
 	GList *tagged; /* tagged windows */
 
+	GntListWindow list;
 	GntListWindow *windows; /* Window-list window */
 	GntListWindow *actions; /* Action-list window */
 } GntWMPrivate;
@@ -420,12 +428,14 @@ gnt_wm_init(GntWM *wm)
 static void
 switch_window(GntWM *wm, int direction, gboolean urgent)
 {
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GntWidget *w = NULL, *wid = NULL;
 	GList *list;
 	int pos, orgpos;
 
-	if (wm->_list.window || wm->menu)
+	if (priv->list.window || wm->menu) {
 		return;
+	}
 
 	if (gnt_ws_is_empty(wm->cws) || gnt_ws_is_single(wm->cws)) {
 		return;
@@ -550,9 +560,11 @@ static gboolean
 window_close(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 
-	if (wm->_list.window)
+	if (priv->list.window) {
 		return TRUE;
+	}
 
 	if (!gnt_ws_is_empty(wm->cws)) {
 		gnt_widget_destroy(gnt_ws_get_top_widget(wm->cws));
@@ -566,8 +578,9 @@ static void
 destroy__list(G_GNUC_UNUSED GntWidget *widget, GntWM *wm)
 {
 	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
-	wm->_list.window = NULL;
-	wm->_list.tree = NULL;
+
+	priv->list.window = NULL;
+	priv->list.tree = NULL;
 	priv->windows = NULL;
 	priv->actions = NULL;
 	update_screen(wm);
@@ -576,14 +589,15 @@ destroy__list(G_GNUC_UNUSED GntWidget *widget, GntWM *wm)
 static void
 setup__list(GntWM *wm)
 {
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GntWidget *tree, *win;
 	ensure_normal_mode(wm);
-	win = wm->_list.window = gnt_box_new(FALSE, FALSE);
+	win = priv->list.window = gnt_box_new(FALSE, FALSE);
 	gnt_box_set_toplevel(GNT_BOX(win), TRUE);
 	gnt_box_set_pad(GNT_BOX(win), 0);
 	gnt_widget_set_transient(win, TRUE);
 
-	tree = wm->_list.tree = gnt_tree_new();
+	tree = priv->list.tree = gnt_tree_new();
 	gnt_box_add_widget(GNT_BOX(win), tree);
 
 	g_signal_connect(G_OBJECT(win), "destroy", G_CALLBACK(destroy__list), wm);
@@ -595,7 +609,7 @@ window_list_activate(GntTree *tree, GntWM *wm)
 	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GntBindable *sel = gnt_tree_get_selection_data(GNT_TREE(tree));
 
-	gnt_widget_destroy(wm->_list.window);
+	gnt_widget_destroy(priv->list.window);
 
 	if (!sel)
 		return;
@@ -682,7 +696,7 @@ list_of_windows(GntWM *wm, gboolean workspace)
 	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GntWidget *tree, *win;
 	setup__list(wm);
-	priv->windows = &wm->_list;
+	priv->windows = &priv->list;
 
 	win = priv->windows->window;
 	tree = priv->windows->tree;
@@ -712,9 +726,11 @@ static gboolean
 window_list(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 
-	if (wm->_list.window || wm->menu)
+	if (priv->list.window || wm->menu) {
 		return TRUE;
+	}
 
 	if (gnt_ws_is_empty(wm->cws)) {
 		return TRUE;
@@ -929,8 +945,11 @@ static gboolean
 shift_left(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
-	if (wm->_list.window)
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
+
+	if (priv->list.window) {
 		return TRUE;
+	}
 
 	if (gnt_ws_is_empty(wm->cws)) {
 		return TRUE;
@@ -944,9 +963,11 @@ static gboolean
 shift_right(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 
-	if (wm->_list.window)
+	if (priv->list.window) {
 		return TRUE;
+	}
 
 	if (gnt_ws_is_empty(wm->cws)) {
 		return TRUE;
@@ -959,9 +980,10 @@ shift_right(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 static void
 action_list_activate(GntTree *tree, GntWM *wm)
 {
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GntAction *action = gnt_tree_get_selection_data(tree);
 	action->callback();
-	gnt_widget_destroy(wm->_list.window);
+	gnt_widget_destroy(priv->list.window);
 }
 
 static int
@@ -981,14 +1003,16 @@ list_actions(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 	GntWM *wm = GNT_WM(bindable);
 	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	int n;
-	if (wm->_list.window || wm->menu)
+
+	if (priv->list.window || wm->menu) {
 		return TRUE;
+	}
 
 	if (wm->acts == NULL)
 		return TRUE;
 
 	setup__list(wm);
-	priv->actions = &wm->_list;
+	priv->actions = &priv->list;
 
 	win = priv->actions->window;
 	tree = priv->actions->tree;
@@ -1098,8 +1122,11 @@ static gboolean
 start_move(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
-	if (wm->_list.window || wm->menu)
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
+
+	if (priv->list.window || wm->menu) {
 		return TRUE;
+	}
 	if (gnt_ws_is_empty(wm->cws)) {
 		return TRUE;
 	}
@@ -1114,8 +1141,11 @@ static gboolean
 start_resize(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
-	if (wm->_list.window || wm->menu)
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
+
+	if (priv->list.window || wm->menu) {
 		return TRUE;
+	}
 	if (gnt_ws_is_empty(wm->cws)) {
 		return TRUE;
 	}
@@ -1252,9 +1282,11 @@ static gboolean
 workspace_list(GntBindable *b, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(b);
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 
-	if (wm->_list.window || wm->menu)
+	if (priv->list.window || wm->menu) {
 		return TRUE;
+	}
 
 	list_of_windows(wm, TRUE);
 
@@ -1276,8 +1308,9 @@ static gboolean
 ignore_keys_start(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 {
 	GntWM *wm = GNT_WM(bindable);
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 
-	if(!wm->menu && !wm->_list.window && wm->mode == GNT_KP_MODE_NORMAL){
+	if (!wm->menu && !priv->list.window && wm->mode == GNT_KP_MODE_NORMAL) {
 		ignore_keys = TRUE;
 		return TRUE;
 	}
@@ -1656,8 +1689,8 @@ gnt_wm_switch_workspace(GntWM *wm, gint n)
 	if (!s)
 		return FALSE;
 
-	if (wm->_list.window) {
-		gnt_widget_destroy(wm->_list.window);
+	if (priv->list.window) {
+		gnt_widget_destroy(priv->list.window);
 	}
 	ensure_normal_mode(wm);
 	gnt_ws_hide(wm->cws, wm->nodes);
@@ -1871,7 +1904,7 @@ gnt_wm_new_window_real(GntWM *wm, GntWidget *widget)
 
 	if (!transient) {
 		GntWS *ws = wm->cws;
-		if (node->me != wm->_list.window) {
+		if (!gnt_wm_is_list_window(wm, node->me)) {
 			if (GNT_IS_BOX(widget)) {
 				ws = new_widget_find_workspace(wm, widget);
 			}
@@ -1879,8 +1912,8 @@ gnt_wm_new_window_real(GntWM *wm, GntWidget *widget)
 			gnt_ws_append_widget(ws, widget);
 		}
 
-		if (wm->event_stack || node->me == wm->_list.window ||
-				gnt_ws_is_top_widget(ws, node->me)) {
+		if (wm->event_stack || gnt_wm_is_list_window(wm, node->me) ||
+		    gnt_ws_is_top_widget(ws, node->me)) {
 			gnt_wm_raise_window(wm, node->me);
 		} else {
 			bottom_panel(node->panel);     /* New windows should not grab focus */
@@ -1923,7 +1956,7 @@ void gnt_wm_new_window(GntWM *wm, GntWidget *widget)
 	if (priv->windows && !gnt_widget_get_transient(widget)) {
 		if ((GNT_IS_BOX(widget) &&
 		     gnt_box_get_title(GNT_BOX(widget))) &&
-		    wm->_list.window != widget &&
+		    !gnt_wm_is_list_window(wm, widget) &&
 		    gnt_widget_get_take_focus(widget)) {
 			gnt_tree_add_row_last(
 			        GNT_TREE(priv->windows->tree), widget,
@@ -1996,6 +2029,7 @@ time_t gnt_wm_get_idle_time()
 
 gboolean gnt_wm_process_input(GntWM *wm, const char *keys)
 {
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	gboolean ret = FALSE;
 
 	keys = gnt_bindable_remap_keys(GNT_BINDABLE(wm), keys);
@@ -2075,8 +2109,8 @@ gboolean gnt_wm_process_input(GntWM *wm, const char *keys)
 
 	/* Escape to close the window-list or action-list window */
 	if (strcmp(keys, "\033") == 0) {
-		if (wm->_list.window) {
-			gnt_widget_destroy(wm->_list.window);
+		if (priv->list.window) {
+			gnt_widget_destroy(priv->list.window);
 			return TRUE;
 		}
 	} else if (keys[0] == '\033' && isdigit(keys[1]) && keys[2] == '\0') {
@@ -2093,11 +2127,11 @@ gboolean gnt_wm_process_input(GntWM *wm, const char *keys)
 		return TRUE;
 	}
 
-	if (wm->menu)
+	if (wm->menu) {
 		ret = gnt_widget_key_pressed(GNT_WIDGET(wm->menu), keys);
-	else if (wm->_list.window)
-		ret = gnt_widget_key_pressed(wm->_list.window, keys);
-	else if (!gnt_ws_is_empty(wm->cws)) {
+	} else if (priv->list.window) {
+		ret = gnt_widget_key_pressed(priv->list.window, keys);
+	} else if (!gnt_ws_is_empty(wm->cws)) {
 		GntWidget *win = gnt_ws_get_top_widget(wm->cws);
 		if (GNT_IS_WINDOW(win)) {
 			GntMenu *menu = gnt_window_get_menu(GNT_WINDOW(win));
@@ -2234,21 +2268,22 @@ void gnt_wm_move_window(GntWM *wm, GntWidget *widget, int x, int y)
 static void
 gnt_wm_give_focus(GntWM *wm, GntWidget *widget)
 {
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GntNode *node = g_hash_table_lookup(wm->nodes, widget);
 
 	if (!node)
 		return;
 
 	gnt_widget_set_is_urgent(widget, FALSE);
-	if (widget != wm->_list.window && !GNT_IS_MENU(widget)) {
+	if (!gnt_wm_is_list_window(wm, widget) && !GNT_IS_MENU(widget)) {
 		gnt_ws_bring_to_front(wm->cws, widget);
 	}
 
 	gnt_widget_draw(widget);
 	top_panel(node->panel);
 
-	if (wm->_list.window) {
-		GntNode *nd = g_hash_table_lookup(wm->nodes, wm->_list.window);
+	if (priv->list.window) {
+		GntNode *nd = g_hash_table_lookup(wm->nodes, priv->list.window);
 		top_panel(nd->panel);
 	}
 	gnt_ws_draw_taskbar(wm->cws, FALSE);
@@ -2312,9 +2347,19 @@ void gnt_wm_raise_window(GntWM *wm, GntWidget *widget)
 	g_signal_emit(wm, signals[SIG_GIVE_FOCUS], 0, widget);
 }
 
+/* Private. */
+gboolean
+gnt_wm_is_list_window(GntWM *wm, GntWidget *widget)
+{
+	GntWMPrivate *priv = NULL;
+
+	g_return_val_if_fail(GNT_IS_WM(wm), FALSE);
+	priv = gnt_wm_get_instance_private(wm);
+
+	return priv->list.window == widget;
+}
+
 void gnt_wm_set_event_stack(GntWM *wm, gboolean set)
 {
 	wm->event_stack = set;
 }
-
-

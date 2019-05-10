@@ -52,6 +52,7 @@
 
 #include "gntboxprivate.h"
 #include "gntmenuprivate.h"
+#include "gntwmprivate.h"
 #include "gntwsprivate.h"
 
 #include "gntwidgetprivate.h"
@@ -223,7 +224,8 @@ detect_mouse_action(const char *buffer)
 		return TRUE;
 
 	if (event == GNT_LEFT_MOUSE_DOWN && widget &&
-	    widget != wm->_list.window && !gnt_widget_get_transient(widget)) {
+	    !gnt_wm_is_list_window(wm, widget) &&
+	    !gnt_widget_get_transient(widget)) {
 		gint widgetx, widgety;
 		if (!gnt_ws_is_top_widget(wm->cws, widget)) {
 			gnt_wm_raise_window(wm, widget);
@@ -739,8 +741,9 @@ gboolean gnt_widget_has_focus(GntWidget *widget)
 
 	widget = gnt_widget_get_toplevel(widget);
 
-	if (widget == wm->_list.window)
+	if (gnt_wm_is_list_window(wm, widget)) {
 		return TRUE;
+	}
 	if (gnt_ws_is_top_widget(wm->cws, widget)) {
 		if (GNT_IS_BOX(widget) &&
 		    (gnt_box_get_active(GNT_BOX(widget)) == w || widget == w)) {
