@@ -815,7 +815,7 @@ void gnt_register_action(const char *label, void (*callback)(void))
 	action->label = g_strdup(label);
 	action->callback = callback;
 
-	wm->acts = g_list_append(wm->acts, action);
+	gnt_wm_add_action(wm, action);
 }
 
 static void

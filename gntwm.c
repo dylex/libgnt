@@ -82,6 +82,8 @@ typedef struct
 	GntListWindow list;
 	GntListWindow *windows; /* Window-list window */
 	GntListWindow *actions; /* Action-list window */
+
+	GList *acts; /* List of actions */
 } GntWMPrivate;
 
 enum
@@ -1008,8 +1010,9 @@ list_actions(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 		return TRUE;
 	}
 
-	if (wm->acts == NULL)
+	if (priv->acts == NULL) {
 		return TRUE;
+	}
 
 	setup__list(wm);
 	priv->actions = &priv->list;
@@ -1022,13 +1025,13 @@ list_actions(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 	/* XXX: Do we really want this? */
 	gnt_tree_set_compare_func(GNT_TREE(tree), compare_action);
 
-	for (iter = wm->acts; iter; iter = iter->next) {
+	for (iter = priv->acts; iter; iter = iter->next) {
 		GntAction *action = iter->data;
 		gnt_tree_add_row_last(GNT_TREE(tree), action,
 				gnt_tree_create_row(GNT_TREE(tree), action->label), NULL);
 	}
 	g_signal_connect(G_OBJECT(tree), "activate", G_CALLBACK(action_list_activate), wm);
-	n = g_list_length(wm->acts);
+	n = g_list_length(priv->acts);
 	gnt_widget_set_size(tree, 0, n);
 	gnt_widget_set_position(win, 0, getmaxy(stdscr) - 3 - n);
 
@@ -2357,6 +2360,18 @@ gnt_wm_is_list_window(GntWM *wm, GntWidget *widget)
 	priv = gnt_wm_get_instance_private(wm);
 
 	return priv->list.window == widget;
+}
+
+/* Private. */
+void
+gnt_wm_add_action(GntWM *wm, GntAction *action)
+{
+	GntWMPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WM(wm));
+	priv = gnt_wm_get_instance_private(wm);
+
+	priv->acts = g_list_append(priv->acts, action);
 }
 
 void gnt_wm_set_event_stack(GntWM *wm, gboolean set)

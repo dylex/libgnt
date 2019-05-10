@@ -40,6 +40,8 @@ G_BEGIN_DECLS
  */
 gboolean gnt_wm_is_list_window(GntWM *wm, GntWidget *widget);
 
+void gnt_wm_add_action(GntWM *wm, GntAction *action);
+
 G_END_DECLS
 
 #endif /* GNT_WM_PRIVATE_H */
