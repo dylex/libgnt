@@ -87,8 +87,6 @@ struct _GntWM
 
 	/*< public >*/
 	GHashTable *GNTSEAL(nodes);    /* GntWidget -> GntNode */
-	GHashTable *GNTSEAL(name_places);    /* window name -> ws*/
-	GHashTable *GNTSEAL(title_places);    /* window title -> ws */
 
 	GHashTable *GNTSEAL(positions);
 

@@ -86,6 +86,9 @@ typedef struct
 	GntListWindow *windows; /* Window-list window */
 	GntListWindow *actions; /* Action-list window */
 
+	GHashTable *name_places;  /* window name -> ws */
+	GHashTable *title_places; /* window title -> ws */
+
 	GList *acts; /* List of actions */
 
 	/* Currently active menu. There can be at most one menu at a time on
@@ -430,8 +433,10 @@ gnt_wm_init(GntWM *wm)
 {
 	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 
-	wm->name_places = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-	wm->title_places = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+	priv->name_places =
+	        g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+	priv->title_places =
+	        g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
 	gnt_style_read_workspaces(wm);
 	if (priv->workspaces == NULL) {
 		priv->cws = gnt_ws_new("default");
@@ -1896,14 +1901,14 @@ new_widget_find_workspace(GntWM *wm, GntWidget *widget)
 	const gchar *name, *title;
 	title = gnt_box_get_title(GNT_BOX(widget));
 	if (title) {
-		ret = g_hash_table_find(wm->title_places, (GHRFunc)match_title,
-		                        (gpointer)title);
+		ret = g_hash_table_find(priv->title_places,
+		                        (GHRFunc)match_title, (gpointer)title);
 	}
 	if (ret)
 		return ret;
 	name = gnt_widget_get_name(widget);
 	if (name) {
-		ret = g_hash_table_find(wm->name_places, (GHRFunc)match_title,
+		ret = g_hash_table_find(priv->name_places, (GHRFunc)match_title,
 		                        (gpointer)name);
 	}
 	return ret ? ret : priv->cws;
@@ -2432,6 +2437,30 @@ gnt_wm_is_list_window(GntWM *wm, GntWidget *widget)
 	priv = gnt_wm_get_instance_private(wm);
 
 	return priv->list.window == widget;
+}
+
+/* Private. */
+void
+gnt_wm_set_place_by_name(GntWM *wm, const gchar *name, GntWS *ws)
+{
+	GntWMPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WM(wm));
+	priv = gnt_wm_get_instance_private(wm);
+
+	g_hash_table_replace(priv->name_places, g_strdup(name), ws);
+}
+
+/* Private. */
+void
+gnt_wm_set_place_by_title(GntWM *wm, const gchar *title, GntWS *ws)
+{
+	GntWMPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WM(wm));
+	priv = gnt_wm_get_instance_private(wm);
+
+	g_hash_table_replace(priv->title_places, g_strdup(title), ws);
 }
 
 /* Private. */

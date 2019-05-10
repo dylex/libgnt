@@ -52,6 +52,9 @@ void gnt_wm_set_mainloop(GntWM *wm, GMainLoop *loop);
  */
 gboolean gnt_wm_is_list_window(GntWM *wm, GntWidget *widget);
 
+void gnt_wm_set_place_by_name(GntWM *wm, const gchar *name, GntWS *ws);
+void gnt_wm_set_place_by_title(GntWM *wm, const gchar *title, GntWS *ws);
+
 void gnt_wm_add_action(GntWM *wm, GntAction *action);
 
 GntMenu *gnt_wm_get_menu(GntWM *wm);

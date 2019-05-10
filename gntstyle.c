@@ -28,6 +28,8 @@
 #include "gntcolors.h"
 #include "gntws.h"
 
+#include "gntwmprivate.h"
+
 #include <glib.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -188,15 +190,17 @@ void gnt_style_read_workspaces(GntWM *wm)
 
 		titles = g_key_file_get_string_list(gkfile, group, "window-names", &c, NULL);
 		if (titles) {
-			for (j = 0; j < c; ++j)
-				g_hash_table_replace(wm->name_places, g_strdup(titles[j]), ws);
+			for (j = 0; j < c; ++j) {
+				gnt_wm_set_place_by_name(wm, titles[j], ws);
+			}
 			g_strfreev(titles);
 		}
 
 		titles = g_key_file_get_string_list(gkfile, group, "window-titles", &c, NULL);
 		if (titles) {
-			for (j = 0; j < c; ++j)
-				g_hash_table_replace(wm->title_places, g_strdup(titles[j]), ws);
+			for (j = 0; j < c; ++j) {
+				gnt_wm_set_place_by_title(wm, titles[j], ws);
+			}
 			g_strfreev(titles);
 		}
 	}
