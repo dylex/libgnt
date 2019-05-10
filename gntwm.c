@@ -86,6 +86,7 @@ typedef struct
 	GntListWindow *windows; /* Window-list window */
 	GntListWindow *actions; /* Action-list window */
 
+	GHashTable *nodes;        /* GntWidget -> GntNode */
 	GHashTable *name_places;  /* window name -> ws */
 	GHashTable *title_places; /* window title -> ws */
 
@@ -286,7 +287,7 @@ update_screen(GntWM *wm)
 	if (priv->menu) {
 		GntMenu *top = priv->menu;
 		while (top) {
-			GntNode *node = g_hash_table_lookup(wm->nodes, top);
+			GntNode *node = g_hash_table_lookup(priv->nodes, top);
 			if (node)
 				top_panel(node->panel);
 			top = gnt_menu_get_submenu(top);
@@ -444,7 +445,8 @@ gnt_wm_init(GntWM *wm)
 	} else {
 		priv->cws = priv->workspaces->data;
 	}
-	wm->nodes = g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL, free_node);
+	priv->nodes = g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL,
+	                                    free_node);
 	wm->positions = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
 	if (gnt_style_get_bool(GNT_STYLE_REMPOS, TRUE))
 		read_window_positions(wm);
@@ -548,7 +550,7 @@ window_scroll_up(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 	}
 
 	window = gnt_ws_get_top_widget(priv->cws);
-	node = g_hash_table_lookup(wm->nodes, window);
+	node = g_hash_table_lookup(priv->nodes, window);
 	if (!node)
 		return TRUE;
 
@@ -574,7 +576,7 @@ window_scroll_down(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 	}
 
 	window = gnt_ws_get_top_widget(priv->cws);
-	node = g_hash_table_lookup(wm->nodes, window);
+	node = g_hash_table_lookup(priv->nodes, window);
 	if (!node)
 		return TRUE;
 
@@ -968,7 +970,7 @@ shift_window(GntWM *wm, GntWidget *widget, int dir)
 	gnt_ws_draw_taskbar(priv->cws, FALSE);
 	if (!gnt_ws_is_empty(priv->cws)) {
 		GntWidget *w = gnt_ws_get_top_widget(priv->cws);
-		GntNode *node = g_hash_table_lookup(wm->nodes, w);
+		GntNode *node = g_hash_table_lookup(priv->nodes, w);
 		top_panel(node->panel);
 		update_panels();
 		doupdate();
@@ -1115,6 +1117,7 @@ reverse_char(WINDOW *d, int y, int x, gboolean set)
 static void
 window_reverse(GntWidget *win, gboolean set, GntWM *wm)
 {
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	int i;
 	int w, h;
 	WINDOW *d;
@@ -1138,7 +1141,7 @@ window_reverse(GntWidget *win, gboolean set, GntWM *wm)
 	for (i = 0; i < h; i += reverse_char(d, i, 0, set));
 	for (i = 0; i < h; i += reverse_char(d, i, w-1, set));
 
-	gnt_wm_copy_win(win, g_hash_table_lookup(wm->nodes, win));
+	gnt_wm_copy_win(win, g_hash_table_lookup(priv->nodes, win));
 	update_screen(wm);
 }
 
@@ -1222,12 +1225,13 @@ refresh_screen(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 	endwin();
 	refresh();
 
-	g_hash_table_foreach(wm->nodes, (GHFunc)refresh_node, GINT_TO_POINTER(TRUE));
+	g_hash_table_foreach(priv->nodes, (GHFunc)refresh_node,
+	                     GINT_TO_POINTER(TRUE));
 	g_signal_emit(wm, signals[SIG_TERMINAL_REFRESH], 0);
 
 	for (iter = gnt_ws_get_last(priv->cws); iter; iter = iter->prev) {
 		GntWidget *w = iter->data;
-		GntNode *node = g_hash_table_lookup(wm->nodes, w);
+		GntNode *node = g_hash_table_lookup(priv->nodes, w);
 		top_panel(node->panel);
 	}
 
@@ -1501,10 +1505,10 @@ gnt_wm_destroy(GObject *obj)
 	GList *list;
 
 	list = NULL;
-	g_hash_table_foreach(wm->nodes, (GHFunc)accumulate_windows, &list);
+	g_hash_table_foreach(priv->nodes, (GHFunc)accumulate_windows, &list);
 	g_list_free_full(list, (GDestroyNotify)gnt_widget_destroy);
-	g_hash_table_destroy(wm->nodes);
-	wm->nodes = NULL;
+	g_hash_table_destroy(priv->nodes);
+	priv->nodes = NULL;
 
 	g_list_free_full(priv->workspaces, g_object_unref);
 	priv->workspaces = NULL;
@@ -1747,9 +1751,9 @@ gnt_wm_switch_workspace(GntWM *wm, gint n)
 		gnt_widget_destroy(priv->list.window);
 	}
 	ensure_normal_mode(wm);
-	gnt_ws_hide(priv->cws, wm->nodes);
+	gnt_ws_hide(priv->cws, priv->nodes);
 	priv->cws = s;
-	gnt_ws_show(priv->cws, wm->nodes);
+	gnt_ws_show(priv->cws, priv->nodes);
 
 	gnt_ws_draw_taskbar(priv->cws, TRUE);
 	update_screen(wm);
@@ -1815,7 +1819,7 @@ gnt_wm_widget_move_workspace(GntWM *wm, GntWS *neww, GntWidget *widget)
 	oldw = gnt_wm_widget_find_workspace(wm, widget);
 	if (!oldw || oldw == neww)
 		return;
-	node = g_hash_table_lookup(wm->nodes, widget);
+	node = g_hash_table_lookup(priv->nodes, widget);
 	if (node && node->ws == neww)
 		return;
 
@@ -1825,9 +1829,9 @@ gnt_wm_widget_move_workspace(GntWM *wm, GntWS *neww, GntWidget *widget)
 	gnt_ws_remove_widget(oldw, widget);
 	gnt_ws_add_widget(neww, widget);
 	if (neww == priv->cws) {
-		gnt_ws_widget_show(widget, wm->nodes);
+		gnt_ws_widget_show(widget, priv->nodes);
 	} else {
-		gnt_ws_widget_hide(widget, wm->nodes);
+		gnt_ws_widget_hide(widget, priv->nodes);
 	}
 }
 
@@ -1929,7 +1933,7 @@ gnt_wm_new_window_real(GntWM *wm, GntWidget *widget)
 	node->me = widget;
 	node->scroll = 0;
 
-	g_hash_table_replace(wm->nodes, widget, node);
+	g_hash_table_replace(priv->nodes, widget, node);
 
 	refresh_node(widget, node, GINT_TO_POINTER(TRUE));
 
@@ -1982,7 +1986,7 @@ gnt_wm_new_window_real(GntWM *wm, GntWidget *widget)
 			gnt_widget_set_focus(node->me, FALSE);
 			gnt_widget_set_urgent(node->me);
 			if (priv->cws != ws) {
-				gnt_ws_widget_hide(widget, wm->nodes);
+				gnt_ws_widget_hide(widget, priv->nodes);
 			}
 		}
 	}
@@ -1998,7 +2002,7 @@ void gnt_wm_new_window(GntWM *wm, GntWidget *widget)
 	widget = gnt_widget_get_toplevel(widget);
 
 	if (!gnt_widget_get_visible(widget) ||
-	    g_hash_table_lookup(wm->nodes, widget)) {
+	    g_hash_table_lookup(priv->nodes, widget)) {
 		update_screen(wm);
 		return;
 	}
@@ -2057,11 +2061,11 @@ void gnt_wm_window_close(GntWM *wm, GntWidget *widget)
 
 	s = gnt_wm_widget_find_workspace(wm, widget);
 
-	if (g_hash_table_lookup(wm->nodes, widget) == NULL)
+	if (g_hash_table_lookup(priv->nodes, widget) == NULL)
 		return;
 
 	g_signal_emit(wm, signals[SIG_CLOSE_WIN], 0, widget);
-	g_hash_table_remove(wm->nodes, widget);
+	g_hash_table_remove(priv->nodes, widget);
 
 	if (priv->windows) {
 		gnt_tree_remove(GNT_TREE(priv->windows->tree), widget);
@@ -2227,12 +2231,16 @@ gnt_wm_win_moved(G_GNUC_UNUSED GntWM *wm, GntNode *node)
 
 void gnt_wm_resize_window(GntWM *wm, GntWidget *widget, int width, int height)
 {
+	GntWMPrivate *priv = NULL;
 	gboolean ret = TRUE;
 	GntNode *node;
 	int maxx, maxy;
 
+	g_return_if_fail(GNT_IS_WM(wm));
+	priv = gnt_wm_get_instance_private(wm);
+
 	widget = gnt_widget_get_toplevel(widget);
-	node = g_hash_table_lookup(wm->nodes, widget);
+	node = g_hash_table_lookup(priv->nodes, widget);
 	if (!node)
 		return;
 
@@ -2297,11 +2305,15 @@ write_positions_to_file(GntWM *wm)
 
 void gnt_wm_move_window(GntWM *wm, GntWidget *widget, int x, int y)
 {
+	GntWMPrivate *priv = NULL;
 	gboolean ret = TRUE;
 	GntNode *node;
 
+	g_return_if_fail(GNT_IS_WM(wm));
+	priv = gnt_wm_get_instance_private(wm);
+
 	widget = gnt_widget_get_toplevel(widget);
-	node = g_hash_table_lookup(wm->nodes, widget);
+	node = g_hash_table_lookup(priv->nodes, widget);
 	if (!node)
 		return;
 
@@ -2332,7 +2344,7 @@ static void
 gnt_wm_give_focus(GntWM *wm, GntWidget *widget)
 {
 	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
-	GntNode *node = g_hash_table_lookup(wm->nodes, widget);
+	GntNode *node = g_hash_table_lookup(priv->nodes, widget);
 
 	if (!node)
 		return;
@@ -2346,7 +2358,8 @@ gnt_wm_give_focus(GntWM *wm, GntWidget *widget)
 	top_panel(node->panel);
 
 	if (priv->list.window) {
-		GntNode *nd = g_hash_table_lookup(wm->nodes, priv->list.window);
+		GntNode *nd =
+		        g_hash_table_lookup(priv->nodes, priv->list.window);
 		top_panel(nd->panel);
 	}
 	gnt_ws_draw_taskbar(priv->cws, FALSE);
@@ -2370,7 +2383,7 @@ void gnt_wm_update_window(GntWM *wm, GntWidget *widget)
 	}
 
 	ws = gnt_wm_widget_find_workspace(wm, widget);
-	node = g_hash_table_lookup(wm->nodes, widget);
+	node = g_hash_table_lookup(priv->nodes, widget);
 	if (node == NULL) {
 		gnt_wm_new_window(wm, widget);
 	} else
@@ -2413,6 +2426,17 @@ void gnt_wm_raise_window(GntWM *wm, GntWidget *widget)
 
 	gnt_ws_bring_to_front(priv->cws, widget);
 	g_signal_emit(wm, signals[SIG_GIVE_FOCUS], 0, widget);
+}
+
+void
+gnt_wm_foreach(GntWM *wm, GHFunc func, gpointer user_data)
+{
+	GntWMPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WM(wm));
+	priv = gnt_wm_get_instance_private(wm);
+
+	g_hash_table_foreach(priv->nodes, func, user_data);
 }
 
 /* Private. */

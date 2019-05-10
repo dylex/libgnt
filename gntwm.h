@@ -86,8 +86,6 @@ struct _GntWM
 	GntBindable inherit;
 
 	/*< public >*/
-	GHashTable *GNTSEAL(nodes);    /* GntWidget -> GntNode */
-
 	GHashTable *GNTSEAL(positions);
 
 	/*< private >*/
@@ -267,6 +265,21 @@ void gnt_wm_window_decorate(GntWM *wm, GntWidget *widget);
  * Close a window.
  */
 void gnt_wm_window_close(GntWM *wm, GntWidget *widget);
+
+/**
+ * gnt_wm_foreach:
+ * @wm:                 The window-manager.
+ * @func: (scope call): The function to call for each key/value pair.
+ * @user_data:          User data to pass to the function.
+ *
+ * Calls the given function for each of the #GntWidget / #GntNode pairs in the
+ * #GntWM. The function is passed the widget and node of each pair, and the
+ * given @user_data parameter. The window manager may not be modified while
+ * iterating over it (you can't add/remove widgets).
+ *
+ * Since: 3.0.0
+ */
+void gnt_wm_foreach(GntWM *wm, GHFunc func, gpointer user_data);
 
 /**
  * gnt_wm_process_input:

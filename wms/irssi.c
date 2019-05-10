@@ -352,7 +352,7 @@ irssi_terminal_refresh(GntWM *wm)
 {
 	GntIrssiWM *irssi = GNT_IRSSI_WM(wm);
 	draw_line_separators(irssi);
-	g_hash_table_foreach(wm->nodes, (GHFunc)refresh_window, wm);
+	gnt_wm_foreach(wm, (GHFunc)refresh_window, wm);
 }
 
 static void
