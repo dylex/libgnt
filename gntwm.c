@@ -85,6 +85,12 @@ typedef struct
 	GntListWindow *actions; /* Action-list window */
 
 	GList *acts; /* List of actions */
+
+	/* Will be set to %TRUE when a user-event, ie. a mouse-click or a
+	 * key-press is being processed. This variable will be used to
+	 * determine whether to give focus to a new window.
+	 */
+	gboolean event_stack;
 } GntWMPrivate;
 
 enum
@@ -419,7 +425,6 @@ gnt_wm_init(GntWM *wm)
 	} else {
 		priv->cws = priv->workspaces->data;
 	}
-	wm->event_stack = FALSE;
 	wm->nodes = g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL, free_node);
 	wm->positions = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
 	if (gnt_style_get_bool(GNT_STYLE_REMPOS, TRUE))
@@ -1946,7 +1951,7 @@ gnt_wm_new_window_real(GntWM *wm, GntWidget *widget)
 			gnt_ws_append_widget(ws, widget);
 		}
 
-		if (wm->event_stack || gnt_wm_is_list_window(wm, node->me) ||
+		if (priv->event_stack || gnt_wm_is_list_window(wm, node->me) ||
 		    gnt_ws_is_top_widget(ws, node->me)) {
 			gnt_wm_raise_window(wm, node->me);
 		} else {
@@ -2412,8 +2417,25 @@ gnt_wm_add_action(GntWM *wm, GntAction *action)
 }
 
 /* Private. */
+gboolean
+gnt_wm_get_event_stack(GntWM *wm)
+{
+	GntWMPrivate *priv = NULL;
+
+	g_return_val_if_fail(GNT_IS_WM(wm), FALSE);
+	priv = gnt_wm_get_instance_private(wm);
+
+	return priv->event_stack;
+}
+
+/* Private. */
 void
 gnt_wm_set_event_stack(GntWM *wm, gboolean set)
 {
-	wm->event_stack = set;
+	GntWMPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WM(wm));
+	priv = gnt_wm_get_instance_private(wm);
+
+	priv->event_stack = set;
 }

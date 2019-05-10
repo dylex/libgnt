@@ -709,10 +709,11 @@ void gnt_main()
 
 void gnt_window_present(GntWidget *window)
 {
-	if (wm->event_stack)
+	if (gnt_wm_get_event_stack(wm)) {
 		gnt_wm_raise_window(wm, window);
-	else
+	} else {
 		gnt_widget_set_urgent(window);
+	}
 }
 
 void gnt_screen_occupy(GntWidget *widget)
