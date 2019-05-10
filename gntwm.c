@@ -2033,6 +2033,8 @@ void gnt_wm_new_window(GntWM *wm, GntWidget *widget)
 
 void gnt_wm_window_decorate(GntWM *wm, GntWidget *widget)
 {
+	g_return_if_fail(GNT_IS_WM(wm));
+
 	g_signal_emit(wm, signals[SIG_DECORATE_WIN], 0, widget);
 }
 
@@ -2078,15 +2080,19 @@ void gnt_wm_window_close(GntWM *wm, GntWidget *widget)
 	update_screen(priv);
 }
 
-time_t gnt_wm_get_idle_time()
+time_t
+gnt_wm_get_idle_time(void)
 {
 	return time(NULL) - last_active_time;
 }
 
 gboolean gnt_wm_process_input(GntWM *wm, const char *keys)
 {
-	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
+	GntWMPrivate *priv = NULL;
 	gboolean ret = FALSE;
+
+	g_return_val_if_fail(GNT_IS_WM(wm), FALSE);
+	priv = gnt_wm_get_instance_private(wm);
 
 	keys = gnt_bindable_remap_keys(GNT_BINDABLE(wm), keys);
 
@@ -2393,6 +2399,9 @@ void gnt_wm_update_window(GntWM *wm, GntWidget *widget)
 gboolean gnt_wm_process_click(GntWM *wm, GntMouseEvent event, int x, int y, GntWidget *widget)
 {
 	gboolean ret = TRUE;
+
+	g_return_val_if_fail(GNT_IS_WM(wm), FALSE);
+
 	idle_update = TRUE;
 	g_signal_emit(wm, signals[SIG_MOUSE_CLICK], 0, event, x, y, widget, &ret);
 	return ret;
