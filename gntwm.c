@@ -106,6 +106,8 @@ typedef struct
 	gboolean event_stack;
 
 	GntKeyPressMode mode;
+
+	GHashTable *positions;
 } GntWMPrivate;
 
 enum
@@ -376,6 +378,7 @@ refresh_node(GntWidget *widget, G_GNUC_UNUSED GntNode *node, gpointer m)
 static void
 read_window_positions(GntWM *wm)
 {
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GKeyFile *gfile = g_key_file_new();
 	char *filename = g_build_filename(gnt_get_config_dir(), ".gntpositions", NULL);
 	GError *error = NULL;
@@ -405,7 +408,7 @@ read_window_positions(GntWM *wm)
 				GntPosition *p = g_new0(GntPosition, 1);
 				p->x = x;
 				p->y = y;
-				g_hash_table_replace(wm->positions, g_strdup(title + 1), p);
+				g_hash_table_replace(priv->positions, g_strdup(title + 1), p);
 			} else {
 				gnt_warning("Invalid number of arguments (%" G_GSIZE_FORMAT
 						") for positioning a window.", l);
@@ -447,7 +450,7 @@ gnt_wm_init(GntWM *wm)
 	}
 	priv->nodes = g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL,
 	                                    free_node);
-	wm->positions = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+	priv->positions = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
 	if (gnt_style_get_bool(GNT_STYLE_REMPOS, TRUE))
 		read_window_positions(wm);
 	g_timeout_add_seconds(IDLE_CHECK_INTERVAL, check_idle, NULL);
@@ -2010,7 +2013,7 @@ void gnt_wm_new_window(GntWM *wm, GntWidget *widget)
 	if (GNT_IS_BOX(widget)) {
 		const gchar *title = gnt_box_get_title(GNT_BOX(widget));
 		GntPosition *p = NULL;
-		if (title && (p = g_hash_table_lookup(wm->positions, title)) != NULL) {
+		if (title && (p = g_hash_table_lookup(priv->positions, title)) != NULL) {
 			sanitize_position(widget, &p->x, &p->y, TRUE);
 			gnt_widget_set_position(widget, p->x, p->y);
 			mvwin(gnt_widget_get_window(widget), p->y, p->x);
@@ -2274,6 +2277,7 @@ static gboolean
 write_already(gpointer data)
 {
 	GntWM *wm = data;
+	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	FILE *file;
 	char *filename;
 
@@ -2284,7 +2288,7 @@ write_already(gpointer data)
 		gnt_warning("error opening file (%s) to save positions", filename);
 	} else {
 		fprintf(file, "[positions]\n");
-		g_hash_table_foreach(wm->positions, (GHFunc)write_gdi, file);
+		g_hash_table_foreach(priv->positions, (GHFunc)write_gdi, file);
 		fclose(file);
 	}
 
@@ -2332,7 +2336,7 @@ void gnt_wm_move_window(GntWM *wm, GntWidget *widget, int x, int y)
 			GntPosition *p = g_new0(GntPosition, 1);
 			GntWidget *wid = node->me;
 			gnt_widget_get_position(wid, &p->x, &p->y);
-			g_hash_table_replace(wm->positions, g_strdup(title), p);
+			g_hash_table_replace(priv->positions, g_strdup(title), p);
 			write_positions_to_file(wm);
 		}
 	}
@@ -2437,6 +2441,17 @@ gnt_wm_foreach(GntWM *wm, GHFunc func, gpointer user_data)
 	priv = gnt_wm_get_instance_private(wm);
 
 	g_hash_table_foreach(priv->nodes, func, user_data);
+}
+
+gboolean
+gnt_wm_has_window_position(GntWM *wm, const gchar *title)
+{
+	GntWMPrivate *priv = NULL;
+
+	g_return_val_if_fail(GNT_IS_WM(wm), FALSE);
+	priv = gnt_wm_get_instance_private(wm);
+
+	return g_hash_table_lookup(priv->positions, title) != NULL;
 }
 
 /* Private. */

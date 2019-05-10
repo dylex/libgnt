@@ -85,9 +85,6 @@ struct _GntWM
 {
 	GntBindable inherit;
 
-	/*< public >*/
-	GHashTable *GNTSEAL(positions);
-
 	/*< private >*/
 	void *res1;
 	void *res2;
@@ -352,6 +349,20 @@ void gnt_wm_raise_window(GntWM *wm, GntWidget *widget);
  * Returns:  The idle time of the user.
  */
 time_t gnt_wm_get_idle_time(void);
+
+/**
+ * gnt_wm_has_window_position:
+ * @wm:    The window-manager.
+ * @title: The title of the window.
+ *
+ * Checks whether the window manager has a recorded window position for a
+ * window with the given @title.
+ *
+ * Returns: #TRUE if a position is recorded for the window, %FALSE otherwise.
+ *
+ * Since: 3.0.0
+ */
+gboolean gnt_wm_has_window_position(GntWM *wm, const gchar *title);
 
 G_END_DECLS
 
