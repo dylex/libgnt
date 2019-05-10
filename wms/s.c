@@ -129,7 +129,7 @@ s_new_window(GntWM *wm, GntWidget *win)
 			gnt_widget_set_size(win, -1, h + 2);  /* XXX: Why is the +2 needed here? -- sadrul */
 		} else if (!gnt_widget_get_transient(win)) {
 			const gchar *title = gnt_box_get_title(GNT_BOX(win));
-			if (title == NULL || !g_hash_table_lookup(wm->positions, title)) {
+			if (title == NULL || !gnt_wm_has_window_position(wm, title)) {
 				/* In the middle of the screen */
 				x = (maxx - w) / 2;
 				y = (maxy - h) / 2;
@@ -148,7 +148,7 @@ s_new_window(GntWM *wm, GntWidget *win)
 static GntWidget *
 find_widget(GntWM *wm, const char *wname)
 {
-	GList *iter = gnt_ws_get_list(wm->cws);
+	GList *iter = gnt_ws_get_list(gnt_wm_get_current_workspace(wm));
 	for (; iter; iter = iter->next) {
 		GntWidget *widget = iter->data;
 		const char *name = gnt_widget_get_name(widget);

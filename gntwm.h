@@ -44,14 +44,6 @@
 #define GNT_IS_WM_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_WM))
 #define GNT_WM_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_WM, GntWMClass))
 
-typedef enum
-{
-	GNT_KP_MODE_NORMAL,
-	GNT_KP_MODE_RESIZE,
-	GNT_KP_MODE_MOVE,
-	GNT_KP_MODE_WAIT_ON_CHILD
-} GntKeyPressMode;
-
 typedef struct _GntNode GntNode;
 
 struct _GntNode
@@ -83,21 +75,8 @@ typedef struct _GntAction
 	void (*callback)(void);
 } GntAction;
 
-typedef struct _GntListWindow {
-		GntWidget *window;
-		GntWidget *tree;
-} GntListWindow;
-
 /**
  * GntWM:
- * @acts: List of actions
- * @menu: Currently active menu. There can be at most one menu at a time on the
- *        screen. If there is a menu being displayed, then all the keystrokes
- *        will be sent to the menu until it is closed, either when the user
- *        activates a menuitem, or presses Escape to cancel the menu.
- * @event_stack: Will be set to %TRUE when a user-event, ie. a mouse-click or a
- *               key-press is being processed. This variable will be used to
- *               determine whether to give focus to a new window.
  *
  * Access to any fields is deprecated. See inline comments for replacements.
  *
@@ -105,27 +84,6 @@ typedef struct _GntListWindow {
 struct _GntWM
 {
 	GntBindable inherit;
-
-	/*< public >*/
-	GMainLoop *GNTSEAL(loop);
-
-	GntWS *GNTSEAL(cws);
-
-	GntListWindow GNTSEAL(_list);
-
-	GHashTable *GNTSEAL(nodes);    /* GntWidget -> GntNode */
-	GHashTable *GNTSEAL(name_places);    /* window name -> ws*/
-	GHashTable *GNTSEAL(title_places);    /* window title -> ws */
-
-	GList *GNTSEAL(acts);
-
-	GntMenu *GNTSEAL(menu);
-
-	gboolean GNTSEAL(event_stack);
-
-	GntKeyPressMode GNTSEAL(mode);
-
-	GHashTable *GNTSEAL(positions);
 
 	/*< private >*/
 	void *res1;
@@ -199,6 +157,18 @@ G_BEGIN_DECLS
  * Returns: GType for GntWM.
  */
 GType gnt_wm_get_type(void);
+
+/**
+ * gnt_wm_get_current_workspace:
+ * @wm: The window-manager.
+ *
+ * Gets the current workspace.
+ *
+ * Returns: (transfer none): The @GntWS that is currently active.
+ *
+ * Since: 3.0.0
+ */
+GntWS *gnt_wm_get_current_workspace(GntWM *wm);
 
 /**
  * gnt_wm_add_workspace:
@@ -294,6 +264,21 @@ void gnt_wm_window_decorate(GntWM *wm, GntWidget *widget);
 void gnt_wm_window_close(GntWM *wm, GntWidget *widget);
 
 /**
+ * gnt_wm_foreach:
+ * @wm:                 The window-manager.
+ * @func: (scope call): The function to call for each key/value pair.
+ * @user_data:          User data to pass to the function.
+ *
+ * Calls the given function for each of the #GntWidget / #GntNode pairs in the
+ * #GntWM. The function is passed the widget and node of each pair, and the
+ * given @user_data parameter. The window manager may not be modified while
+ * iterating over it (you can't add/remove widgets).
+ *
+ * Since: 3.0.0
+ */
+void gnt_wm_foreach(GntWM *wm, GHFunc func, gpointer user_data);
+
+/**
  * gnt_wm_process_input:
  * @wm:      The window-manager.
  * @string:  The input string to process.
@@ -359,25 +344,25 @@ void gnt_wm_update_window(GntWM *wm, GntWidget *widget);
 void gnt_wm_raise_window(GntWM *wm, GntWidget *widget);
 
 /**
- * gnt_wm_set_event_stack:
- *
- * Internal function -- do not use.
- */
-void gnt_wm_set_event_stack(GntWM *wm, gboolean set);
-
-/**
- * gnt_wm_copy_win:
- *
- * Internal function -- do not use.
- */
-void gnt_wm_copy_win(GntWidget *widget, GntNode *node);
-
-/**
  * gnt_wm_get_idle_time:
  *
  * Returns:  The idle time of the user.
  */
 time_t gnt_wm_get_idle_time(void);
+
+/**
+ * gnt_wm_has_window_position:
+ * @wm:    The window-manager.
+ * @title: The title of the window.
+ *
+ * Checks whether the window manager has a recorded window position for a
+ * window with the given @title.
+ *
+ * Returns: #TRUE if a position is recorded for the window, %FALSE otherwise.
+ *
+ * Since: 3.0.0
+ */
+gboolean gnt_wm_has_window_position(GntWM *wm, const gchar *title);
 
 G_END_DECLS
 

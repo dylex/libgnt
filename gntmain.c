@@ -52,6 +52,7 @@
 
 #include "gntboxprivate.h"
 #include "gntmenuprivate.h"
+#include "gntwmprivate.h"
 #include "gntwsprivate.h"
 
 #include "gntwidgetprivate.h"
@@ -164,7 +165,8 @@ detect_mouse_action(const char *buffer)
 	GntWidget *widget = NULL;
 	PANEL *p = NULL;
 
-	if (gnt_ws_is_empty(wm->cws) || buffer[0] != 27) {
+	if (gnt_ws_is_empty(gnt_wm_get_current_workspace(wm)) ||
+	    buffer[0] != 27) {
 		return FALSE;
 	}
 
@@ -223,9 +225,11 @@ detect_mouse_action(const char *buffer)
 		return TRUE;
 
 	if (event == GNT_LEFT_MOUSE_DOWN && widget &&
-	    widget != wm->_list.window && !gnt_widget_get_transient(widget)) {
+	    !gnt_wm_is_list_window(wm, widget) &&
+	    !gnt_widget_get_transient(widget)) {
 		gint widgetx, widgety;
-		if (!gnt_ws_is_top_widget(wm->cws, widget)) {
+		if (!gnt_ws_is_top_widget(gnt_wm_get_current_workspace(wm),
+		                          widget)) {
 			gnt_wm_raise_window(wm, widget);
 		}
 		gnt_widget_get_position(widget, &widgetx, &widgety);
@@ -237,7 +241,8 @@ detect_mouse_action(const char *buffer)
 	} else if (event == GNT_MOUSE_UP) {
 		if (button == MOUSE_NONE && y == getmaxy(stdscr) - 1) {
 			/* Clicked on the taskbar */
-			int n = g_list_length(gnt_ws_get_list(wm->cws));
+			int n = g_list_length(gnt_ws_get_list(
+			        gnt_wm_get_current_workspace(wm)));
 			if (n) {
 				int width = getmaxx(stdscr) / n;
 				gnt_bindable_perform_action_named(GNT_BINDABLE(wm), "switch-window-n", x/width, NULL);
@@ -298,8 +303,9 @@ io_invoke(GIOChannel *source, G_GNUC_UNUSED GIOCondition cond,
 	gboolean is_special = FALSE;
 	gboolean is_escape = FALSE;
 
-	if (wm->mode == GNT_KP_MODE_WAIT_ON_CHILD)
+	if (gnt_wm_get_keypress_mode(wm) == GNT_KP_MODE_WAIT_ON_CHILD) {
 		return FALSE;
+	}
 
 	if (HOLDING_ESCAPE) {
 		is_escape = TRUE;
@@ -369,8 +375,9 @@ io_invoke(GIOChannel *source, G_GNUC_UNUSED GIOCondition cond,
 	char *k;
 	char *cvrt = NULL;
 
-	if (wm->mode == GNT_KP_MODE_WAIT_ON_CHILD)
+	if (gnt_wm_get_keypress_mode(wm) == GNT_KP_MODE_WAIT_ON_CHILD) {
 		return FALSE;
+	}
 
 	rd = read(STDIN_FILENO, keys + HOLDING_ESCAPE, sizeof(keys) - 1 - HOLDING_ESCAPE);
 	if (rd < 0)
@@ -500,15 +507,15 @@ static void
 ask_before_exit(void)
 {
 	static GntWidget *win = NULL;
+	GntMenu *menu;
 	GntWidget *bbox, *button;
 
-	if (wm->menu) {
-		do {
-			gnt_widget_hide(GNT_WIDGET(wm->menu));
-			if (wm->menu)
-				wm->menu = gnt_menu_get_parent_menu(wm->menu);
-		} while (wm->menu);
+	menu = gnt_wm_get_menu(wm);
+	while (menu) {
+		gnt_widget_hide(GNT_WIDGET(menu));
+		menu = gnt_menu_get_parent_menu(menu);
 	}
+	gnt_wm_set_menu(wm, NULL);
 
 	if (win)
 		goto raise;
@@ -694,8 +701,9 @@ void gnt_init()
 
 void gnt_main()
 {
-	wm->loop = g_main_loop_new(NULL, FALSE);
-	g_main_loop_run(wm->loop);
+	GMainLoop *loop = g_main_loop_new(NULL, FALSE);
+	gnt_wm_set_mainloop(wm, loop);
+	g_main_loop_run(loop);
 }
 
 /*********************************
@@ -704,10 +712,11 @@ void gnt_main()
 
 void gnt_window_present(GntWidget *window)
 {
-	if (wm->event_stack)
+	if (gnt_wm_get_event_stack(wm)) {
 		gnt_wm_raise_window(wm, window);
-	else
+	} else {
 		gnt_widget_set_urgent(window);
+	}
 }
 
 void gnt_screen_occupy(GntWidget *widget)
@@ -739,9 +748,10 @@ gboolean gnt_widget_has_focus(GntWidget *widget)
 
 	widget = gnt_widget_get_toplevel(widget);
 
-	if (widget == wm->_list.window)
+	if (gnt_wm_is_list_window(wm, widget)) {
 		return TRUE;
-	if (gnt_ws_is_top_widget(wm->cws, widget)) {
+	}
+	if (gnt_ws_is_top_widget(gnt_wm_get_current_workspace(wm), widget)) {
 		if (GNT_IS_BOX(widget) &&
 		    (gnt_box_get_active(GNT_BOX(widget)) == w || widget == w)) {
 			return TRUE;
@@ -754,7 +764,7 @@ void gnt_widget_set_urgent(GntWidget *widget)
 {
 	widget = gnt_widget_get_toplevel(widget);
 
-	if (gnt_ws_is_top_widget(wm->cws, widget)) {
+	if (gnt_ws_is_top_widget(gnt_wm_get_current_workspace(wm), widget)) {
 		return;
 	}
 
@@ -812,29 +822,31 @@ void gnt_register_action(const char *label, void (*callback)(void))
 	action->label = g_strdup(label);
 	action->callback = callback;
 
-	wm->acts = g_list_append(wm->acts, action);
+	gnt_wm_add_action(wm, action);
 }
 
 static void
 reset_menu(G_GNUC_UNUSED GntWidget *widget, G_GNUC_UNUSED gpointer data)
 {
-	wm->menu = NULL;
+	gnt_wm_set_menu(wm, NULL);
 }
 
 gboolean gnt_screen_menu_show(gpointer newmenu)
 {
-	if (wm->menu) {
+	if (gnt_wm_get_menu(wm)) {
 		/* For now, if a menu is being displayed, then another menu
 		 * can NOT take over. */
 		return FALSE;
 	}
 
-	wm->menu = newmenu;
-	gnt_widget_set_visible(GNT_WIDGET(wm->menu), TRUE);
-	gnt_widget_draw(GNT_WIDGET(wm->menu));
+	gnt_wm_set_menu(wm, GNT_MENU(newmenu));
+	gnt_widget_set_visible(GNT_WIDGET(newmenu), TRUE);
+	gnt_widget_draw(GNT_WIDGET(newmenu));
 
-	g_signal_connect(G_OBJECT(wm->menu), "hide", G_CALLBACK(reset_menu), NULL);
-	g_signal_connect(G_OBJECT(wm->menu), "destroy", G_CALLBACK(reset_menu), NULL);
+	g_signal_connect(G_OBJECT(newmenu), "hide", G_CALLBACK(reset_menu),
+	                 NULL);
+	g_signal_connect(G_OBJECT(newmenu), "destroy", G_CALLBACK(reset_menu),
+	                 NULL);
 
 	return TRUE;
 }
@@ -871,7 +883,7 @@ reap_child(G_GNUC_UNUSED GPid pid, gint status, gpointer data)
 #ifndef _WIN32
 	clean_pid();
 #endif
-	wm->mode = GNT_KP_MODE_NORMAL;
+	gnt_wm_set_keypress_mode(wm, GNT_KP_MODE_NORMAL);
 	endwin();
 	setup_io();
 	refresh();
@@ -895,7 +907,7 @@ gboolean gnt_giveup_console(const char *wd, char **argv, char **envp,
 	cp->callback = callback;
 	cp->data = data;
 	g_source_remove(channel_read_callback);
-	wm->mode = GNT_KP_MODE_WAIT_ON_CHILD;
+	gnt_wm_set_keypress_mode(wm, GNT_KP_MODE_WAIT_ON_CHILD);
 	g_child_watch_add(pid, reap_child, cp);
 
 	return TRUE;
@@ -903,7 +915,8 @@ gboolean gnt_giveup_console(const char *wd, char **argv, char **envp,
 
 gboolean gnt_is_refugee()
 {
-	return (wm && wm->mode == GNT_KP_MODE_WAIT_ON_CHILD);
+	return (wm &&
+	        gnt_wm_get_keypress_mode(wm) == GNT_KP_MODE_WAIT_ON_CHILD);
 }
 
 const char *C_(const char *x)
