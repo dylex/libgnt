@@ -132,8 +132,8 @@ static void gnt_wm_new_window_real(GntWM *wm, GntWidget *widget);
 static void gnt_wm_win_resized(GntWM *wm, GntNode *node);
 static void gnt_wm_win_moved(GntWM *wm, GntNode *node);
 static void gnt_wm_give_focus(GntWM *wm, GntWidget *widget);
-static void update_window_in_list(GntWM *wm, GntWidget *wid);
-static void shift_window(GntWM *wm, GntWidget *widget, int dir);
+static void update_window_in_list(GntWMPrivate *priv, GntWidget *wid);
+static void shift_window(GntWMPrivate *priv, GntWidget *widget, int dir);
 static gboolean workspace_next(GntBindable *wm, GList *n);
 static gboolean workspace_prev(GntBindable *wm, GList *n);
 
@@ -141,7 +141,7 @@ static gboolean workspace_prev(GntBindable *wm, GList *n);
 static int widestringwidth(wchar_t *wide);
 #endif
 
-static void ensure_normal_mode(GntWM *wm);
+static void ensure_normal_mode(GntWMPrivate *priv);
 static gboolean write_already(gpointer data);
 static int write_timeout;
 static time_t last_active_time;
@@ -278,10 +278,8 @@ update_act_msg(void)
 }
 
 static gboolean
-update_screen(GntWM *wm)
+update_screen(GntWMPrivate *priv)
 {
-	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
-
 	if (priv->mode == GNT_KP_MODE_WAIT_ON_CHILD) {
 		return TRUE;
 	}
@@ -376,9 +374,8 @@ refresh_node(GntWidget *widget, G_GNUC_UNUSED GntNode *node, gpointer m)
 }
 
 static void
-read_window_positions(GntWM *wm)
+read_window_positions(GntWMPrivate *priv)
 {
-	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GKeyFile *gfile = g_key_file_new();
 	char *filename = g_build_filename(gnt_get_config_dir(), ".gntpositions", NULL);
 	GError *error = NULL;
@@ -451,8 +448,9 @@ gnt_wm_init(GntWM *wm)
 	priv->nodes = g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL,
 	                                    free_node);
 	priv->positions = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-	if (gnt_style_get_bool(GNT_STYLE_REMPOS, TRUE))
-		read_window_positions(wm);
+	if (gnt_style_get_bool(GNT_STYLE_REMPOS, TRUE)) {
+		read_window_positions(priv);
+	}
 	g_timeout_add_seconds(IDLE_CHECK_INTERVAL, check_idle, NULL);
 	time(&last_active_time);
 	gnt_wm_switch_workspace(wm, 0);
@@ -475,7 +473,7 @@ switch_window(GntWM *wm, int direction, gboolean urgent)
 	}
 
 	if (priv->mode != GNT_KP_MODE_NORMAL) {
-		ensure_normal_mode(wm);
+		ensure_normal_mode(priv);
 	}
 
 	w = gnt_ws_get_top_widget(priv->cws);
@@ -560,7 +558,7 @@ window_scroll_up(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 	if (node->scroll) {
 		node->scroll--;
 		gnt_wm_copy_win(window, node);
-		update_screen(wm);
+		update_screen(priv);
 	}
 	return TRUE;
 }
@@ -587,7 +585,7 @@ window_scroll_down(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 	if (h - node->scroll > getmaxy(node->window)) {
 		node->scroll++;
 		gnt_wm_copy_win(window, node);
-		update_screen(wm);
+		update_screen(priv);
 	}
 	return TRUE;
 }
@@ -604,30 +602,27 @@ window_close(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 
 	if (!gnt_ws_is_empty(priv->cws)) {
 		gnt_widget_destroy(gnt_ws_get_top_widget(priv->cws));
-		ensure_normal_mode(wm);
+		ensure_normal_mode(priv);
 	}
 
 	return TRUE;
 }
 
 static void
-destroy__list(G_GNUC_UNUSED GntWidget *widget, GntWM *wm)
+destroy__list(G_GNUC_UNUSED GntWidget *widget, GntWMPrivate *priv)
 {
-	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
-
 	priv->list.window = NULL;
 	priv->list.tree = NULL;
 	priv->windows = NULL;
 	priv->actions = NULL;
-	update_screen(wm);
+	update_screen(priv);
 }
 
 static void
-setup__list(GntWM *wm)
+setup__list(GntWMPrivate *priv)
 {
-	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GntWidget *tree, *win;
-	ensure_normal_mode(wm);
+	ensure_normal_mode(priv);
 	win = priv->list.window = gnt_box_new(FALSE, FALSE);
 	gnt_box_set_toplevel(GNT_BOX(win), TRUE);
 	gnt_box_set_pad(GNT_BOX(win), 0);
@@ -636,7 +631,7 @@ setup__list(GntWM *wm)
 	tree = priv->list.tree = gnt_tree_new();
 	gnt_box_add_widget(GNT_BOX(win), tree);
 
-	g_signal_connect(G_OBJECT(win), "destroy", G_CALLBACK(destroy__list), wm);
+	g_signal_connect(G_OBJECT(win), "destroy", G_CALLBACK(destroy__list), priv);
 }
 
 static void
@@ -659,9 +654,8 @@ window_list_activate(GntTree *tree, GntWM *wm)
 }
 
 static void
-populate_window_list(GntWM *wm, gboolean workspace)
+populate_window_list(GntWMPrivate *priv, gboolean workspace)
 {
-	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GList *iter;
 	GntTree *tree = GNT_TREE(priv->windows->tree);
 	if (!workspace) {
@@ -673,7 +667,7 @@ populate_window_list(GntWM *wm, gboolean workspace)
 			        gnt_tree_create_row(tree,
 			                            gnt_box_get_title(box)),
 			        NULL);
-			update_window_in_list(wm, GNT_WIDGET(box));
+			update_window_in_list(priv, GNT_WIDGET(box));
 		}
 	} else {
 		GList *ws = priv->workspaces;
@@ -689,17 +683,15 @@ populate_window_list(GntWM *wm, gboolean workspace)
 				        gnt_tree_create_row(
 				                tree, gnt_box_get_title(box)),
 				        ws->data);
-				update_window_in_list(wm, GNT_WIDGET(box));
+				update_window_in_list(priv, GNT_WIDGET(box));
 			}
 		}
 	}
 }
 
 static gboolean
-window_list_key_pressed(GntWidget *widget, const char *text, GntWM *wm)
+window_list_key_pressed(GntWidget *widget, const char *text, GntWMPrivate *priv)
 {
-	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
-
 	if (text[1] == 0 && !gnt_ws_is_empty(priv->cws)) {
 		GntBindable *sel = gnt_tree_get_selection_data(GNT_TREE(widget));
 		switch (text[0]) {
@@ -708,20 +700,20 @@ window_list_key_pressed(GntWidget *widget, const char *text, GntWM *wm)
 				if (GNT_IS_WS(sel)) {
 					/* reorder the workspace. */
 				} else
-					shift_window(wm, GNT_WIDGET(sel), -1);
+					shift_window(priv, GNT_WIDGET(sel), -1);
 				break;
 			case '=':
 			case '.':
 				if (GNT_IS_WS(sel)) {
 					/* reorder the workspace. */
 				} else
-					shift_window(wm, GNT_WIDGET(sel), 1);
+					shift_window(priv, GNT_WIDGET(sel), 1);
 				break;
 			default:
 				return FALSE;
 		}
 		gnt_tree_remove_all(GNT_TREE(widget));
-		populate_window_list(wm, GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget), "workspace")));
+		populate_window_list(priv, GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget), "workspace")));
 		gnt_tree_set_selected(GNT_TREE(widget), sel);
 		return TRUE;
 	}
@@ -733,7 +725,7 @@ list_of_windows(GntWM *wm, gboolean workspace)
 {
 	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GntWidget *tree, *win;
-	setup__list(wm);
+	setup__list(priv);
 	priv->windows = &priv->list;
 
 	win = priv->windows->window;
@@ -741,7 +733,7 @@ list_of_windows(GntWM *wm, gboolean workspace)
 
 	gnt_box_set_title(GNT_BOX(win), workspace ? "Workspace List" : "Window List");
 
-	populate_window_list(wm, workspace);
+	populate_window_list(priv, workspace);
 
 	if (!gnt_ws_is_empty(priv->cws)) {
 		gnt_tree_set_selected(GNT_TREE(tree), gnt_ws_get_top_widget(priv->cws));
@@ -750,7 +742,7 @@ list_of_windows(GntWM *wm, gboolean workspace)
 	}
 
 	g_signal_connect(G_OBJECT(tree), "activate", G_CALLBACK(window_list_activate), wm);
-	g_signal_connect(G_OBJECT(tree), "key_pressed", G_CALLBACK(window_list_key_pressed), wm);
+	g_signal_connect(G_OBJECT(tree), "key_pressed", G_CALLBACK(window_list_key_pressed), priv);
 	g_object_set_data(G_OBJECT(tree), "workspace", GINT_TO_POINTER(workspace));
 
 	gnt_tree_set_col_width(GNT_TREE(tree), 0, getmaxx(stdscr) / 3);
@@ -946,9 +938,8 @@ dump_screen(G_GNUC_UNUSED GntBindable *b, G_GNUC_UNUSED GList *params)
 }
 
 static void
-shift_window(GntWM *wm, GntWidget *widget, int dir)
+shift_window(GntWMPrivate *priv, GntWidget *widget, int dir)
 {
-	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GList *all = gnt_ws_get_list(priv->cws);
 	GList *list = g_list_find(all, widget);
 	int length, pos;
@@ -994,7 +985,7 @@ shift_left(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 		return TRUE;
 	}
 
-	shift_window(wm, gnt_ws_get_top_widget(priv->cws), -1);
+	shift_window(priv, gnt_ws_get_top_widget(priv->cws), -1);
 	return TRUE;
 }
 
@@ -1012,14 +1003,13 @@ shift_right(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 		return TRUE;
 	}
 
-	shift_window(wm, gnt_ws_get_top_widget(priv->cws), 1);
+	shift_window(priv, gnt_ws_get_top_widget(priv->cws), 1);
 	return TRUE;
 }
 
 static void
-action_list_activate(GntTree *tree, GntWM *wm)
+action_list_activate(GntTree *tree, GntWMPrivate *priv)
 {
-	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GntAction *action = gnt_tree_get_selection_data(tree);
 	action->callback();
 	gnt_widget_destroy(priv->list.window);
@@ -1051,7 +1041,7 @@ list_actions(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 		return TRUE;
 	}
 
-	setup__list(wm);
+	setup__list(priv);
 	priv->actions = &priv->list;
 
 	win = priv->actions->window;
@@ -1067,7 +1057,7 @@ list_actions(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 		gnt_tree_add_row_last(GNT_TREE(tree), action,
 				gnt_tree_create_row(GNT_TREE(tree), action->label), NULL);
 	}
-	g_signal_connect(G_OBJECT(tree), "activate", G_CALLBACK(action_list_activate), wm);
+	g_signal_connect(G_OBJECT(tree), "activate", G_CALLBACK(action_list_activate), priv);
 	n = g_list_length(priv->acts);
 	gnt_widget_set_size(tree, 0, n);
 	gnt_widget_set_position(win, 0, getmaxy(stdscr) - 3 - n);
@@ -1118,9 +1108,8 @@ reverse_char(WINDOW *d, int y, int x, gboolean set)
 }
 
 static void
-window_reverse(GntWidget *win, gboolean set, GntWM *wm)
+window_reverse(GntWidget *win, gboolean set, GntWMPrivate *priv)
 {
-	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	int i;
 	int w, h;
 	WINDOW *d;
@@ -1145,17 +1134,15 @@ window_reverse(GntWidget *win, gboolean set, GntWM *wm)
 	for (i = 0; i < h; i += reverse_char(d, i, w-1, set));
 
 	gnt_wm_copy_win(win, g_hash_table_lookup(priv->nodes, win));
-	update_screen(wm);
+	update_screen(priv);
 }
 
 static void
-ensure_normal_mode(GntWM *wm)
+ensure_normal_mode(GntWMPrivate *priv)
 {
-	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
-
 	if (priv->mode != GNT_KP_MODE_NORMAL) {
 		if (!gnt_ws_is_empty(priv->cws)) {
-			window_reverse(gnt_ws_get_top_widget(priv->cws), FALSE, wm);
+			window_reverse(gnt_ws_get_top_widget(priv->cws), FALSE, priv);
 		}
 		priv->mode = GNT_KP_MODE_NORMAL;
 	}
@@ -1175,7 +1162,7 @@ start_move(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 	}
 
 	priv->mode = GNT_KP_MODE_MOVE;
-	window_reverse(gnt_ws_get_top_widget(priv->cws), TRUE, wm);
+	window_reverse(gnt_ws_get_top_widget(priv->cws), TRUE, priv);
 
 	return TRUE;
 }
@@ -1194,7 +1181,7 @@ start_resize(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 	}
 
 	priv->mode = GNT_KP_MODE_RESIZE;
-	window_reverse(gnt_ws_get_top_widget(priv->cws), TRUE, wm);
+	window_reverse(gnt_ws_get_top_widget(priv->cws), TRUE, priv);
 
 	return TRUE;
 }
@@ -1239,7 +1226,7 @@ refresh_screen(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 	}
 
 	gnt_ws_draw_taskbar(priv->cws, TRUE);
-	update_screen(wm);
+	update_screen(priv);
 
 	curs_set(0);   /* endwin resets the cursor to normal */
 	keypad(stdscr, 1);
@@ -1296,7 +1283,7 @@ tag_widget(GntBindable *b, G_GNUC_UNUSED GList *params)
 	link = g_list_find(priv->tagged, widget);
 	if (link) {
 		priv->tagged = g_list_delete_link(priv->tagged, link);
-		remove_tag(widget, wm);
+		remove_tag(widget, NULL);
 		return TRUE;
 	}
 
@@ -1318,7 +1305,7 @@ place_tagged(GntBindable *b, G_GNUC_UNUSED GList *params)
 	for (iter = priv->tagged; iter; iter = g_list_delete_link(iter, iter)) {
 		GntWidget *widget = GNT_WIDGET(iter->data);
 		gnt_wm_widget_move_workspace(wm, priv->cws, widget);
-		remove_tag(widget, wm);
+		remove_tag(widget, NULL);
 	}
 
 	priv->tagged = NULL;
@@ -1753,13 +1740,13 @@ gnt_wm_switch_workspace(GntWM *wm, gint n)
 	if (priv->list.window) {
 		gnt_widget_destroy(priv->list.window);
 	}
-	ensure_normal_mode(wm);
+	ensure_normal_mode(priv);
 	gnt_ws_hide(priv->cws, priv->nodes);
 	priv->cws = s;
 	gnt_ws_show(priv->cws, priv->nodes);
 
 	gnt_ws_draw_taskbar(priv->cws, TRUE);
-	update_screen(wm);
+	update_screen(priv);
 	if (!gnt_ws_is_empty(priv->cws)) {
 		gnt_wm_raise_window(wm, gnt_ws_get_top_widget(priv->cws));
 	}
@@ -1874,9 +1861,8 @@ void gnt_wm_set_workspaces(GntWM *wm, GList *workspaces)
 }
 
 static void
-update_window_in_list(GntWM *wm, GntWidget *wid)
+update_window_in_list(GntWMPrivate *priv, GntWidget *wid)
 {
-	GntWMPrivate *priv = gnt_wm_get_instance_private(wm);
 	GntTextFormatFlags flag = 0;
 
 	if (priv->windows == NULL) {
@@ -2006,7 +1992,7 @@ void gnt_wm_new_window(GntWM *wm, GntWidget *widget)
 
 	if (!gnt_widget_get_visible(widget) ||
 	    g_hash_table_lookup(priv->nodes, widget)) {
-		update_screen(wm);
+		update_screen(priv);
 		return;
 	}
 
@@ -2037,12 +2023,12 @@ void gnt_wm_new_window(GntWM *wm, GntWidget *widget)
 			                          "workspace")
 			                ? priv->cws
 			                : NULL);
-			update_window_in_list(wm, widget);
+			update_window_in_list(priv, widget);
 		}
 	}
 
 	gnt_ws_draw_taskbar(priv->cws, FALSE);
-	update_screen(wm);
+	update_screen(priv);
 }
 
 void gnt_wm_window_decorate(GntWM *wm, GntWidget *widget)
@@ -2089,7 +2075,7 @@ void gnt_wm_window_close(GntWM *wm, GntWidget *widget)
 	}
 
 	gnt_ws_draw_taskbar(priv->cws, FALSE);
-	update_screen(wm);
+	update_screen(priv);
 }
 
 time_t gnt_wm_get_idle_time()
@@ -2149,7 +2135,7 @@ gboolean gnt_wm_process_input(GntWM *wm, const char *keys)
 			}
 			if (ox != x || oy != y) {
 				gnt_screen_move_widget(widget, x, y);
-				window_reverse(widget, TRUE, wm);
+				window_reverse(widget, TRUE, priv);
 				return TRUE;
 			}
 		} else if (priv->mode == GNT_KP_MODE_RESIZE) {
@@ -2166,12 +2152,12 @@ gboolean gnt_wm_process_input(GntWM *wm, const char *keys)
 			}
 			if (oh != h || ow != w) {
 				gnt_screen_resize_widget(widget, w, h);
-				window_reverse(widget, TRUE, wm);
+				window_reverse(widget, TRUE, priv);
 				return TRUE;
 			}
 		}
 		if (strcmp(keys, "\r") == 0 || strcmp(keys, "\033") == 0) {
-			window_reverse(widget, FALSE, wm);
+			window_reverse(widget, FALSE, priv);
 			priv->mode = GNT_KP_MODE_NORMAL;
 		}
 		return TRUE;
@@ -2264,7 +2250,7 @@ void gnt_wm_resize_window(GntWM *wm, GntWidget *widget, int width, int height)
 	g_signal_emit(wm, signals[SIG_RESIZED], 0, node);
 
 	show_panel(node->panel);
-	update_screen(wm);
+	update_screen(priv);
 }
 
 static void
@@ -2341,7 +2327,7 @@ void gnt_wm_move_window(GntWM *wm, GntWidget *widget, int x, int y)
 		}
 	}
 
-	update_screen(wm);
+	update_screen(priv);
 }
 
 static void
@@ -2367,7 +2353,7 @@ gnt_wm_give_focus(GntWM *wm, GntWidget *widget)
 		top_panel(nd->panel);
 	}
 	gnt_ws_draw_taskbar(priv->cws, FALSE);
-	update_screen(wm);
+	update_screen(priv);
 }
 
 void gnt_wm_update_window(GntWM *wm, GntWidget *widget)
@@ -2396,7 +2382,7 @@ void gnt_wm_update_window(GntWM *wm, GntWidget *widget)
 	if (ws == priv->cws || gnt_widget_get_transient(widget)) {
 		gnt_wm_copy_win(widget, node);
 		gnt_ws_draw_taskbar(priv->cws, FALSE);
-		update_screen(wm);
+		update_screen(priv);
 	} else if (ws && ws != priv->cws && gnt_widget_get_is_urgent(widget)) {
 		if (!act || (act && !g_list_find(act, ws)))
 			act = g_list_prepend(act, ws);
