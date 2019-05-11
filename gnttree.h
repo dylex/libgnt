@@ -251,7 +251,7 @@ GList * gnt_tree_get_row_text_list(GntTree *tree, gpointer key);
  *
  * Returns: (transfer none): The key of the row.
  *
- * Since: 2.7.2
+ * Since: 2.7.3
  */
 gpointer gnt_tree_row_get_key(GntTree *tree, GntTreeRow *row);
 
@@ -264,7 +264,7 @@ gpointer gnt_tree_row_get_key(GntTree *tree, GntTreeRow *row);
  *
  * Returns: The next row.
  *
- * Since: 2.7.2
+ * Since: 2.7.3
  */
 GntTreeRow * gnt_tree_row_get_next(GntTree *tree, GntTreeRow *row);
 
@@ -277,7 +277,7 @@ GntTreeRow * gnt_tree_row_get_next(GntTree *tree, GntTreeRow *row);
  *
  * Returns: The previous row.
  *
- * Since: 2.7.2
+ * Since: 2.7.3
  */
 GntTreeRow * gnt_tree_row_get_prev(GntTree *tree, GntTreeRow *row);
 
@@ -290,7 +290,7 @@ GntTreeRow * gnt_tree_row_get_prev(GntTree *tree, GntTreeRow *row);
  *
  * Returns: The child row.
  *
- * Since: 2.7.2
+ * Since: 2.7.3
  */
 GntTreeRow * gnt_tree_row_get_child(GntTree *tree, GntTreeRow *row);
 
@@ -303,7 +303,7 @@ GntTreeRow * gnt_tree_row_get_child(GntTree *tree, GntTreeRow *row);
  *
  * Returns: The parent row.
  *
- * Since: 2.7.2
+ * Since: 2.7.3
  */
 GntTreeRow * gnt_tree_row_get_parent(GntTree *tree, GntTreeRow *row);
 
