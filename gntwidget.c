@@ -295,6 +295,66 @@ gnt_widget_class_init(GntWidgetClass *klass)
 }
 
 /******************************************************************************
+ * Internal GntWidget API
+ *****************************************************************************/
+
+/* Different from gnt_widget_get_size in that it ignores shadows. */
+void
+gnt_widget_get_internal_size(GntWidget *widget, gint *width, gint *height)
+{
+	GntWidgetPrivate *priv = NULL;
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
+	if (width) {
+		*width = priv->width;
+	}
+	if (height) {
+		*height = priv->height;
+	}
+}
+
+/* Different from gnt_widget_set_size in that it sets the values directly. */
+void
+gnt_widget_set_internal_size(GntWidget *widget, gint width, gint height)
+{
+	GntWidgetPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
+
+	priv->width = width;
+	priv->height = height;
+}
+
+void
+gnt_widget_get_minimum_size(GntWidget *widget, gint *width, gint *height)
+{
+	GntWidgetPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
+
+	if (width) {
+		*width = priv->minw;
+	}
+	if (height) {
+		*height = priv->minh;
+	}
+}
+
+void
+gnt_widget_set_minimum_size(GntWidget *widget, gint width, gint height)
+{
+	GntWidgetPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
+
+	priv->minw = width;
+	priv->minh = height;
+}
+
+/******************************************************************************
  * GntWidget API
  *****************************************************************************/
 void gnt_widget_set_take_focus(GntWidget *widget, gboolean can)
@@ -522,23 +582,6 @@ gnt_widget_get_size(GntWidget *widget, int *width, int *height)
 		*height = priv->height + shadow;
 }
 
-/* Internal.
- * Different from gnt_widget_get_size in that it ignores shadows.
- */
-void
-gnt_widget_get_internal_size(GntWidget *widget, gint *width, gint *height)
-{
-	GntWidgetPrivate *priv = NULL;
-	g_return_if_fail(GNT_IS_WIDGET(widget));
-	priv = gnt_widget_get_instance_private(widget);
-	if (width) {
-		*width = priv->width;
-	}
-	if (height) {
-		*height = priv->height;
-	}
-}
-
 static void
 init_widget(GntWidget *widget)
 {
@@ -639,51 +682,6 @@ gnt_widget_set_size(GntWidget *widget, int width, int height)
 	}
 
 	return ret;
-}
-
-/* Internal.
- * Different from gnt_widget_set_size in that it sets the values directly.
- */
-void
-gnt_widget_set_internal_size(GntWidget *widget, gint width, gint height)
-{
-	GntWidgetPrivate *priv = NULL;
-
-	g_return_if_fail(GNT_IS_WIDGET(widget));
-	priv = gnt_widget_get_instance_private(widget);
-
-	priv->width = width;
-	priv->height = height;
-}
-
-/* Internal. */
-void
-gnt_widget_get_minimum_size(GntWidget *widget, gint *width, gint *height)
-{
-	GntWidgetPrivate *priv = NULL;
-
-	g_return_if_fail(GNT_IS_WIDGET(widget));
-	priv = gnt_widget_get_instance_private(widget);
-
-	if (width) {
-		*width = priv->minw;
-	}
-	if (height) {
-		*height = priv->minh;
-	}
-}
-
-/* Internal. */
-void
-gnt_widget_set_minimum_size(GntWidget *widget, gint width, gint height)
-{
-	GntWidgetPrivate *priv = NULL;
-
-	g_return_if_fail(GNT_IS_WIDGET(widget));
-	priv = gnt_widget_get_instance_private(widget);
-
-	priv->minw = width;
-	priv->minh = height;
 }
 
 gboolean
