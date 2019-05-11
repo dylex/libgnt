@@ -502,7 +502,7 @@ gnt_file_sel_class_init(GntFileSelClass *klass)
 	kl->size_request = gnt_file_sel_size_request;
 
 	/**
-	 * GntFileSel::file-selected
+	 * GntFileSel::file-selected:
 	 * @widget: The file selection window that received the signal
 	 * @path: The full path to the selected file
 	 * @file: The name of the file only
@@ -522,7 +522,7 @@ gnt_file_sel_class_init(GntFileSelClass *klass)
 					 G_TYPE_NONE, 2, G_TYPE_STRING, G_TYPE_STRING);
 
 	/**
-	 * GntFileSel::cancelled
+	 * GntFileSel::cancelled:
 	 * @widget: The file selection window that received the signal
 	 *
 	 * The ::cancelled signal is emitted when the Cancel button on a
