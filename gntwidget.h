@@ -127,15 +127,6 @@ void gnt_widget_show(GntWidget *widget);
 void gnt_widget_draw(GntWidget *widget);
 
 /**
- * gnt_widget_expose:
- *
- * Expose part of a widget.
- *
- * Internal function -- do not use.
- */
-void gnt_widget_expose(GntWidget *widget, int x, int y, int width, int height);
-
-/**
  * gnt_widget_hide:
  * @widget:   The widget to hide.
  *
@@ -317,14 +308,6 @@ void gnt_widget_set_name(GntWidget *widget, const gchar *name);
  * Returns: The name of the widget.
  */
 const gchar *gnt_widget_get_name(GntWidget *widget);
-
-/**
- * gnt_widget_queue_update:
- *
- * Internal function -- do not use.
- * Use gnt_widget_draw() instead.
- */
-void gnt_widget_queue_update(GntWidget *widget);
 
 /**
  * gnt_widget_set_take_focus:

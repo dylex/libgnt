@@ -101,6 +101,12 @@ gnt_widget_init(G_GNUC_UNUSED GntWidget *widget)
 }
 
 static void
+gnt_widget_expose(GntWidget *widget, int x, int y, int width, int height)
+{
+	g_signal_emit(widget, signals[SIG_EXPOSE], 0, x, y, width, height);
+}
+
+static void
 gnt_widget_map(GntWidget *widget)
 {
 	/* Get some default size for the widget */
@@ -354,6 +360,42 @@ gnt_widget_set_minimum_size(GntWidget *widget, gint width, gint height)
 	priv->minh = height;
 }
 
+static gboolean
+update_queue_callback(gpointer data)
+{
+	GntWidget *widget = GNT_WIDGET(data);
+	GntWidgetPrivate *priv = gnt_widget_get_instance_private(widget);
+
+	if (priv->queue_update == 0) {
+		return FALSE;
+	}
+	if (gnt_widget_get_mapped(widget)) {
+		gnt_screen_update(widget);
+	}
+	priv->queue_update = 0;
+	return FALSE;
+}
+
+void
+gnt_widget_queue_update(GntWidget *widget)
+{
+	GntWidgetPrivate *priv = NULL;
+
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+	priv = gnt_widget_get_instance_private(widget);
+
+	if (priv->window == NULL) {
+		return;
+	}
+
+	widget = gnt_widget_get_toplevel(widget);
+
+	if (priv->queue_update == 0) {
+		priv->queue_update =
+		        g_timeout_add(0, update_queue_callback, widget);
+	}
+}
+
 /******************************************************************************
  * GntWidget API
  *****************************************************************************/
@@ -459,12 +501,6 @@ gnt_widget_clicked(GntWidget *widget, GntMouseEvent event, int x, int y)
 	if (!ret && event == GNT_RIGHT_MOUSE_DOWN)
 		ret = gnt_bindable_perform_action_named(GNT_BINDABLE(widget), "context-menu", NULL);
 	return ret;
-}
-
-void
-gnt_widget_expose(GntWidget *widget, int x, int y, int width, int height)
-{
-	g_signal_emit(widget, signals[SIG_EXPOSE], 0, x, y, width, height);
 }
 
 void
@@ -729,41 +765,6 @@ gnt_widget_get_name(GntWidget *widget)
 void gnt_widget_activate(GntWidget *widget)
 {
 	g_signal_emit(widget, signals[SIG_ACTIVATE], 0);
-}
-
-static gboolean
-update_queue_callback(gpointer data)
-{
-	GntWidget *widget = GNT_WIDGET(data);
-	GntWidgetPrivate *priv = gnt_widget_get_instance_private(widget);
-
-	if (priv->queue_update == 0) {
-		return FALSE;
-	}
-	if (gnt_widget_get_mapped(widget)) {
-		gnt_screen_update(widget);
-	}
-	priv->queue_update = 0;
-	return FALSE;
-}
-
-void gnt_widget_queue_update(GntWidget *widget)
-{
-	GntWidgetPrivate *priv = NULL;
-
-	g_return_if_fail(GNT_IS_WIDGET(widget));
-	priv = gnt_widget_get_instance_private(widget);
-
-	if (priv->window == NULL) {
-		return;
-	}
-
-	widget = gnt_widget_get_toplevel(widget);
-
-	if (priv->queue_update == 0) {
-		priv->queue_update =
-		        g_timeout_add(0, update_queue_callback, widget);
-	}
 }
 
 gboolean gnt_widget_confirm_size(GntWidget *widget, int width, int height)

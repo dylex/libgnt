@@ -33,6 +33,7 @@ void gnt_widget_get_minimum_size(GntWidget *widget, gint *width, gint *height);
 void gnt_widget_set_minimum_size(GntWidget *widget, gint width, gint height);
 void gnt_widget_get_internal_size(GntWidget *widget, gint *width, gint *height);
 void gnt_widget_set_internal_size(GntWidget *widget, gint width, gint height);
+void gnt_widget_queue_update(GntWidget *widget);
 
 G_END_DECLS
 
