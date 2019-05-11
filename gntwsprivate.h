@@ -29,16 +29,13 @@
 G_BEGIN_DECLS
 
 /* Private access to some internals. Contact us if you need these. */
-gboolean gnt_ws_is_empty(GntWS *ws);
 gboolean gnt_ws_is_single(GntWS *ws);
-GntWidget *gnt_ws_get_top_widget(GntWS *ws);
 gboolean gnt_ws_is_top_widget(GntWS *ws, GntWidget *widget);
 GList *gnt_ws_get_last(GntWS *ws);
 void gnt_ws_append_widget(GntWS *ws, GntWidget *widget);
 void gnt_ws_bring_to_front(GntWS *ws, GntWidget *widget);
 
 void gnt_ws_set_list(GntWS *ws, GList *list);
-GList *gnt_ws_get_list(GntWS *ws);
 
 G_END_DECLS
 

@@ -43,8 +43,6 @@
 #include "gntwindow.h"
 #include "gntlabel.h"
 
-#include "gntwsprivate.h"
-
 #define GNT_TYPE_IRSSI_WM gnt_irssi_wm_get_type()
 G_DECLARE_FINAL_TYPE(GntIrssiWM, gnt_irssi_wm, GNT, IRSSI_WM, GntWM)
 
@@ -246,7 +244,7 @@ irssi_update_window(GntWM *wm, GntNode *node)
 	g_object_set_data(
 	        G_OBJECT(win), "irssi-index",
 	        GINT_TO_POINTER(g_list_index(
-	                gnt_ws_get_list(gnt_wm_get_current_workspace(wm)),
+	                gnt_ws_get_widgets(gnt_wm_get_current_workspace(wm)),
 	                win)));
 	g_timeout_add(0, (GSourceFunc)update_conv_window_title, node);
 }

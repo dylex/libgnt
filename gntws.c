@@ -148,6 +148,15 @@ gnt_ws_draw_taskbar(GntWS *ws, gboolean reposition)
 	wrefresh(taskbar);
 }
 
+gboolean
+gnt_ws_is_empty(GntWS *ws)
+{
+	GntWSPrivate *priv = NULL;
+	g_return_val_if_fail(GNT_IS_WS(ws), TRUE);
+	priv = gnt_ws_get_instance_private(ws);
+	return priv->ordered == NULL;
+}
+
 void gnt_ws_add_widget(GntWS *ws, GntWidget* wid)
 {
 	GntWSPrivate *priv = NULL;
@@ -172,6 +181,28 @@ void gnt_ws_remove_widget(GntWS *ws, GntWidget* wid)
 
 	priv->list = g_list_remove(priv->list, wid);
 	priv->ordered = g_list_remove(priv->ordered, wid);
+}
+
+GntWidget *
+gnt_ws_get_top_widget(GntWS *ws)
+{
+	GntWSPrivate *priv = NULL;
+
+	g_return_val_if_fail(GNT_IS_WS(ws), NULL);
+	priv = gnt_ws_get_instance_private(ws);
+
+	return priv->ordered ? priv->ordered->data : NULL;
+}
+
+GList *
+gnt_ws_get_widgets(GntWS *ws)
+{
+	GntWSPrivate *priv = NULL;
+
+	g_return_val_if_fail(GNT_IS_WS(ws), NULL);
+	priv = gnt_ws_get_instance_private(ws);
+
+	return priv->list;
 }
 
 void
@@ -254,26 +285,6 @@ gnt_ws_set_list(GntWS *ws, GList *list)
 }
 
 /* Internal. */
-GList *
-gnt_ws_get_list(GntWS *ws)
-{
-	GntWSPrivate *priv = NULL;
-	g_return_val_if_fail(GNT_IS_WS(ws), NULL);
-	priv = gnt_ws_get_instance_private(ws);
-	return priv->list;
-}
-
-/* Internal. */
-gboolean
-gnt_ws_is_empty(GntWS *ws)
-{
-	GntWSPrivate *priv = NULL;
-	g_return_val_if_fail(GNT_IS_WS(ws), TRUE);
-	priv = gnt_ws_get_instance_private(ws);
-	return priv->ordered == NULL;
-}
-
-/* Internal. */
 gboolean
 gnt_ws_is_single(GntWS *ws)
 {
@@ -281,16 +292,6 @@ gnt_ws_is_single(GntWS *ws)
 	g_return_val_if_fail(GNT_IS_WS(ws), FALSE);
 	priv = gnt_ws_get_instance_private(ws);
 	return priv->ordered != NULL && priv->ordered->next == NULL;
-}
-
-/* Internal. */
-GntWidget *
-gnt_ws_get_top_widget(GntWS *ws)
-{
-	GntWSPrivate *priv = NULL;
-	g_return_val_if_fail(GNT_IS_WS(ws), NULL);
-	priv = gnt_ws_get_instance_private(ws);
-	return priv->ordered ? priv->ordered->data : NULL;
 }
 
 /* Internal. */

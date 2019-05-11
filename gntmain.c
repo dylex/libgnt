@@ -241,7 +241,7 @@ detect_mouse_action(const char *buffer)
 	} else if (event == GNT_MOUSE_UP) {
 		if (button == MOUSE_NONE && y == getmaxy(stdscr) - 1) {
 			/* Clicked on the taskbar */
-			int n = g_list_length(gnt_ws_get_list(
+			int n = g_list_length(gnt_ws_get_widgets(
 			        gnt_wm_get_current_workspace(wm)));
 			if (n) {
 				int width = getmaxx(stdscr) / n;

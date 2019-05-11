@@ -83,6 +83,18 @@ GntWS *gnt_ws_new(const char *name);
 void gnt_ws_set_name(GntWS *ws, const gchar *name);
 
 /**
+ * gnt_ws_is_empty:
+ * @ws: The workspace.
+ *
+ * Gets whether the workspace contains no widgets.
+ *
+ * Returns: %TRUE if the workspace is empty, %FALSE otherwise.
+ *
+ * Since: 3.0.0
+ */
+gboolean gnt_ws_is_empty(GntWS *ws);
+
+/**
  * gnt_ws_add_widget:
  * @ws:     The workspace.
  * @widget: The widget to add.
@@ -103,6 +115,32 @@ void gnt_ws_add_widget(GntWS *ws, GntWidget *widget);
  * Since: 2.1.0
  */
 void gnt_ws_remove_widget(GntWS *ws, GntWidget *widget);
+
+/**
+ * gnt_ws_get_top_widget:
+ * @ws: The workspace.
+ *
+ * Gets the widget that is at the top of the workspace.
+ *
+ * Returns: (transfer none): The widget at the top of the workspace.
+ *
+ * Since: 3.0.0
+ */
+GntWidget *gnt_ws_get_top_widget(GntWS *ws);
+
+/**
+ * gnt_ws_get_widgets:
+ * @ws: The workspace.
+ *
+ * Gets all widgets contained in the workspace. This is probably only useful
+ * for implementing #GntWM subclasses.
+ *
+ * Returns: (transfer none) (element-type GntWidget): The list of widgets in
+ *          the workspace.
+ *
+ * Since: 3.0.0
+ */
+GList *gnt_ws_get_widgets(GntWS *ws);
 
 /**
  * gnt_ws_widget_hide:
