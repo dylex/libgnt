@@ -129,7 +129,9 @@ gnt_widget_class_init(GntWidgetClass *klass)
 	klass->destroy = gnt_widget_destroy;
 	klass->show = gnt_widget_show;
 	klass->draw = gnt_widget_draw;
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	klass->expose = gnt_widget_expose;
+G_GNUC_END_IGNORE_DEPRECATIONS
 	klass->map = gnt_widget_map;
 	klass->lost_focus = gnt_widget_focus_change;
 	klass->gained_focus = gnt_widget_focus_change;
@@ -338,7 +340,9 @@ gnt_widget_show(GntWidget *widget)
 	g_return_if_fail(widget != NULL);
 
 	gnt_widget_draw(widget);
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	gnt_screen_occupy(widget);
+G_GNUC_END_IGNORE_DEPRECATIONS
 }
 
 void
@@ -395,7 +399,9 @@ gnt_widget_draw(GntWidget *widget)
 	}
 
 	g_signal_emit(widget, signals[SIG_DRAW], 0);
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	gnt_widget_queue_update(widget);
+G_GNUC_END_IGNORE_DEPRECATIONS
 	gnt_widget_set_drawing(widget, FALSE);
 }
 
@@ -442,7 +448,9 @@ gnt_widget_hide(GntWidget *widget)
 	if (gnt_widget_has_shadow(widget))
 		mvwvline(widget->window, 1, widget->priv.width, ' ', widget->priv.height);
 #endif
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	gnt_screen_release(widget);
+G_GNUC_END_IGNORE_DEPRECATIONS
 	gnt_widget_set_visible(widget, FALSE);
 	gnt_widget_set_mapped(widget, FALSE);
 }
@@ -637,7 +645,9 @@ update_queue_callback(gpointer data)
 	if (!g_object_get_data(G_OBJECT(widget), "gnt:queue_update"))
 		return FALSE;
 	if (gnt_widget_get_mapped(widget)) {
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 		gnt_screen_update(widget);
+G_GNUC_END_IGNORE_DEPRECATIONS
 	}
 	g_object_set_data(G_OBJECT(widget), "gnt:queue_update", NULL);
 	return FALSE;

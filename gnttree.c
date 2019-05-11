@@ -616,7 +616,9 @@ redraw_tree(GntTree *tree)
 	}
 	wmove(widget->window, current, pos);
 
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	gnt_widget_queue_update(widget);
+G_GNUC_END_IGNORE_DEPRECATIONS
 }
 
 static void

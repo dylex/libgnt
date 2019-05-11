@@ -78,29 +78,37 @@ gboolean gnt_ascii_only(void);
  */
 void gnt_window_present(GntWidget *window);
 
+#ifndef GNT_DISABLE_DEPRECATED
 /**
  * gnt_screen_occupy:
  *
  * Internal function -- do not use.
  * Use gnt_widget_show() instead.
+ *
+ * Deprecated: 2.14.0: Use gnt_widget_show() instead.
  */
-void gnt_screen_occupy(GntWidget *widget);
+void gnt_screen_occupy(GntWidget *widget) G_GNUC_DEPRECATED;
 
 /**
  * gnt_screen_release:
  *
  * Internal function -- do not use.
  * Use gnt_widget_hide() instead.
+ *
+ * Deprecated: 2.14.0: Use gnt_widget_hide() instead.
  */
-void gnt_screen_release(GntWidget *widget);
+void gnt_screen_release(GntWidget *widget) G_GNUC_DEPRECATED;
 
 /**
  * gnt_screen_update:
  *
  * Internal function -- do not use.
  * Use gnt_widget_draw() instead.
+ *
+ * Deprecated: 2.14.0: Use gnt_widget_draw() instead.
  */
-void gnt_screen_update(GntWidget *widget);
+void gnt_screen_update(GntWidget *widget) G_GNUC_DEPRECATED;
+#endif /* GNT_DISABLE_DEPRECATED */
 
 /**
  * gnt_screen_resize_widget:

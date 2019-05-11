@@ -389,7 +389,9 @@ gnt_wm_init(GTypeInstance *instance, gpointer class)
 	wm->workspaces = NULL;
 	wm->name_places = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
 	wm->title_places = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	gnt_style_read_workspaces(wm);
+G_GNUC_END_IGNORE_DEPRECATIONS
 	if (wm->workspaces == NULL) {
 		wm->cws = gnt_ws_new("default");
 		gnt_wm_add_workspace(wm, wm->cws);
@@ -500,7 +502,9 @@ window_scroll_up(GntBindable *bindable, GList *null)
 
 	if (node->scroll) {
 		node->scroll--;
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 		gnt_wm_copy_win(window, node);
+G_GNUC_END_IGNORE_DEPRECATIONS
 		update_screen(wm);
 	}
 	return TRUE;
@@ -525,7 +529,9 @@ window_scroll_down(GntBindable *bindable, GList *null)
 	gnt_widget_get_size(window, &w, &h);
 	if (h - node->scroll > getmaxy(node->window)) {
 		node->scroll++;
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 		gnt_wm_copy_win(window, node);
+G_GNUC_END_IGNORE_DEPRECATIONS
 		update_screen(wm);
 	}
 	return TRUE;
@@ -1051,7 +1057,9 @@ window_reverse(GntWidget *win, gboolean set, GntWM *wm)
 	for (i = 0; i < h; i += reverse_char(d, i, 0, set));
 	for (i = 0; i < h; i += reverse_char(d, i, w-1, set));
 
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	gnt_wm_copy_win(win, g_hash_table_lookup(wm->nodes, win));
+G_GNUC_END_IGNORE_DEPRECATIONS
 	update_screen(wm);
 }
 
@@ -1829,7 +1837,9 @@ gnt_wm_new_window_real(GntWM *wm, GntWidget *widget)
 		w = MIN(w, maxx);
 		h = MIN(h, maxy);
 		node->window = newwin(h, w, y, x);
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 		gnt_wm_copy_win(widget, node);
+G_GNUC_END_IGNORE_DEPRECATIONS
 	}
 #endif
 
@@ -2232,7 +2242,9 @@ void gnt_wm_update_window(GntWM *wm, GntWidget *widget)
 		g_signal_emit(wm, signals[SIG_UPDATE_WIN], 0, node);
 
 	if (ws == wm->cws || gnt_widget_get_transient(widget)) {
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 		gnt_wm_copy_win(widget, node);
+G_GNUC_END_IGNORE_DEPRECATIONS
 		gnt_ws_draw_taskbar(wm->cws, FALSE);
 		update_screen(wm);
 	} else if (ws && ws != wm->cws && gnt_widget_get_is_urgent(widget)) {

@@ -358,19 +358,25 @@ void gnt_wm_update_window(GntWM *wm, GntWidget *widget);
  */
 void gnt_wm_raise_window(GntWM *wm, GntWidget *widget);
 
+#ifndef GNT_DISABLE_DEPRECATED
 /**
  * gnt_wm_set_event_stack:
  *
  * Internal function -- do not use.
+ *
+ * Deprecated: 2.14.0
  */
-void gnt_wm_set_event_stack(GntWM *wm, gboolean set);
+void gnt_wm_set_event_stack(GntWM *wm, gboolean set) G_GNUC_DEPRECATED;
 
 /**
  * gnt_wm_copy_win:
  *
  * Internal function -- do not use.
+ *
+ * Deprecated: 2.14.0
  */
-void gnt_wm_copy_win(GntWidget *widget, GntNode *node);
+void gnt_wm_copy_win(GntWidget *widget, GntNode *node) G_GNUC_DEPRECATED;
+#endif
 
 /**
  * gnt_wm_get_idle_time:

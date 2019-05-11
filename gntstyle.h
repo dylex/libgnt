@@ -129,12 +129,16 @@ gboolean gnt_style_parse_bool(const char *value);
  */
 gboolean gnt_style_get_bool(GntStyle style, gboolean def);
 
+#ifndef GNT_DISABLE_DEPRECATED
 /**
  * gnt_styles_get_keyremaps:
  *
  * Internal function -- do not use.
+ *
+ * Deprecated: 2.14.0
  */
-void gnt_styles_get_keyremaps(GType type, GHashTable *hash);
+void gnt_styles_get_keyremaps(GType type, GHashTable *hash) G_GNUC_DEPRECATED;
+#endif
 
 /**
  * gnt_style_read_actions:
@@ -154,14 +158,18 @@ void gnt_style_read_actions(GType type, GntBindableClass *klass);
  */
 gboolean gnt_style_read_menu_accels(const char *name, GHashTable *table);
 
+#ifndef GNT_DISABLE_DEPRECATED
 /**
  * gnt_style_read_workspaces:
  *
  * Reads workspace information.
  *
  * Internal function -- do not use.
+ *
+ * Deprecated: 2.14.0
  */
-void gnt_style_read_workspaces(GntWM *wm);
+void gnt_style_read_workspaces(GntWM *wm) G_GNUC_DEPRECATED;
+#endif
 
 /**
  * gnt_init_styles:

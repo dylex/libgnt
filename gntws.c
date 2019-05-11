@@ -47,7 +47,9 @@ widget_show(gpointer data, gpointer nodes)
 	gnt_widget_set_visible(GNT_WIDGET(data), TRUE);
 	if (node) {
 		show_panel(node->panel);
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 		gnt_wm_copy_win(GNT_WIDGET(data), node);
+G_GNUC_END_IGNORE_DEPRECATIONS
 	}
 }
 

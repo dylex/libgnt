@@ -296,7 +296,9 @@ gnt_bindable_remap_keys(GntBindable *bindable, const char *text)
 	if (klass->remaps == NULL)
 	{
 		klass->remaps = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 		gnt_styles_get_keyremaps(type, klass->remaps);
+G_GNUC_END_IGNORE_DEPRECATIONS
 	}
 
 	remap = g_hash_table_lookup(klass->remaps, text);

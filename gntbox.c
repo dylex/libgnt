@@ -382,7 +382,9 @@ gnt_box_destroy(GntWidget *w)
 	GntBox *box = GNT_BOX(w);
 
 	gnt_box_remove_all(box);
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	gnt_screen_release(w);
+G_GNUC_END_IGNORE_DEPRECATIONS
 }
 
 static void

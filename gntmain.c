@@ -261,7 +261,9 @@ io_invoke(GIOChannel *source, GIOCondition cond, gpointer null)
 		escape_stuff.timer = 0;
 	}
 	keys[rd] = 0;
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	gnt_wm_set_event_stack(wm, TRUE);
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 	cvrt = g_locale_to_utf8(keys, rd, (gsize*)&rd, NULL, NULL);
 	k = cvrt ? cvrt : keys;
@@ -298,8 +300,11 @@ io_invoke(GIOChannel *source, GIOCondition cond, gpointer null)
 		k += p;
 	}
 end:
-	if (wm)
+	if (wm) {
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 		gnt_wm_set_event_stack(wm, FALSE);
+G_GNUC_END_IGNORE_DEPRECATIONS
+	}
 	g_free(cvrt);
 	return TRUE;
 }

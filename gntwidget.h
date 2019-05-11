@@ -251,14 +251,18 @@ void gnt_widget_show(GntWidget *widget);
  */
 void gnt_widget_draw(GntWidget *widget);
 
+#ifndef GNT_DISABLE_DEPRECATED
 /**
  * gnt_widget_expose:
  *
  * Expose part of a widget.
  *
  * Internal function -- do not use.
+ *
+ * Deprecated: 2.14.0
  */
-void gnt_widget_expose(GntWidget *widget, int x, int y, int width, int height);
+void gnt_widget_expose(GntWidget *widget, int x, int y, int width, int height) G_GNUC_DEPRECATED;
+#endif
 
 /**
  * gnt_widget_hide:
@@ -418,13 +422,17 @@ void gnt_widget_set_name(GntWidget *widget, const char *name);
  */
 const char *gnt_widget_get_name(GntWidget *widget);
 
+#ifndef GNT_DISABLE_DEPRECATED
 /**
  * gnt_widget_queue_update:
  *
  * Internal function -- do not use.
  * Use gnt_widget_draw() instead.
+ *
+ * Deprecated: 2.14.0: Use gnt_widget_draw() instead.
  */
-void gnt_widget_queue_update(GntWidget *widget);
+void gnt_widget_queue_update(GntWidget *widget) G_GNUC_DEPRECATED;
+#endif
 
 /**
  * gnt_widget_set_take_focus:
