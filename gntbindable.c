@@ -55,6 +55,35 @@ typedef struct
 /******************************************************************************
  * Helpers
  *****************************************************************************/
+static void
+register_binding(GntBindableClass *klass, const char *name, const char *trigger,
+                 GList *list)
+{
+	GntBindableActionParam *param;
+	GntBindableAction *action;
+
+	if (name == NULL || *name == '\0') {
+		g_hash_table_remove(klass->bindings, (char *)trigger);
+		gnt_keys_del_combination(trigger);
+		return;
+	}
+
+	action = g_hash_table_lookup(klass->actions, name);
+	if (!action) {
+		gnt_warning("Invalid action name %s for %s", name,
+		            g_type_name(G_OBJECT_CLASS_TYPE(klass)));
+		if (list) {
+			g_list_free(list);
+		}
+		return;
+	}
+
+	param = g_new0(GntBindableActionParam, 1);
+	param->action = action;
+	param->list = list;
+	g_hash_table_replace(klass->bindings, g_strdup(trigger), param);
+	gnt_keys_add_combination(trigger);
+}
 
 static void
 gnt_bindable_free_rebind_info(void)
@@ -75,11 +104,11 @@ static void
 gnt_bindable_rebinding_rebind(G_GNUC_UNUSED GntWidget *button, gpointer data)
 {
 	if (rebind_info.keys) {
-		gnt_bindable_register_binding(rebind_info.klass,
+		register_binding(rebind_info.klass,
 				NULL,
 				rebind_info.okeys,
 				rebind_info.params);
-		gnt_bindable_register_binding(rebind_info.klass,
+		register_binding(rebind_info.klass,
 				rebind_info.name,
 				rebind_info.keys,
 				rebind_info.params);
@@ -350,34 +379,6 @@ gnt_bindable_check_key(GntBindable *bindable, const char *keys) {
 	GntBindableClass *klass = GNT_BINDABLE_CLASS(GNT_BINDABLE_GET_CLASS(bindable));
 	GntBindableActionParam *param = g_hash_table_lookup(klass->bindings, keys);
 	return (param && param->action);
-}
-
-static void
-register_binding(GntBindableClass *klass, const char *name, const char *trigger, GList *list)
-{
-	GntBindableActionParam *param;
-	GntBindableAction *action;
-
-	if (name == NULL || *name == '\0') {
-		g_hash_table_remove(klass->bindings, (char*)trigger);
-		gnt_keys_del_combination(trigger);
-		return;
-	}
-
-	action = g_hash_table_lookup(klass->actions, name);
-	if (!action) {
-		gnt_warning("Invalid action name %s for %s",
-				name, g_type_name(G_OBJECT_CLASS_TYPE(klass)));
-		if (list)
-			g_list_free(list);
-		return;
-	}
-
-	param = g_new0(GntBindableActionParam, 1);
-	param->action = action;
-	param->list = list;
-	g_hash_table_replace(klass->bindings, g_strdup(trigger), param);
-	gnt_keys_add_combination(trigger);
 }
 
 void gnt_bindable_register_binding(GntBindableClass *klass, const char *name,
