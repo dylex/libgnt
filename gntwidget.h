@@ -32,14 +32,6 @@
 #include <stdio.h>
 #include <glib.h>
 
-#ifndef GNTSEAL
-#  if defined(GNTSEAL_ENABLE)
-#    define GNTSEAL(ident)      _gnt_sealed__ ## ident
-#  else
-#    define GNTSEAL(ident)      ident
-#  endif
-#endif /* !GNTSEAL */
-
 #include "gntbindable.h"
 
 /* XXX: This will probably move elsewhere */
