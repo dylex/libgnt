@@ -62,6 +62,7 @@
 
 #include "gntboxprivate.h"
 #include "gntmenuprivate.h"
+#include "gntstyleprivate.h"
 #include "gntwidgetprivate.h"
 #include "gntwmprivate.h"
 #include "gntwsprivate.h"

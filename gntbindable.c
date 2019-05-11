@@ -37,6 +37,8 @@
 #include "gntwindow.h"
 #include "gntlabel.h"
 
+#include "gntstyleprivate.h"
+
 static struct
 {
 	char * okeys;         /* Old keystrokes */

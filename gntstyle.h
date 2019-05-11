@@ -130,13 +130,6 @@ gboolean gnt_style_parse_bool(const char *value);
 gboolean gnt_style_get_bool(GntStyle style, gboolean def);
 
 /**
- * gnt_styles_get_keyremaps:
- *
- * Internal function -- do not use.
- */
-void gnt_styles_get_keyremaps(GType type, GHashTable *hash);
-
-/**
  * gnt_style_read_actions:
  *
  * Internal function -- do not use.
@@ -153,15 +146,6 @@ void gnt_style_read_actions(GType type, GntBindableClass *klass);
  * Returns:  %TRUE if some accels were read, %FALSE otherwise.
  */
 gboolean gnt_style_read_menu_accels(const char *name, GHashTable *table);
-
-/**
- * gnt_style_read_workspaces:
- *
- * Reads workspace information.
- *
- * Internal function -- do not use.
- */
-void gnt_style_read_workspaces(GntWM *wm);
 
 /**
  * gnt_init_styles:

@@ -9,6 +9,7 @@ ignore_headers = [
     'gntboxprivate.h',
     'gntmenuprivate.h',
     'gntmenuitemprivate.h',
+    'gntstyleprivate.h',
     'gnttreeprivate.h',
     'gntwidgetprivate.h',
     'gntwmprivate.h',
