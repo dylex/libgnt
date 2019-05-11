@@ -20,7 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-/**
+/*
  * 1. Buddylist is aligned on the left.
  * 2. The rest of the screen is split into MxN grid for conversation windows.
  * 	- M = split-h in ~/.gntrc:[irssi]
