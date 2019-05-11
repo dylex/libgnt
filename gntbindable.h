@@ -73,22 +73,29 @@ typedef gboolean (*GntBindableActionCallbackNoParam)(GntBindable *bindable);
  * @klass:    The class the binding is for.
  * @name:     The name of the binding.
  * @callback: (scope call): The callback for the binding.
- * @trigger:  The default trigger for the binding, or %NULL, followed by a
- *            %NULL-terminated list of default parameters.
+ * @trigger:  The default trigger for the binding, or %NULL.
+ * @...:      A %NULL-terminated list of default parameters.
  *
  * Register a bindable action for a class.
  */
-void gnt_bindable_class_register_action(GntBindableClass *klass, const char *name, GntBindableActionCallback callback, const char *trigger, ...);
+void gnt_bindable_class_register_action(GntBindableClass *klass,
+                                        const char *name,
+                                        GntBindableActionCallback callback,
+                                        const char *trigger,
+                                        ...) G_GNUC_NULL_TERMINATED;
 
 /**
  * gnt_bindable_register_binding:
- * @klass:     The class the binding is for.
- * @name:      The name of the binding.
- * @trigger:   A new trigger for the binding, followed by a %NULL-terminated list of parameters for the callback.
+ * @klass:   The class the binding is for.
+ * @name:    The name of the binding.
+ * @trigger: A new trigger for the binding.
+ * @...:     A %NULL-terminated list of parameters for the callback.
  *
  * Register a key-binding to an existing action.
  */
-void gnt_bindable_register_binding(GntBindableClass *klass, const char *name, const char *trigger, ...);
+void gnt_bindable_register_binding(GntBindableClass *klass, const char *name,
+                                   const char *trigger,
+                                   ...) G_GNUC_NULL_TERMINATED;
 
 /**
  * gnt_bindable_perform_action_key:
@@ -116,8 +123,9 @@ gboolean gnt_bindable_check_key(GntBindable *bindable, const char *keys);
 
 /**
  * gnt_bindable_perform_action_named:
- * @bindable:  The bindable object.
- * @name:      The action to perform, followed by a %NULL-terminated list of parameters.
+ * @bindable: The bindable object.
+ * @name:     The action to perform.
+ * @...:      A %NULL-terminated list of parameters.
  *
  * Perform an action on a bindable object.
  *

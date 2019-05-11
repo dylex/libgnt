@@ -104,8 +104,10 @@ GHashTable * gnt_hash_table_duplicate(GHashTable *src, GHashFunc hash, GEqualFun
 
 /**
  * gnt_util_parse_widgets:
- * @string:  The XML string.
- * @num:     The number of widgets to return, followed by 'num' GntWidget **
+ * @string: The XML string.
+ * @num:    The number of widgets to return.
+ * @...:    (array length=num): A list of #GntWidget** pointers to place the
+ *          result.
  *
  * Parse widgets from an XML description. For example,
  *
