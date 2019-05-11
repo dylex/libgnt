@@ -27,6 +27,8 @@
 #include "gntstyle.h"
 #include "gntutils.h"
 
+#include "gntmainprivate.h"
+
 #define GNT_WIDGET_FLAGS(priv) (priv->flags)
 #define GNT_WIDGET_SET_FLAGS(priv, flags) (GNT_WIDGET_FLAGS(priv) |= flags)
 #define GNT_WIDGET_UNSET_FLAGS(priv, flags) (GNT_WIDGET_FLAGS(priv) &= ~(flags))

@@ -25,6 +25,7 @@
 #include "gntstyle.h"
 #include "gntutils.h"
 
+#include "gntmainprivate.h"
 #include "gntwidgetprivate.h"
 
 #include <string.h>
