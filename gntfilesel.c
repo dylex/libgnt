@@ -510,6 +510,7 @@ gnt_file_sel_class_init(GntFileSelClass *klass)
 	 * The ::file-selected signal is emitted when the Select button or the
 	 * file tree on a #GntFileSel is activated.
 	 *
+	 * Since: 2.1.0
 	 */
 	signals[SIG_FILE_SELECTED] =
 		g_signal_new("file_selected",

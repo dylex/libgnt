@@ -52,6 +52,8 @@ typedef struct _GntSliderClass		GntSliderClass;
  * GntSlider:
  *
  * Access to any fields is deprecated. See inline comments for replacements.
+ *
+ * Since: 2.1.0
  */
 struct _GntSlider
 {

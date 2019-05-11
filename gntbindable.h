@@ -159,6 +159,8 @@ gboolean gnt_bindable_perform_action_key(GntBindable *bindable, const char *keys
  * Discover if a key is bound.
  *
  * Returns:  %TRUE if the the key has an action associated with it.
+ *
+ * Since: 2.4.2
  */
 gboolean gnt_bindable_check_key(GntBindable *bindable, const char *keys);
 
@@ -180,6 +182,8 @@ gboolean gnt_bindable_perform_action_named(GntBindable *bindable, const char *na
  * Returns a GntTree populated with "key" -> "binding" for the widget.
  *
  * Returns: (transfer full): The GntTree.
+ *
+ * Since: 2.1.1
  */
 GntBindable * gnt_bindable_bindings_view(GntBindable *bind);
 
@@ -191,6 +195,8 @@ GntBindable * gnt_bindable_bindings_view(GntBindable *bind);
  * From this window a user can select a listing to rebind a new key for the given action.
  *
  * Returns:  %TRUE
+ *
+ * Since: 2.1.1
  */
 
 gboolean gnt_bindable_build_help_window(GntBindable *bindable);

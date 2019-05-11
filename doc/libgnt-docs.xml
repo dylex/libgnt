@@ -105,6 +105,14 @@
       <title>Index of new symbols in 2.7.2</title>
       <xi:include href="xml/api-index-2.7.2.xml"><xi:fallback /></xi:include>
     </index>
+    <index id="api-2.6.0">
+      <title>Index of new symbols in 2.6.0</title>
+      <xi:include href="xml/api-index-2.6.0.xml"><xi:fallback /></xi:include>
+    </index>
+    <index id="api-2.4.2">
+      <title>Index of new symbols in 2.4.2</title>
+      <xi:include href="xml/api-index-2.4.2.xml"><xi:fallback /></xi:include>
+    </index>
     <index id="api-2.4.0">
       <title>Index of new symbols in 2.4.0</title>
       <xi:include href="xml/api-index-2.4.0.xml"><xi:fallback /></xi:include>
@@ -116,6 +124,10 @@
     <index id="api-2.2.0">
       <title>Index of new symbols in 2.2.0</title>
       <xi:include href="xml/api-index-2.2.0.xml"><xi:fallback /></xi:include>
+    </index>
+    <index id="api-2.1.1">
+      <title>Index of new symbols in 2.1.1</title>
+      <xi:include href="xml/api-index-2.1.1.xml"><xi:fallback /></xi:include>
     </index>
     <index id="api-2.1.0">
       <title>Index of new symbols in 2.1.0</title>

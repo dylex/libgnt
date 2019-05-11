@@ -49,11 +49,16 @@ typedef struct _GntTextView			GntTextView;
 typedef struct _GntTextViewPriv		GntTextViewPriv;
 typedef struct _GntTextViewClass		GntTextViewClass;
 
+/**
+ * GntTextViewFlag:
+ *
+ * Since: 2.1.0
+ */
 typedef enum
 {
 	GNT_TEXT_VIEW_NO_SCROLL     = 1 << 0,
 	GNT_TEXT_VIEW_WRAP_CHAR     = 1 << 1,
-	GNT_TEXT_VIEW_TOP_ALIGN     = 1 << 2,
+	GNT_TEXT_VIEW_TOP_ALIGN     = 1 << 2,  /* Since: 2.1.1 */
 } GntTextViewFlag;
 
 /**
