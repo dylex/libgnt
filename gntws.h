@@ -46,6 +46,8 @@ typedef struct _GntWS GntWS;
  * GntWS:
  *
  * Access to any fields is deprecated. See inline comments for replacements.
+ *
+ * Since: 2.1.0
  */
 struct _GntWS
 {

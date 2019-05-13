@@ -183,6 +183,8 @@ struct _GntWMClass
 	/* This is invoked whenever the terminal window is resized, or the
 	 * screen session is attached to a new terminal. (ie, from the
 	 * SIGWINCH callback)
+	 *
+	 * Since: 2.1.0
 	 */
 	void (*terminal_refresh)(GntWM *wm);
 
