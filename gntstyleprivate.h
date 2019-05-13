@@ -29,7 +29,9 @@
 G_BEGIN_DECLS
 
 /* Private access to some internals. Contact us if you need these. */
+G_GNUC_INTERNAL
 void gnt_styles_get_keyremaps(GType type, GHashTable *hash);
+G_GNUC_INTERNAL
 void gnt_style_read_workspaces(GntWM *wm);
 
 G_END_DECLS

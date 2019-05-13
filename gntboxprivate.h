@@ -29,6 +29,7 @@
 G_BEGIN_DECLS
 
 /* Private access to some internals. Contact us if you need these. */
+G_GNUC_INTERNAL
 GntWidget *gnt_box_get_active(GntBox *box);
 
 G_END_DECLS

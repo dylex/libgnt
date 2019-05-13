@@ -29,12 +29,18 @@
 G_BEGIN_DECLS
 
 /* Private access to some internals. Contact us if you need these. */
+G_GNUC_INTERNAL
 gboolean gnt_ws_is_single(GntWS *ws);
+G_GNUC_INTERNAL
 gboolean gnt_ws_is_top_widget(GntWS *ws, GntWidget *widget);
+G_GNUC_INTERNAL
 GList *gnt_ws_get_last(GntWS *ws);
+G_GNUC_INTERNAL
 void gnt_ws_append_widget(GntWS *ws, GntWidget *widget);
+G_GNUC_INTERNAL
 void gnt_ws_bring_to_front(GntWS *ws, GntWidget *widget);
 
+G_GNUC_INTERNAL
 void gnt_ws_set_list(GntWS *ws, GList *list);
 
 G_END_DECLS

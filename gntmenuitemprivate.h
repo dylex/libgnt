@@ -29,9 +29,13 @@
 G_BEGIN_DECLS
 
 /* Private access to some internals. Contact us if you need these. */
+G_GNUC_INTERNAL
 gboolean gnt_menuitem_has_callback(GntMenuItem *item);
+G_GNUC_INTERNAL
 void gnt_menuitem_set_position(GntMenuItem *item, gint x, gint y);
+G_GNUC_INTERNAL
 void gnt_menuitem_get_position(GntMenuItem *item, gint *x, gint *y);
+G_GNUC_INTERNAL
 const gchar *gnt_menuitem_get_text(GntMenuItem *item);
 
 G_END_DECLS

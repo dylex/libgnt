@@ -29,10 +29,15 @@
 G_BEGIN_DECLS
 
 /* Private access to some internals. Contact us if you need these. */
+G_GNUC_INTERNAL
 void gnt_widget_get_minimum_size(GntWidget *widget, gint *width, gint *height);
+G_GNUC_INTERNAL
 void gnt_widget_set_minimum_size(GntWidget *widget, gint width, gint height);
+G_GNUC_INTERNAL
 void gnt_widget_get_internal_size(GntWidget *widget, gint *width, gint *height);
+G_GNUC_INTERNAL
 void gnt_widget_set_internal_size(GntWidget *widget, gint width, gint height);
+G_GNUC_INTERNAL
 void gnt_widget_queue_update(GntWidget *widget);
 
 G_END_DECLS

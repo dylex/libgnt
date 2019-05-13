@@ -28,8 +28,11 @@
 G_BEGIN_DECLS
 
 /* Private access to some internals. Contact us if you need these. */
+G_GNUC_INTERNAL
 void gnt_screen_occupy(GntWidget *widget);
+G_GNUC_INTERNAL
 void gnt_screen_release(GntWidget *widget);
+G_GNUC_INTERNAL
 void gnt_screen_update(GntWidget *widget);
 
 G_END_DECLS

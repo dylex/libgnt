@@ -29,9 +29,13 @@
 G_BEGIN_DECLS
 
 /* Private access to some internals. Contact us if you need these. */
+G_GNUC_INTERNAL
 GntMenuType gnt_menu_get_menutype(GntMenu *menu);
+G_GNUC_INTERNAL
 GntMenuItem *gnt_menu_get_selected_item(GntMenu *menu);
+G_GNUC_INTERNAL
 GntMenu *gnt_menu_get_parent_menu(GntMenu *menu);
+G_GNUC_INTERNAL
 GntMenu *gnt_menu_get_submenu(GntMenu *menu);
 
 G_END_DECLS

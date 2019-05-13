@@ -37,8 +37,10 @@ typedef enum
 G_BEGIN_DECLS
 /* Private access to some internals. Contact us if you need these. */
 
+G_GNUC_INTERNAL
 void gnt_wm_copy_win(GntWidget *widget, GntNode *node);
 
+G_GNUC_INTERNAL
 void gnt_wm_set_mainloop(GntWM *wm, GMainLoop *loop);
 
 /*
@@ -50,20 +52,30 @@ void gnt_wm_set_mainloop(GntWM *wm, GMainLoop *loop);
  *
  * Internal.
  */
+G_GNUC_INTERNAL
 gboolean gnt_wm_is_list_window(GntWM *wm, GntWidget *widget);
 
+G_GNUC_INTERNAL
 void gnt_wm_set_place_by_name(GntWM *wm, const gchar *name, GntWS *ws);
+G_GNUC_INTERNAL
 void gnt_wm_set_place_by_title(GntWM *wm, const gchar *title, GntWS *ws);
 
+G_GNUC_INTERNAL
 void gnt_wm_add_action(GntWM *wm, GntAction *action);
 
+G_GNUC_INTERNAL
 GntMenu *gnt_wm_get_menu(GntWM *wm);
+G_GNUC_INTERNAL
 void gnt_wm_set_menu(GntWM *wm, GntMenu *menu);
 
+G_GNUC_INTERNAL
 gboolean gnt_wm_get_event_stack(GntWM *wm);
+G_GNUC_INTERNAL
 void gnt_wm_set_event_stack(GntWM *wm, gboolean set);
 
+G_GNUC_INTERNAL
 GntKeyPressMode gnt_wm_get_keypress_mode(GntWM *wm);
+G_GNUC_INTERNAL
 void gnt_wm_set_keypress_mode(GntWM *wm, GntKeyPressMode mode);
 
 G_END_DECLS

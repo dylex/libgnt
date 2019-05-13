@@ -29,7 +29,9 @@
 G_BEGIN_DECLS
 
 /* Private access to some internals. Contact us if you need these. */
+G_GNUC_INTERNAL
 GntTreeRow *gnt_tree_get_current(GntTree *tree);
+G_GNUC_INTERNAL
 GntTreeRow *gnt_tree_get_top(GntTree *tree);
 
 G_END_DECLS
