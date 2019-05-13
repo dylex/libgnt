@@ -33,8 +33,6 @@
 #include "gntwindow.h"
 #include "gntlabel.h"
 
-#include "gntwsprivate.h"
-
 #define GNT_TYPE_S_WM gnt_s_wm_get_type()
 G_DECLARE_FINAL_TYPE(GntSWM, gnt_s_wm, GNT, S_WM, GntWM)
 
@@ -148,7 +146,7 @@ s_new_window(GntWM *wm, GntWidget *win)
 static GntWidget *
 find_widget(GntWM *wm, const char *wname)
 {
-	GList *iter = gnt_ws_get_list(gnt_wm_get_current_workspace(wm));
+	GList *iter = gnt_ws_get_widgets(gnt_wm_get_current_workspace(wm));
 	for (; iter; iter = iter->next) {
 		GntWidget *widget = iter->data;
 		const char *name = gnt_widget_get_name(widget);

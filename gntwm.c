@@ -478,7 +478,7 @@ switch_window(GntWM *wm, int direction, gboolean urgent)
 	}
 
 	w = gnt_ws_get_top_widget(priv->cws);
-	list = gnt_ws_get_list(priv->cws);
+	list = gnt_ws_get_widgets(priv->cws);
 	orgpos = pos = g_list_index(list, w);
 	g_return_if_fail(pos >= 0);
 
@@ -532,7 +532,7 @@ switch_window_n(GntBindable *bind, GList *list)
 	else
 		n = 0;
 
-	if ((l = g_list_nth(gnt_ws_get_list(priv->cws), n)) != NULL) {
+	if ((l = g_list_nth(gnt_ws_get_widgets(priv->cws), n)) != NULL) {
 		gnt_wm_raise_window(wm, l->data);
 	}
 
@@ -660,7 +660,8 @@ populate_window_list(GntWMPrivate *priv, gboolean workspace)
 	GList *iter;
 	GntTree *tree = GNT_TREE(priv->windows->tree);
 	if (!workspace) {
-		for (iter = gnt_ws_get_list(priv->cws); iter; iter = iter->next) {
+		for (iter = gnt_ws_get_widgets(priv->cws); iter;
+		     iter = iter->next) {
 			GntBox *box = GNT_BOX(iter->data);
 
 			gnt_tree_add_row_last(
@@ -675,7 +676,7 @@ populate_window_list(GntWMPrivate *priv, gboolean workspace)
 		for (; ws; ws = ws->next) {
 			gnt_tree_add_row_last(tree, ws->data,
 					gnt_tree_create_row(tree, gnt_ws_get_name(GNT_WS(ws->data))), NULL);
-			for (iter = gnt_ws_get_list(GNT_WS(ws->data)); iter;
+			for (iter = gnt_ws_get_widgets(GNT_WS(ws->data)); iter;
 			     iter = iter->next) {
 				GntBox *box = GNT_BOX(iter->data);
 
@@ -941,7 +942,7 @@ dump_screen(G_GNUC_UNUSED GntBindable *b, G_GNUC_UNUSED GList *params)
 static void
 shift_window(GntWMPrivate *priv, GntWidget *widget, int dir)
 {
-	GList *all = gnt_ws_get_list(priv->cws);
+	GList *all = gnt_ws_get_widgets(priv->cws);
 	GList *list = g_list_find(all, widget);
 	int length, pos;
 	if (!list)
@@ -1829,7 +1830,7 @@ gnt_wm_widget_move_workspace(GntWM *wm, GntWS *neww, GntWidget *widget)
 static gint widget_in_workspace(gconstpointer workspace, gconstpointer wid)
 {
 	GntWS *s = (GntWS *)workspace;
-	GList *list = gnt_ws_get_list(s);
+	GList *list = gnt_ws_get_widgets(s);
 	if (list && g_list_find(list, wid)) {
 		return 0;
 	}
@@ -2064,7 +2065,7 @@ void gnt_wm_window_close(GntWM *wm, GntWidget *widget)
 	}
 
 	if (s) {
-		pos = g_list_index(gnt_ws_get_list(s), widget);
+		pos = g_list_index(gnt_ws_get_widgets(s), widget);
 
 		if (pos != -1) {
 			gnt_ws_remove_widget(s, widget);
