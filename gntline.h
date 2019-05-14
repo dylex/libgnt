@@ -41,9 +41,26 @@
 #define GNT_IS_LINE_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_LINE))
 #define GNT_LINE_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_LINE, GntLineClass))
 
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GNT_LINE_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_LINE_FLAGS(obj)				(GNT_LINE(obj)->priv.flags)
+/**
+ * GNT_LINE_SET_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_LINE_SET_FLAGS(obj, flags)		(GNT_LINE_FLAGS(obj) |= flags)
+/**
+ * GNT_LINE_UNSET_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_LINE_UNSET_FLAGS(obj, flags)	(GNT_LINE_FLAGS(obj) &= ~(flags))
+#endif
 
 typedef struct _GntLine			GntLine;
 typedef struct _GntLineClass		GntLineClass;

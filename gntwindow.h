@@ -42,9 +42,26 @@
 #define GNT_IS_WINDOW_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_WINDOW))
 #define GNT_WINDOW_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_WINDOW, GntWindowClass))
 
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GNT_WINDOW_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_WINDOW_FLAGS(obj)				(GNT_WINDOW(obj)->priv.flags)
+/**
+ * GNT_WINDOW_SET_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_WINDOW_SET_FLAGS(obj, flags)		(GNT_WINDOW_FLAGS(obj) |= flags)
+/**
+ * GNT_WINDOW_UNSET_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_WINDOW_UNSET_FLAGS(obj, flags)	(GNT_WINDOW_FLAGS(obj) &= ~(flags))
+#endif
 
 typedef struct _GntWindow			GntWindow;
 typedef struct _GntWindowClass		GntWindowClass;

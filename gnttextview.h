@@ -41,9 +41,26 @@
 #define GNT_IS_TEXT_VIEW_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_TEXT_VIEW))
 #define GNT_TEXT_VIEW_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_TEXT_VIEW, GntTextViewClass))
 
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GNT_TEXT_VIEW_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_TEXT_VIEW_FLAGS(obj)				(GNT_TEXT_VIEW(obj)->priv.flags)
+/**
+ * GNT_TEXT_VIEW_SET_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_TEXT_VIEW_SET_FLAGS(obj, flags)		(GNT_TEXT_VIEW_FLAGS(obj) |= flags)
+/**
+ * GNT_TEXT_VIEW_UNSET_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_TEXT_VIEW_UNSET_FLAGS(obj, flags)	(GNT_TEXT_VIEW_FLAGS(obj) &= ~(flags))
+#endif
 
 typedef struct _GntTextView			GntTextView;
 typedef struct _GntTextViewClass		GntTextViewClass;

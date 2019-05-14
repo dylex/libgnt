@@ -42,9 +42,26 @@
 #define GNT_IS_MENU_ITEM_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_MENU_ITEM))
 #define GNT_MENU_ITEM_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_MENU_ITEM, GntMenuItemClass))
 
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GNT_MENU_ITEM_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_MENU_ITEM_FLAGS(obj)				(GNT_MENU_ITEM(obj)->priv.flags)
+/**
+ * GNT_MENU_ITEM_SET_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_MENU_ITEM_SET_FLAGS(obj, flags)		(GNT_MENU_ITEM_FLAGS(obj) |= flags)
+/**
+ * GNT_MENU_ITEM_UNSET_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_MENU_ITEM_UNSET_FLAGS(obj, flags)	(GNT_MENU_ITEM_FLAGS(obj) &= ~(flags))
+#endif
 
 typedef struct _GntMenuItem			GntMenuItem;
 typedef struct _GntMenuItemPriv		GntMenuItemPriv;

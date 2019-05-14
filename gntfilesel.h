@@ -41,9 +41,26 @@
 #define GNT_IS_FILE_SEL_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_FILE_SEL))
 #define GNT_FILE_SEL_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_FILE_SEL, GntFileSelClass))
 
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GNT_FILE_SEL_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_FILE_SEL_FLAGS(obj)				(GNT_FILE_SEL(obj)->priv.flags)
+/**
+ * GNT_FILE_SEL_SET_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_FILE_SEL_SET_FLAGS(obj, flags)		(GNT_FILE_SEL_FLAGS(obj) |= flags)
+/**
+ * GNT_FILE_SEL_UNSET_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_FILE_SEL_UNSET_FLAGS(obj, flags)	(GNT_FILE_SEL_FLAGS(obj) &= ~(flags))
+#endif
 
 typedef struct _GntFileSel			GntFileSel;
 typedef struct _GntFileSelClass		GntFileSelClass;

@@ -41,9 +41,26 @@
 #define GNT_IS_ENTRY_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_ENTRY))
 #define GNT_ENTRY_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_ENTRY, GntEntryClass))
 
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GNT_ENTRY_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_ENTRY_FLAGS(obj)				(GNT_ENTRY(obj)->priv.flags)
+/**
+ * GNT_ENTRY_SET_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_ENTRY_SET_FLAGS(obj, flags)		(GNT_ENTRY_FLAGS(obj) |= flags)
+/**
+ * GNT_ENTRY_UNSET_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_ENTRY_UNSET_FLAGS(obj, flags)	(GNT_ENTRY_FLAGS(obj) &= ~(flags))
+#endif
 
 #define	ENTRY_CHAR		'_'			/* The character to use to fill in the blank places */
 
