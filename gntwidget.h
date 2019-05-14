@@ -45,12 +45,6 @@ typedef enum
 	GNT_MOUSE_SCROLL_DOWN
 } GntMouseEvent;
 
-/* XXX: I'll have to ask grim what he's using this for in guifications. */
-typedef enum
-{
-	GNT_PARAM_SERIALIZABLE	= 1 << G_PARAM_USER_SHIFT
-} GntParamFlags;
-
 G_BEGIN_DECLS
 
 #define GNT_TYPE_WIDGET gnt_widget_get_type()
