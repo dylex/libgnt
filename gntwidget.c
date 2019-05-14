@@ -382,6 +382,8 @@ void
 gnt_widget_queue_update(GntWidget *widget)
 {
 	GntWidgetPrivate *priv = NULL;
+	GntWidget *toplevel = NULL;
+	GntWidgetPrivate *toplevel_priv = NULL;
 
 	g_return_if_fail(GNT_IS_WIDGET(widget));
 	priv = gnt_widget_get_instance_private(widget);
@@ -390,11 +392,12 @@ gnt_widget_queue_update(GntWidget *widget)
 		return;
 	}
 
-	widget = gnt_widget_get_toplevel(widget);
+	toplevel = gnt_widget_get_toplevel(widget);
+	toplevel_priv = gnt_widget_get_instance_private(toplevel);
 
-	if (priv->queue_update == 0) {
-		priv->queue_update =
-		        g_timeout_add(0, update_queue_callback, widget);
+	if (toplevel_priv->queue_update == 0) {
+		toplevel_priv->queue_update =
+		        g_timeout_add(0, update_queue_callback, toplevel);
 	}
 }
 
