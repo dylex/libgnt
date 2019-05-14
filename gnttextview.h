@@ -46,8 +46,15 @@
 #define GNT_TEXT_VIEW_UNSET_FLAGS(obj, flags)	(GNT_TEXT_VIEW_FLAGS(obj) &= ~(flags))
 
 typedef struct _GntTextView			GntTextView;
-typedef struct _GntTextViewPriv		GntTextViewPriv;
 typedef struct _GntTextViewClass		GntTextViewClass;
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntTextViewPriv:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
+typedef struct _GntTextViewPriv GntTextViewPriv;
+#endif
 
 /**
  * GntTextViewFlag:

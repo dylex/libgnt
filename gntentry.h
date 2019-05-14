@@ -48,10 +48,17 @@
 #define	ENTRY_CHAR		'_'			/* The character to use to fill in the blank places */
 
 typedef struct _GntEntry			GntEntry;
-typedef struct _GntEntryPriv		GntEntryPriv;
 typedef struct _GntEntryClass	GntEntryClass;
 typedef struct _GntEntryKillRing    GntEntryKillRing;
 typedef struct _GntEntrySearch		GntEntrySearch;
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntEntryPriv:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
+typedef struct _GntEntryPriv GntEntryPriv;
+#endif
 
 typedef enum
 {

@@ -47,8 +47,15 @@
 #define GNT_MENU_UNSET_FLAGS(obj, flags)	(GNT_MENU_FLAGS(obj) &= ~(flags))
 
 typedef struct _GntMenu			GntMenu;
-typedef struct _GntMenuPriv		GntMenuPriv;
 typedef struct _GntMenuClass		GntMenuClass;
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntMenuPriv:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
+typedef struct _GntMenuPriv GntMenuPriv;
+#endif
 
 #include "gntmenuitem.h"
 

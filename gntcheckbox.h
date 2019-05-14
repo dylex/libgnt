@@ -47,8 +47,15 @@
 #define GNT_CHECK_BOX_UNSET_FLAGS(obj, flags)	(GNT_CHECK_BOX_FLAGS(obj) &= ~(flags))
 
 typedef struct _GntCheckBox			GntCheckBox;
-typedef struct _GntCheckBoxPriv		GntCheckBoxPriv;
 typedef struct _GntCheckBoxClass		GntCheckBoxClass;
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntCheckBoxPriv:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
+typedef struct _GntCheckBoxPriv GntCheckBoxPriv;
+#endif
 
 /**
  * GntCheckBox:

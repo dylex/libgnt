@@ -42,8 +42,15 @@
 #define GNT_SKEL_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_SKEL, GntSkelClass))
 
 typedef struct _GntSkel			GntSkel;
-typedef struct _GntSkelPriv		GntSkelPriv;
 typedef struct _GntSkelClass		GntSkelClass;
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntSkelPriv:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
+typedef struct _GntSkelPriv GntSkelPriv;
+#endif
 
 struct _GntSkel
 {

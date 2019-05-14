@@ -47,8 +47,15 @@
 #define GNT_WINDOW_UNSET_FLAGS(obj, flags)	(GNT_WINDOW_FLAGS(obj) &= ~(flags))
 
 typedef struct _GntWindow			GntWindow;
-typedef struct _GntWindowPriv		GntWindowPriv;
 typedef struct _GntWindowClass		GntWindowClass;
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntWindowPriv:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
+typedef struct _GntWindowPriv GntWindowPriv;
+#endif
 
 typedef enum
 {

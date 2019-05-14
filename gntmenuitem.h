@@ -52,19 +52,22 @@ typedef struct _GntMenuItemClass		GntMenuItemClass;
 
 #include "gntmenu.h"
 
+#ifndef GNT_DISABLE_DEPRECATED
 /**
  * GntMenuItemPriv:
  *
- * Access to any fields is deprecated. See inline comments for replacements.
+ * Deprecated: 2.14.0: This is an internal implementation detail. See inline
+ * comments for replacements.
  */
 struct _GntMenuItemPriv
 {
 	/* These will be used to determine the position of the submenu */
 	int GNTSEAL(x);
 	int GNTSEAL(y);
-	char GNTSEAL(trigger);
-	char *GNTSEAL(id);
+	char GNTSEAL(trigger); /* Use gnt_menuitem_get_trigger(). */
+	char *GNTSEAL(id);     /* Use gnt_menuitem_get_id(). */
 };
+#endif
 
 typedef void (*GntMenuItemCallback)(GntMenuItem *item, gpointer data);
 

@@ -45,8 +45,15 @@
 #define GNT_SLIDER_UNSET_FLAGS(obj, flags)   (GNT_SLIDER_FLAGS(obj) &= ~(flags))
 
 typedef struct _GntSlider			GntSlider;
-typedef struct _GntSliderPriv		GntSliderPriv;
 typedef struct _GntSliderClass		GntSliderClass;
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntSliderPriv:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
+typedef struct _GntSliderPriv GntSliderPriv;
+#endif
 
 /**
  * GntSlider:

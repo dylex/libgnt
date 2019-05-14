@@ -46,8 +46,15 @@
 #define GNT_COMBO_BOX_UNSET_FLAGS(obj, flags)	(GNT_COMBO_BOX_FLAGS(obj) &= ~(flags))
 
 typedef struct _GntComboBox			GntComboBox;
-typedef struct _GntComboBoxPriv		GntComboBoxPriv;
 typedef struct _GntComboBoxClass		GntComboBoxClass;
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntComboBoxPriv:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
+typedef struct _GntComboBoxPriv GntComboBoxPriv;
+#endif
 
 /**
  * GntComboBox:

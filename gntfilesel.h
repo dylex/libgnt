@@ -46,9 +46,16 @@
 #define GNT_FILE_SEL_UNSET_FLAGS(obj, flags)	(GNT_FILE_SEL_FLAGS(obj) &= ~(flags))
 
 typedef struct _GntFileSel			GntFileSel;
-typedef struct _GntFileSelPriv		GntFileSelPriv;
 typedef struct _GntFileSelClass		GntFileSelClass;
 typedef struct _GntFile             GntFile;
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntFileSelPriv:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
+typedef struct _GntFileSelPriv GntFileSelPriv;
+#endif
 
 /**
  * GntFileSel:

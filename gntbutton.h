@@ -43,12 +43,19 @@
 #define GNT_BUTTON_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_BUTTON, GntButtonClass))
 
 typedef struct _GntButton			GntButton;
-typedef struct _GntButtonPriv		GntButtonPriv;
 typedef struct _GntButtonClass		GntButtonClass;
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntButtonPriv:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
+typedef struct _GntButtonPriv GntButtonPriv;
+#endif
 
 struct _GntButtonPriv
 {
-	char *text;
+	char *GNTSEAL(text);
 };
 
 /**

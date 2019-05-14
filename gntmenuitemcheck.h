@@ -47,8 +47,15 @@
 #define GNT_MENU_ITEM_CHECK_UNSET_FLAGS(obj, flags)	(GNT_MENU_ITEM_CHECK_FLAGS(obj) &= ~(flags))
 
 typedef struct _GntMenuItemCheck			GntMenuItemCheck;
-typedef struct _GntMenuItemCheckPriv		GntMenuItemCheckPriv;
 typedef struct _GntMenuItemCheckClass		GntMenuItemCheckClass;
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntMenuItemCheckPriv:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
+typedef struct _GntMenuItemCheckPriv GntMenuItemCheckPriv;
+#endif
 
 /**
  * GntMenuItemCheck:

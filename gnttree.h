@@ -43,8 +43,15 @@
 #define GNT_TREE_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_TREE, GntTreeClass))
 
 typedef struct _GntTree			GntTree;
-typedef struct _GntTreePriv		GntTreePriv;
 typedef struct _GntTreeClass		GntTreeClass;
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntTreePriv:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
+typedef struct _GntTreePriv GntTreePriv;
+#endif
 
 typedef struct _GntTreeRow		GntTreeRow;
 typedef struct _GntTreeCol		GntTreeCol;

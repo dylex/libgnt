@@ -46,8 +46,15 @@
 #define GNT_LINE_UNSET_FLAGS(obj, flags)	(GNT_LINE_FLAGS(obj) &= ~(flags))
 
 typedef struct _GntLine			GntLine;
-typedef struct _GntLinePriv		GntLinePriv;
 typedef struct _GntLineClass		GntLineClass;
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntLinePriv:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
+typedef struct _GntLinePriv GntLinePriv;
+#endif
 
 /**
  * GntLine:
