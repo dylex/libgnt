@@ -40,6 +40,22 @@
 #define RIGHT_ALIGNED(priv, index) \
 	(priv->columns[index].flags & GNT_TREE_COLUMN_RIGHT_ALIGNED)
 
+typedef enum
+{
+	GNT_TREE_COLUMN_INVISIBLE = 1 << 0,
+	GNT_TREE_COLUMN_FIXED_SIZE = 1 << 1,
+	GNT_TREE_COLUMN_BINARY_DATA = 1 << 2,
+	GNT_TREE_COLUMN_RIGHT_ALIGNED = 1 << 3,
+} GntTreeColumnFlag;
+
+typedef struct _GntTreeColInfo
+{
+	int width;
+	char *title;
+	int width_ratio;
+	GntTreeColumnFlag flags;
+} GntTreeColInfo;
+
 enum
 {
 	PROP_0,
@@ -67,10 +83,6 @@ typedef struct
 
 	GList *list;      /* List of GntTreeRow s */
 	GHashTable *hash; /* We need this for quickly referencing the rows */
-	GntTreeHashFunc hash_func;
-	GntTreeHashEqualityFunc hash_eq_func;
-	GDestroyNotify key_destroy;
-	GDestroyNotify value_destroy;
 
 	int ncol;                /* No. of columns */
 	GntTreeColInfo *columns; /* Would a GList be better? */
@@ -114,12 +126,12 @@ struct _GntTreeRow
 	GntTree *tree;
 };
 
-struct _GntTreeCol
+typedef struct _GntTreeCol
 {
 	char *text;
 	gboolean isbinary;
 	int span;       /* How many columns does it span? */
-};
+} GntTreeCol;
 
 static void tree_selection_changed(GntTree *, GntTreeRow *, GntTreeRow *);
 static void _gnt_tree_init_internals(GntTree *tree, int col);
@@ -2100,7 +2112,9 @@ void gnt_tree_adjust_columns(GntTree *tree)
 	gnt_widget_set_size(GNT_WIDGET(tree), twidth, -1);
 }
 
-void gnt_tree_set_hash_fns(GntTree *tree, gpointer hash, gpointer eq, gpointer kd)
+void
+gnt_tree_set_hash_fns(GntTree *tree, GntTreeHashFunc hash,
+                      GntTreeHashEqualityFunc eq, GDestroyNotify kd)
 {
 	GntTreePrivate *priv = NULL;
 

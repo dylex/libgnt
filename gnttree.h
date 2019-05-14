@@ -43,24 +43,6 @@ typedef guint (*GntTreeHashFunc)(gconstpointer key);
 typedef gboolean (*GntTreeHashEqualityFunc)(gconstpointer a, gconstpointer b);
 
 typedef struct _GntTreeRow		GntTreeRow;
-typedef struct _GntTreeCol		GntTreeCol;
-typedef struct _GntTreeColInfo		GntTreeColInfo;
-
-typedef enum {
-	GNT_TREE_COLUMN_INVISIBLE    = 1 << 0,
-	GNT_TREE_COLUMN_FIXED_SIZE   = 1 << 1,
-	GNT_TREE_COLUMN_BINARY_DATA  = 1 << 2,
-	GNT_TREE_COLUMN_RIGHT_ALIGNED = 1 << 3,
-} GntTreeColumnFlag;
-
-struct _GntTreeColInfo
-{
-	int width;
-	char *title;
-	int width_ratio;
-	GntTreeColumnFlag flags;
-};
-
 G_BEGIN_DECLS
 
 /**
@@ -554,7 +536,8 @@ void gnt_tree_adjust_columns(GntTree *tree);
  *
  * Set the hash functions to use to hash, compare and free the keys.
  */
-void gnt_tree_set_hash_fns(GntTree *tree, gpointer hash, gpointer eq, gpointer kd);
+void gnt_tree_set_hash_fns(GntTree *tree, GntTreeHashFunc hash,
+                           GntTreeHashEqualityFunc eq, GDestroyNotify kd);
 
 /**
  * gnt_tree_set_column_visible:
