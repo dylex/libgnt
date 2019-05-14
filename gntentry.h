@@ -38,15 +38,30 @@
 
 #define	GNT_ENTRY_CHAR		'_'			/* The character to use to fill in the blank places */
 
+/**
+ * GntEntryFlag:
+ * @GNT_ENTRY_FLAG_ALPHA: Alphabetical characters are allowed.
+ * @GNT_ENTRY_FLAG_INT: Digit characters are allowed.
+ * @GNT_ENTRY_FLAG_NO_SPACE: No whitespace is allowed.
+ * @GNT_ENTRY_FLAG_NO_PUNCT: No punctuation is allowed.
+ * @GNT_ENTRY_FLAG_MASK: Mask the characters in the input display.
+ *
+ * Flags that control the behaviour of a #GntEntry.
+ */
 typedef enum
 {
-	GNT_ENTRY_FLAG_ALPHA    = 1 << 0,  /* Only alpha */
-	GNT_ENTRY_FLAG_INT      = 1 << 1,  /* Only integer */
-	GNT_ENTRY_FLAG_NO_SPACE = 1 << 2,  /* No blank space is allowed */
-	GNT_ENTRY_FLAG_NO_PUNCT = 1 << 3,  /* No punctuations */
-	GNT_ENTRY_FLAG_MASK     = 1 << 4,  /* Mask the inputs */
+	GNT_ENTRY_FLAG_ALPHA = 1 << 0,
+	GNT_ENTRY_FLAG_INT = 1 << 1,
+	GNT_ENTRY_FLAG_NO_SPACE = 1 << 2,
+	GNT_ENTRY_FLAG_NO_PUNCT = 1 << 3,
+	GNT_ENTRY_FLAG_MASK = 1 << 4,
 } GntEntryFlag;
 
+/**
+ * GNT_ENTRY_FLAG_ALL:
+ *
+ * Allow all characters in a #GntEntry.
+ */
 #define GNT_ENTRY_FLAG_ALL    (GNT_ENTRY_FLAG_ALPHA | GNT_ENTRY_FLAG_INT)
 
 G_BEGIN_DECLS

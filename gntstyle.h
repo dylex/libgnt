@@ -32,6 +32,18 @@
 #include "gnt.h"
 #include "gntwm.h"
 
+/**
+ * GntStyle:
+ * @GNT_STYLE_SHADOW: Whether to show a shadow. Boolean.
+ * @GNT_STYLE_COLOR: Whether to show colors. Boolean.
+ * @GNT_STYLE_MOUSE: Whether to enable the mouse. Boolean.
+ * @GNT_STYLE_WM: Which window manager to use. String.
+ * @GNT_STYLE_REMPOS: Whether to remember the positions of windows. Boolean.
+ * @GNT_STYLES: The number of style settings.
+ *
+ * The type of style that a user might set. For boolean options, use
+ * gnt_style_get_bool(). For string options, use gnt_style_get().
+ */
 typedef enum
 {
 	GNT_STYLE_SHADOW = 0,

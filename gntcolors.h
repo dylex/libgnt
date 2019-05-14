@@ -33,23 +33,41 @@
 
 /**
  * GntColorType:
+ * @GNT_COLOR_NORMAL: The normal widget background color.
+ * @GNT_COLOR_HIGHLIGHT: The widget background color for highlighting, e.g.,
+ *                       when a button is selected.
+ * @GNT_COLOR_DISABLED: The background color for disabled widgets.
+ * @GNT_COLOR_HIGHLIGHT_D: The color for selected widgets, in windows without
+ *                         focus.
+ * @GNT_COLOR_TEXT_NORMAL: The color of text in an entry.
+ * @GNT_COLOR_TEXT_INACTIVE: The color of text when the entry is out of focus.
+ * @GNT_COLOR_MNEMONIC: The color of a mnemonic character. Unused.
+ * @GNT_COLOR_MNEMONIC_D: The color of a mnemonic character for a widget
+ *                        without focus. Unused.
+ * @GNT_COLOR_SHADOW: The color of a widget shadow.
+ * @GNT_COLOR_TITLE: The color of the title of a window or box.
+ * @GNT_COLOR_TITLE_D: The color of the title of a window or box that is out of
+ *                     focus.
+ * @GNT_COLOR_URGENT: This is for the 'urgent' windows.
+ * @GNT_COLORS: A count of the number of colors. Custom color types start from
+ *              this value.
  *
  * Different classes of colors.
  */
 typedef enum
 {
 	GNT_COLOR_NORMAL = 1,
-	GNT_COLOR_HIGHLIGHT,		/* eg. when a button is selected */
-	GNT_COLOR_DISABLED,		/* eg. when a button is disabled */
-	GNT_COLOR_HIGHLIGHT_D,	/* eg. when a button is selected, but some other window is in focus */
+	GNT_COLOR_HIGHLIGHT,
+	GNT_COLOR_DISABLED,
+	GNT_COLOR_HIGHLIGHT_D,
 	GNT_COLOR_TEXT_NORMAL,
-	GNT_COLOR_TEXT_INACTIVE,	/* when the entry is out of focus */
+	GNT_COLOR_TEXT_INACTIVE,
 	GNT_COLOR_MNEMONIC,
 	GNT_COLOR_MNEMONIC_D,
 	GNT_COLOR_SHADOW,
 	GNT_COLOR_TITLE,
 	GNT_COLOR_TITLE_D,
-	GNT_COLOR_URGENT,       /* this is for the 'urgent' windows */
+	GNT_COLOR_URGENT,
 	GNT_COLORS
 } GntColorType;
 

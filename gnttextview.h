@@ -38,6 +38,11 @@
 
 /**
  * GntTextViewFlag:
+ * @GNT_TEXT_VIEW_NO_SCROLL: Do not add a scrollbar to the view.
+ * @GNT_TEXT_VIEW_WRAP_CHAR: Wrap on characters (instead of words).
+ * @GNT_TEXT_VIEW_TOP_ALIGN: Align text to the top of the view. Since: 2.1.1
+ *
+ * Flags that determine the behaviour of a #GntTextView.
  *
  * Since: 2.1.0
  */
@@ -45,9 +50,21 @@ typedef enum
 {
 	GNT_TEXT_VIEW_NO_SCROLL     = 1 << 0,
 	GNT_TEXT_VIEW_WRAP_CHAR     = 1 << 1,
-	GNT_TEXT_VIEW_TOP_ALIGN     = 1 << 2,  /* Since: 2.1.1 */
+	GNT_TEXT_VIEW_TOP_ALIGN     = 1 << 2,
 } GntTextViewFlag;
 
+/**
+ * GntTextFormatFlags:
+ * @GNT_TEXT_FLAG_NORMAL: Display the text normally.
+ * @GNT_TEXT_FLAG_BOLD: Display the text in bold text.
+ * @GNT_TEXT_FLAG_UNDERLINE: Display the text with underlining.
+ * @GNT_TEXT_FLAG_BLINK: Display the text with blinking.
+ * @GNT_TEXT_FLAG_DIM: Display the text dimmed.
+ * @GNT_TEXT_FLAG_HIGHLIGHT: Display the text with highlighting.
+ *
+ * Flags that determine the display style of portions of text in a
+ * #GntTextView.
+ */
 typedef enum
 {
 	GNT_TEXT_FLAG_NORMAL      = 0,
@@ -234,7 +251,7 @@ void gnt_text_view_attach_editor_widget(GntTextView *view, GntWidget *widget);
  * @view:  The textview widget
  * @flag:  The flag to set
  *
- * Set a GntTextViewFlag for the textview widget.
+ * Set a #GntTextViewFlag for the textview widget.
  *
  * Since: 2.1.0
  */

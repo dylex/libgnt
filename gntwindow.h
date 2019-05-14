@@ -37,6 +37,15 @@
 
 #define GNT_TYPE_WINDOW				(gnt_window_get_type())
 
+/**
+ * GntWindowFlags:
+ * @GNT_WINDOW_MAXIMIZE_X: The window size will be maximized in the
+ *                         x-direction.
+ * @GNT_WINDOW_MAXIMIZE_Y: The window size will be maximized in the
+ *                         y-direction.
+ *
+ * Flags indicating the maximization state of a #GntWindow.
+ */
 typedef enum
 {
 	GNT_WINDOW_MAXIMIZE_X = 1 << 0,

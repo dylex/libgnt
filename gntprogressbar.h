@@ -34,6 +34,15 @@
 
 #define GNT_TYPE_PROGRESS_BAR          (gnt_progress_bar_get_type ())
 
+/**
+ * GntProgressBarOrientation:
+ * @GNT_PROGRESS_LEFT_TO_RIGHT: The progress bar fills from left to right.
+ * @GNT_PROGRESS_RIGHT_TO_LEFT: The progress bar fills from right to left.
+ * @GNT_PROGRESS_BOTTOM_TO_TOP: The progress bar fills from bottom to top.
+ * @GNT_PROGRESS_TOP_TO_BOTTOM: The progress bar fills from top to bottom.
+ *
+ * The orientation of a #GntProgressBar.
+ */
 typedef enum
 {
    GNT_PROGRESS_LEFT_TO_RIGHT,

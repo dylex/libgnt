@@ -35,6 +35,18 @@
 #include "gntbindable.h"
 
 /* XXX: This will probably move elsewhere */
+/**
+ * GntMouseEvent:
+ * @GNT_LEFT_MOUSE_DOWN: A press of the left (primary) button.
+ * @GNT_MIDDLE_MOUSE_DOWN: A press of the middle (secondary) button.
+ * @GNT_RIGHT_MOUSE_DOWN: A press of the right (tertiary) button.
+ * @GNT_MOUSE_UP: A release of a mouse button.
+ * @GNT_MOUSE_SCROLL_UP: A scroll of the mouse wheel up.
+ * @GNT_MOUSE_SCROLL_DOWN: A scroll of the mouse wheel down.
+ *
+ * The type of a mouse event, used in gnt_widget_clicked() and the
+ * #GntWidget::clicked signal.
+ */
 typedef enum
 {
 	GNT_LEFT_MOUSE_DOWN = 1,

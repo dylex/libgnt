@@ -34,6 +34,20 @@
 
 #define GNT_TYPE_BOX gnt_box_get_type()
 
+/**
+ * GntAlignment:
+ * @GNT_ALIGN_LEFT: Align to the left. Applicable to vertically-oriented boxes
+ *                  only.
+ * @GNT_ALIGN_RIGHT: Align to the right. Applicable to vertically-oriented
+ *                   boxes only.
+ * @GNT_ALIGN_MID: Align to the middle. Applies to either orientation.
+ * @GNT_ALIGN_TOP: Align to the top. Applicable to horizontally-oriented boxes
+ *                 only.
+ * @GNT_ALIGN_BOTTOM: Align to the bottom. Applicable to horizontally-oriented
+ *                    boxes only.
+ *
+ * Alignment of contents of #GntBox widgets.
+ */
 typedef enum
 {
 	/* These for vertical boxes */
