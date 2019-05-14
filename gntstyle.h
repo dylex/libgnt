@@ -143,8 +143,15 @@ gboolean gnt_style_get_bool(GntStyle style, gboolean def);
 
 /**
  * gnt_style_read_actions:
+ * @type:  The type from which the setting name is derived.
+ * @klass: The class on which to register bindings.
  *
- * Internal function -- do not use.
+ * Read user-defined actions defined for @type and register bindings on
+ * the @klass.
+ *
+ * User-defined actions should be defined in the config file in a group
+ * with a name determined by the name of the type with "::binding"
+ * appended.
  */
 void gnt_style_read_actions(GType type, GntBindableClass *klass);
 
