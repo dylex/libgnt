@@ -82,8 +82,20 @@ const char * gnt_bindable_remap_keys(GntBindable *bindable, const char *text);
 typedef gboolean (*GntBindableActionCallback) (GntBindable *bindable, GList *params);
 typedef gboolean (*GntBindableActionCallbackNoParam)(GntBindable *bindable);
 
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntBindableAction:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 typedef struct _GntBindableAction GntBindableAction;
+/**
+ * GntBindableActionParam:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 typedef struct _GntBindableActionParam GntBindableActionParam;
+#endif
 
 struct _GntBindableAction
 {
@@ -100,6 +112,7 @@ struct _GntBindableActionParam
 	GList *list;
 };
 
+#ifndef GNT_DISABLE_DEPRECATED
 /*GntBindableAction *gnt_bindable_action_parse(const char *name);*/
 
 /**
@@ -107,6 +120,8 @@ struct _GntBindableActionParam
  * @action: The bindable action.
  *
  * Free a bindable action.
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
  */
 void gnt_bindable_action_free(GntBindableAction *action);
 
@@ -115,8 +130,11 @@ void gnt_bindable_action_free(GntBindableAction *action);
  * @param:  The GntBindableActionParam to free.
  *
  * Free a GntBindableActionParam.
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
  */
 void gnt_bindable_action_param_free(GntBindableActionParam *param);
+#endif
 
 /**
  * gnt_bindable_class_register_action:

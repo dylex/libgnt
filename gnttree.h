@@ -54,14 +54,26 @@ typedef struct _GntTreePriv GntTreePriv;
 #endif
 
 typedef struct _GntTreeRow		GntTreeRow;
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntTreeCol:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 typedef struct _GntTreeCol		GntTreeCol;
 
+/**
+ * GntTreeColumnFlag:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 typedef enum _GntTreeColumnFlag {
 	GNT_TREE_COLUMN_INVISIBLE    = 1 << 0,
 	GNT_TREE_COLUMN_FIXED_SIZE   = 1 << 1,
 	GNT_TREE_COLUMN_BINARY_DATA  = 1 << 2,
 	GNT_TREE_COLUMN_RIGHT_ALIGNED = 1 << 3,
 } GntTreeColumnFlag;
+#endif
 
 /**
  * GntTree:

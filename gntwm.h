@@ -44,6 +44,12 @@
 #define GNT_IS_WM_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_WM))
 #define GNT_WM_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_WM, GntWMClass))
 
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntKeyPressMode:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 typedef enum _GntKeyPressMode
 {
 	GNT_KP_MODE_NORMAL,
@@ -51,6 +57,7 @@ typedef enum _GntKeyPressMode
 	GNT_KP_MODE_MOVE,
 	GNT_KP_MODE_WAIT_ON_CHILD
 } GntKeyPressMode;
+#endif
 
 typedef struct _GntNode
 {
@@ -64,11 +71,18 @@ typedef struct _GntNode
 
 typedef struct _GntWM GntWM;
 
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntPosition:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 typedef struct _GntPosition
 {
 	int x;
 	int y;
 } GntPosition;
+#endif
 
 /**
  * GntAction:

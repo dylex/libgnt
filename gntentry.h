@@ -49,8 +49,6 @@
 
 typedef struct _GntEntry			GntEntry;
 typedef struct _GntEntryClass	GntEntryClass;
-typedef struct _GntEntryKillRing    GntEntryKillRing;
-typedef struct _GntEntrySearch		GntEntrySearch;
 #ifndef GNT_DISABLE_DEPRECATED
 /**
  * GntEntryPriv:
@@ -58,6 +56,18 @@ typedef struct _GntEntrySearch		GntEntrySearch;
  * Deprecated: 2.14.0: This is an internal implementation detail.
  */
 typedef struct _GntEntryPriv GntEntryPriv;
+/**
+ * GntEntryKillRing:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
+typedef struct _GntEntryKillRing GntEntryKillRing;
+/**
+ * GntEntrySearch:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
+typedef struct _GntEntrySearch GntEntrySearch;
 #endif
 
 typedef enum

@@ -47,7 +47,6 @@
 
 typedef struct _GntFileSel			GntFileSel;
 typedef struct _GntFileSelClass		GntFileSelClass;
-typedef struct _GntFile             GntFile;
 #ifndef GNT_DISABLE_DEPRECATED
 /**
  * GntFileSelPriv:
@@ -55,6 +54,13 @@ typedef struct _GntFile             GntFile;
  * Deprecated: 2.14.0: This is an internal implementation detail.
  */
 typedef struct _GntFileSelPriv GntFileSelPriv;
+/**
+ * GntFile:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail. Use #GFile
+ * from GIO for a similar abstraction.
+ */
+typedef struct _GntFile GntFile;
 #endif
 
 /**
@@ -97,6 +103,13 @@ struct _GntFileSelClass
 	void (*gnt_reserved3)(void);
 };
 
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntFileType:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail. Use #GFile
+ * from GIO for a similar abstraction.
+ */
 typedef enum _GntFileType
 {
 	GNT_FILE_REGULAR,
@@ -105,20 +118,25 @@ typedef enum _GntFileType
 
 struct _GntFile
 {
-	char *fullpath;
-	char *basename;
-	GntFileType type;
-	unsigned long size;
+	char *GNTSEAL(fullpath);
+	char *GNTSEAL(basename);
+	GntFileType GNTSEAL(type);
+	unsigned long GNTSEAL(size);
 };
+#endif
 
 G_BEGIN_DECLS
 
+#ifndef GNT_DISABLE_DEPRECATED
 /**
  * gnt_file_sel_get_gtype:
  *
  * Returns: GType for GntFileSel.
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
  */
 GType gnt_file_sel_get_gtype(void);
+#endif
 
 /**
  * gnt_file_sel_new:
@@ -230,6 +248,7 @@ void gnt_file_sel_set_suggested_filename(GntFileSel *sel, const char *suggest);
  */
 void gnt_file_sel_set_read_fn(GntFileSel *sel, gboolean (*read_fn)(const char *path, GList **files, GError **error));
 
+#ifndef GNT_DISABLE_DEPRECATED
 /**
  * gnt_file_new:
  * @name:   The name of the file.
@@ -238,6 +257,8 @@ void gnt_file_sel_set_read_fn(GntFileSel *sel, gboolean (*read_fn)(const char *p
  * Create a new GntFile.
  *
  * Returns:  The newly created GntFile.
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
  */
 GntFile* gnt_file_new(const char *name, unsigned long size);
 
@@ -248,8 +269,11 @@ GntFile* gnt_file_new(const char *name, unsigned long size);
  * Create a new GntFile for a directory.
  *
  * Returns:  The newly created GntFile.
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
  */
 GntFile* gnt_file_new_dir(const char *name);
+#endif
 
 G_END_DECLS
 
