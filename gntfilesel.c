@@ -40,6 +40,20 @@
 
 #include <glib/gstdio.h>
 
+typedef enum
+{
+	GNT_FILE_REGULAR,
+	GNT_FILE_DIR
+} GntFileType;
+
+typedef struct
+{
+	char *fullpath;
+	char *basename;
+	GntFileType type;
+	unsigned long size;
+} GntFile;
+
 typedef struct
 {
 	GntWindow parent;
@@ -158,7 +172,8 @@ is_tagged(GntFileSel *sel, const char *f)
 	return find;
 }
 
-GntFile* gnt_file_new_dir(const char *name)
+static GntFile *
+gnt_file_new_dir(const char *name)
 {
 	GntFile *file = g_new0(GntFile, 1);
 	file->basename = g_strdup(name);
@@ -166,7 +181,8 @@ GntFile* gnt_file_new_dir(const char *name)
 	return file;
 }
 
-GntFile* gnt_file_new(const char *name, unsigned long size)
+static GntFile *
+gnt_file_new(const char *name, unsigned long size)
 {
 	GntFile *file = g_new0(GntFile, 1);
 	file->basename = g_strdup(name);
@@ -795,37 +811,4 @@ void gnt_file_sel_set_read_fn(GntFileSel *sel, gboolean (*read_fn)(const char *p
 	priv = gnt_file_sel_get_instance_private(sel);
 
 	priv->read_fn = read_fn;
-}
-
-/**************************************************************************
- * GntFile GBoxed API
- **************************************************************************/
-static GntFile *
-gnt_file_copy(GntFile *file)
-{
-	GntFile *file_new;
-
-	g_return_val_if_fail(file != NULL, NULL);
-
-	file_new = g_new(GntFile, 1);
-	*file_new = *file;
-
-	file_new->fullpath = g_strdup(file->fullpath);
-	file_new->basename = g_strdup(file->basename);
-
-	return file_new;
-}
-
-GType
-gnt_file_get_type(void)
-{
-	static GType type = 0;
-
-	if (type == 0) {
-		type = g_boxed_type_register_static("GntFile",
-				(GBoxedCopyFunc)gnt_file_copy,
-				(GBoxedFreeFunc)gnt_file_free);
-	}
-
-	return type;
 }
