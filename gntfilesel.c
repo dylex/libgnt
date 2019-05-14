@@ -40,20 +40,6 @@
 
 #include <glib/gstdio.h>
 
-typedef enum
-{
-	GNT_FILE_REGULAR,
-	GNT_FILE_DIR
-} GntFileType;
-
-typedef struct
-{
-	char *fullpath;
-	char *basename;
-	GntFileType type;
-	unsigned long size;
-} GntFile;
-
 typedef struct
 {
 	GntWindow parent;
@@ -168,35 +154,6 @@ is_tagged(GntFileSel *sel, const char *f)
 	                           (GCompareFunc)g_utf8_collate) != NULL;
 	g_free(ret);
 	return find;
-}
-
-static GntFile *
-gnt_file_new_dir(const char *name)
-{
-	GntFile *file = g_new0(GntFile, 1);
-	file->basename = g_strdup(name);
-	file->type = GNT_FILE_DIR;
-	return file;
-}
-
-static GntFile *
-gnt_file_new(const char *name, unsigned long size)
-{
-	GntFile *file = g_new0(GntFile, 1);
-	file->basename = g_strdup(name);
-	file->type = GNT_FILE_REGULAR;
-	file->size = size;
-	return file;
-}
-
-static void
-gnt_file_free(GntFile *file)
-{
-	g_return_if_fail(file != NULL);
-
-	g_free(file->fullpath);
-	g_free(file->basename);
-	g_free(file);
 }
 
 static gboolean
