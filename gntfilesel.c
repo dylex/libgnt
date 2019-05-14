@@ -228,9 +228,9 @@ location_changed(GntFileSel *sel, GError **err)
 					        GNT_TEXT_FLAG_BOLD);
 				}
 			} else {
-				gchar size[128];
-				g_snprintf(size, sizeof(size), "%ld",
-				           (long)st.st_size);
+				gchar *size;
+
+				size = g_format_size((guint64)st.st_size);
 
 				gnt_tree_add_row_after(
 				        GNT_TREE(priv->files), g_strdup(str),
@@ -243,6 +243,8 @@ location_changed(GntFileSel *sel, GError **err)
 					        GNT_TREE(priv->files), key,
 					        GNT_TEXT_FLAG_BOLD);
 				}
+
+				g_free(size);
 			}
 		}
 		g_free(fp);
