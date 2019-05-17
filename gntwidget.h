@@ -130,7 +130,10 @@ typedef enum _GntWidgetFlags
 	GNT_WIDGET_DISABLE_ACTIONS = 1 << 12,
 } GntWidgetFlags;
 #else
-typedef enum _GntWidgetFlags GntWidgetFlags;
+typedef enum _GntWidgetFlags
+{
+	GNT_WIDGET_FLAGS_SEALED__DO_NOT_USE
+} GntWidgetFlags;
 #endif
 
 /* XXX: This will probably move elsewhere */
