@@ -256,16 +256,18 @@ void gnt_file_sel_set_multi_select(GntFileSel *sel, gboolean set);
  */
 void gnt_file_sel_set_suggested_filename(GntFileSel *sel, const char *suggest);
 
+#ifndef GNT_DISABLE_DEPRECATED
 /**
  * gnt_file_sel_set_read_fn:
  * @sel:      The file selector.
  * @read_fn:  The custom read function.
  *
  * Set custom functions to read the names of files.
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
  */
 void gnt_file_sel_set_read_fn(GntFileSel *sel, gboolean (*read_fn)(const char *path, GList **files, GError **error));
 
-#ifndef GNT_DISABLE_DEPRECATED
 /**
  * gnt_file_new:
  * @name:   The name of the file.
