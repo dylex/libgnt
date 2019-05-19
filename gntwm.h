@@ -39,9 +39,7 @@
 
 #define GNT_TYPE_WM gnt_wm_get_type()
 
-typedef struct _GntNode GntNode;
-
-struct _GntNode
+typedef struct _GntNode
 {
 	GntWidget *me;
 
@@ -49,13 +47,20 @@ struct _GntNode
 	int scroll;
 	PANEL *panel;
 	GntWS *ws;
-};
+} GntNode;
 
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntPosition:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 typedef struct _GntPosition
 {
 	int x;
 	int y;
 } GntPosition;
+#endif
 
 /**
  * GntAction:
@@ -124,6 +129,8 @@ struct _GntWMClass
 	/* This is invoked whenever the terminal window is resized, or the
 	 * screen session is attached to a new terminal. (ie, from the
 	 * SIGWINCH callback)
+	 *
+	 * Since: 2.1.0
 	 */
 	void (*terminal_refresh)(GntWM *wm);
 

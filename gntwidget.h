@@ -349,7 +349,7 @@ gboolean gnt_widget_get_visible(GntWidget *widget);
 gboolean gnt_widget_has_shadow(GntWidget *widget);
 
 /**
- * gnt_widget_in_destruction
+ * gnt_widget_in_destruction:
  * @widget: The widget
  *
  * Returns whether the widget is currently being destroyed.
@@ -363,7 +363,7 @@ gboolean gnt_widget_has_shadow(GntWidget *widget);
 gboolean gnt_widget_in_destruction(GntWidget *widget);
 
 /**
- * gnt_widget_set_drawing
+ * gnt_widget_set_drawing:
  * @widget:  The widget
  * @drawing: Whether or not the widget is being drawn
  *
@@ -374,7 +374,7 @@ gboolean gnt_widget_in_destruction(GntWidget *widget);
 void gnt_widget_set_drawing(GntWidget *widget, gboolean drawing);
 
 /**
- * gnt_widget_get_drawing
+ * gnt_widget_get_drawing:
  * @widget: The widget
  *
  * Returns whether the widget is currently being drawn.
@@ -388,7 +388,7 @@ void gnt_widget_set_drawing(GntWidget *widget, gboolean drawing);
 gboolean gnt_widget_get_drawing(GntWidget *widget);
 
 /**
- * gnt_widget_set_mapped
+ * gnt_widget_set_mapped:
  * @widget: The widget
  * @mapped: Whether or not the widget is mapped
  *
@@ -402,7 +402,7 @@ gboolean gnt_widget_get_drawing(GntWidget *widget);
 void gnt_widget_set_mapped(GntWidget *widget, gboolean mapped);
 
 /**
- * gnt_widget_get_mapped
+ * gnt_widget_get_mapped:
  * @widget: The widget
  *
  * Whether widget is mapped or not.
@@ -414,7 +414,7 @@ void gnt_widget_set_mapped(GntWidget *widget, gboolean mapped);
 gboolean gnt_widget_get_mapped(GntWidget *widget);
 
 /**
- * gnt_widget_set_has_border
+ * gnt_widget_set_has_border:
  * @widget:     The widget
  * @has_border: Whether or not the widget has a border
  *
@@ -425,7 +425,7 @@ gboolean gnt_widget_get_mapped(GntWidget *widget);
 void gnt_widget_set_has_border(GntWidget *widget, gboolean has_border);
 
 /**
- * gnt_widget_get_has_border
+ * gnt_widget_get_has_border:
  * @widget: The widget
  *
  * Returns the has-border property on widget.
@@ -437,7 +437,7 @@ void gnt_widget_set_has_border(GntWidget *widget, gboolean has_border);
 gboolean gnt_widget_get_has_border(GntWidget *widget);
 
 /**
- * gnt_widget_set_has_shadow
+ * gnt_widget_set_has_shadow:
  * @widget:     The widget
  * @has_shadow: Whether or not the widget has a shadow
  *
@@ -450,7 +450,7 @@ gboolean gnt_widget_get_has_border(GntWidget *widget);
 void gnt_widget_set_has_shadow(GntWidget *widget, gboolean has_shadow);
 
 /**
- * gnt_widget_get_has_shadow
+ * gnt_widget_get_has_shadow:
  * @widget: The widget
  *
  * Returns the has-shadow property on widget. Note, this is a property of the
@@ -465,7 +465,7 @@ void gnt_widget_set_has_shadow(GntWidget *widget, gboolean has_shadow);
 gboolean gnt_widget_get_has_shadow(GntWidget *widget);
 
 /**
- * gnt_widget_set_has_focus
+ * gnt_widget_set_has_focus:
  * @widget:    The widget
  * @has_focus: Whether or not the widget has focus
  *
@@ -504,7 +504,7 @@ gboolean gnt_widget_get_has_focus(GntWidget *widget);
 void gnt_widget_set_is_urgent(GntWidget *widget, gboolean urgent);
 
 /**
- * gnt_widget_get_urgent
+ * gnt_widget_get_urgent:
  * @widget: The widget
  *
  * Returns whether the widget has the URGENT hint set.
@@ -527,7 +527,7 @@ gboolean gnt_widget_get_is_urgent(GntWidget *widget);
 void gnt_widget_set_grow_x(GntWidget *widget, gboolean grow_x);
 
 /**
- * gnt_widget_get_grow_x
+ * gnt_widget_get_grow_x:
  * @widget: The widget
  *
  * Returns whether the widget should grow in the x direction.
@@ -550,7 +550,7 @@ gboolean gnt_widget_get_grow_x(GntWidget *widget);
 void gnt_widget_set_grow_y(GntWidget *widget, gboolean grow_y);
 
 /**
- * gnt_widget_get_grow_y
+ * gnt_widget_get_grow_y:
  * @widget: The widget
  *
  * Returns whether the widget should grow in the y direction.
@@ -573,7 +573,7 @@ gboolean gnt_widget_get_grow_y(GntWidget *widget);
 void gnt_widget_set_transient(GntWidget *widget, gboolean transient);
 
 /**
- * gnt_widget_get_transient
+ * gnt_widget_get_transient:
  * @widget: The widget
  *
  * Returns whether the widget is transient.
@@ -597,7 +597,7 @@ void gnt_widget_set_disable_actions(GntWidget *widget,
                                     gboolean disable_actions);
 
 /**
- * gnt_widget_get_disable_actions
+ * gnt_widget_get_disable_actions:
  * @widget: The widget
  *
  * Returns whether the widget actions are disabled.

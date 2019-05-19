@@ -1609,6 +1609,11 @@ gnt_wm_class_init(GntWMClass *klass)
 					 g_signal_accumulator_true_handled, NULL, NULL,
 					 G_TYPE_BOOLEAN, 4, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_POINTER);
 
+	/**
+	 * GntWM::terminal-refresh:
+	 *
+	 * Since: 2.1.0
+	 */
 	signals[SIG_TERMINAL_REFRESH] =
 		g_signal_new("terminal-refresh",
 					 G_TYPE_FROM_CLASS(klass),

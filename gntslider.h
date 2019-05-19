@@ -42,7 +42,7 @@ G_BEGIN_DECLS
  *
  * Returns: The GType for GntSlider
  *
- * Since: 2.0.0
+ * Since: 2.1.0
  */
 G_DECLARE_DERIVABLE_TYPE(GntSlider, gnt_slider, GNT, SLIDER, GntWidget)
 

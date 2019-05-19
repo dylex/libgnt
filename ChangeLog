@@ -6,6 +6,9 @@ Please see notes about versioning in README.md.
 version 3.0.0 (????/??/??):
 	* Fix a use after free when using Python. (PR #357 kdex)
 
+version 2.14.0 (????/??/??):
+	...
+
 version 2.13.0 (2018/03/08):
 	* Fixed build against curses 6.0 with opaque structs set. (#16764 dimstar)
 	  (PR #268 Daniel Kamil Kozar)

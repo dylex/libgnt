@@ -1080,6 +1080,11 @@ gnt_entry_class_init(GntEntryClass *klass)
 					 NULL, NULL, NULL,
 					 G_TYPE_NONE, 0);
 
+	/**
+	 * GntEntry::completion:
+	 *
+	 * Since: 2.1.0
+	 */
 	signals[SIG_COMPLETION] =
 		g_signal_new("completion",
 					 G_TYPE_FROM_CLASS(klass),

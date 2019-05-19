@@ -50,6 +50,8 @@ G_BEGIN_DECLS
  * Get the #GType for GntProgressBar
  *
  * Returns: The GType for GntProrgressBar
+ *
+ * Since: 2.6.0
  */
 G_DECLARE_FINAL_TYPE(GntProgressBar, gnt_progress_bar, GNT, PROGRESS_BAR,
 		GntWidget)
@@ -60,6 +62,8 @@ G_DECLARE_FINAL_TYPE(GntProgressBar, gnt_progress_bar, GNT, PROGRESS_BAR,
  * Create a new GntProgressBar
  *
  * Returns: The new GntProgressBar
+ *
+ * Since: 2.6.0
  */
 GntWidget *
 gnt_progress_bar_new (void);
@@ -70,6 +74,8 @@ gnt_progress_bar_new (void);
  * @fraction: The value between 0 and 1 to display
  *
  * Set the progress for a progress bar
+ *
+ * Since: 2.6.0
  */
 void
 gnt_progress_bar_set_fraction (GntProgressBar *pbar, gdouble fraction);
@@ -80,6 +86,8 @@ gnt_progress_bar_set_fraction (GntProgressBar *pbar, gdouble fraction);
  * @orientation: The orientation to use
  *
  * Set the orientation for a progress bar
+ *
+ * Since: 2.6.0
  */
 void
 gnt_progress_bar_set_orientation (GntProgressBar *pbar, GntProgressBarOrientation orientation);
@@ -90,6 +98,8 @@ gnt_progress_bar_set_orientation (GntProgressBar *pbar, GntProgressBarOrientatio
  * @show: A boolean indicating if the value is shown
  *
  * Controls whether the progress value is shown
+ *
+ * Since: 2.6.0
  */
 void
 gnt_progress_bar_set_show_progress (GntProgressBar *pbar, gboolean show);
@@ -101,6 +111,8 @@ gnt_progress_bar_set_show_progress (GntProgressBar *pbar, gboolean show);
  * Get the progress that is displayed
  *
  * Returns: The progress displayed as a value between 0 and 1
+ *
+ * Since: 2.6.0
  */
 gdouble
 gnt_progress_bar_get_fraction (GntProgressBar *pbar);
@@ -112,6 +124,8 @@ gnt_progress_bar_get_fraction (GntProgressBar *pbar);
  * Get the orientation for the progress bar
  *
  * Returns: The current orientation of the progress bar
+ *
+ * Since: 2.6.0
  */
 GntProgressBarOrientation
 gnt_progress_bar_get_orientation (GntProgressBar *pbar);
@@ -123,6 +137,8 @@ gnt_progress_bar_get_orientation (GntProgressBar *pbar);
  * Get a boolean describing if the progress value is shown
  *
  * Returns: %TRUE if the progress value is shown, %FALSE otherwise.
+ *
+ * Since: 2.6.0
  */
 gboolean
 gnt_progress_bar_get_show_progress (GntProgressBar *pbar);
