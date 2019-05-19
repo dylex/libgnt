@@ -69,7 +69,13 @@
 
 #define IDLE_CHECK_INTERVAL 5 /* 5 seconds */
 
-typedef struct _GntListWindow
+typedef struct
+{
+	int x;
+	int y;
+} GntPosition;
+
+typedef struct
 {
 	GntWidget *window;
 	GntWidget *tree;
