@@ -1505,6 +1505,8 @@ gnt_wm_destroy(GObject *obj)
 	g_list_free_full(priv->workspaces, g_object_unref);
 	priv->workspaces = NULL;
 
+	g_clear_pointer(&priv->loop, g_main_loop_unref);
+
 #ifdef USE_PYTHON
 	if (started_python) {
 		Py_Finalize();
