@@ -167,7 +167,7 @@ gboolean gnt_menuitem_activate(GntMenuItem *item);
  *
  * Sets @item visible or not.
  *
- * Since: 2.8.0
+ * Since: 3.0.0
  */
 void
 gnt_menuitem_set_visible(GntMenuItem *item, gboolean visible);
@@ -180,7 +180,7 @@ gnt_menuitem_set_visible(GntMenuItem *item, gboolean visible);
  *
  * Returns: %TRUE, if the @item is visible.
  *
- * Since: 2.8.0
+ * Since: 3.0.0
  */
 gboolean
 gnt_menuitem_is_visible(GntMenuItem *item);
@@ -192,7 +192,7 @@ gnt_menuitem_is_visible(GntMenuItem *item);
  *
  * Changes the text for an @item.
  *
- * Since: 2.8.0
+ * Since: 3.0.0
  */
 void
 gnt_menuitem_set_text(GntMenuItem *item, const gchar *text);

@@ -114,7 +114,7 @@ void gnt_box_add_widget(GntBox *box, GntWidget *widget);
  *
  * Add a widget in the box at its front.
  *
- * Since: 2.8.0
+ * Since: 3.0.0
  */
 void gnt_box_add_widget_in_front(GntBox *box, GntWidget *widget);
 
