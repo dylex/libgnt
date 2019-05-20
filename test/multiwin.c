@@ -21,6 +21,8 @@ main(void)
 #endif
 
 	GntWidget *hbox, *tree, *box2;
+	gchar buf[(430 - 110) * 4]; /* 3 digits + NUL each */
+	gint i;
 
 	hbox = gnt_box_new(FALSE, TRUE);
 	box2 = gnt_box_new(FALSE, TRUE);
@@ -65,12 +67,16 @@ main(void)
 
 	gnt_tree_add_row_after(GNT_TREE(tree), "6", gnt_tree_create_row(GNT_TREE(tree), "6", " long text", "a2"), "4", NULL);
 
-	int i;
-	for (i = 110; i < 430; i++)
-	{
-		char *s;
-		s = g_strdup_printf("%d", i); /* XXX: yes, leaking */
-		gnt_tree_add_row_after(GNT_TREE(tree), s, gnt_tree_create_row(GNT_TREE(tree), s, " long text", "a2"), "4", NULL);
+	for (i = 110; i < 430; i++) {
+		gchar *s = buf + (i - 110) * 4;
+		gint n = sizeof(buf) - (i - 110) * 4;
+		if (g_snprintf(s, n, "%d", i) > n) {
+			g_assert_not_reached();
+		}
+		gnt_tree_add_row_after(GNT_TREE(tree), s,
+		                       gnt_tree_create_row(GNT_TREE(tree), s,
+		                                           " long text", "a2"),
+		                       "4", NULL);
 	}
 
 	gnt_tree_set_row_flags(GNT_TREE(tree), "e", GNT_TEXT_FLAG_DIM);
