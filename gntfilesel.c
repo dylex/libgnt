@@ -59,8 +59,6 @@ typedef struct
 	gboolean dirsonly;   /* Show only directories */
 	gboolean multiselect;
 	GList *tags; /* List of tagged files when multiselect is set */
-
-	gboolean (*read_fn)(const char *path, GList **files, GError **error);
 } GntFileSelPrivate;
 
 enum
@@ -158,79 +156,12 @@ is_tagged(GntFileSel *sel, const char *f)
 	return find;
 }
 
-GntFile* gnt_file_new_dir(const char *name)
-{
-	GntFile *file = g_new0(GntFile, 1);
-	file->basename = g_strdup(name);
-	file->type = GNT_FILE_DIR;
-	return file;
-}
-
-GntFile* gnt_file_new(const char *name, unsigned long size)
-{
-	GntFile *file = g_new0(GntFile, 1);
-	file->basename = g_strdup(name);
-	file->type = GNT_FILE_REGULAR;
-	file->size = size;
-	return file;
-}
-
-static gboolean
-local_read_fn(const char *path, GList **files, GError **error)
-{
-	GDir *dir;
-	GntFile *file;
-	const char *str;
-
-	dir = g_dir_open(path, 0, error);
-	if (dir == NULL || (error && *error)) {
-		return FALSE;
-	}
-
-	*files = NULL;
-	if (*path != '\0' && strcmp(path, G_DIR_SEPARATOR_S)) {
-		file = gnt_file_new_dir("..");
-		*files = g_list_prepend(*files, file);
-	}
-
-	while ((str = g_dir_read_name(dir)) != NULL) {
-		char *fp = g_build_filename(path, str, NULL);
-		GStatBuf st;
-
-		if (g_stat(fp, &st)) {
-			gnt_warning("Error stating location %s", fp);
-		} else {
-			if (S_ISDIR(st.st_mode)) {
-				file = gnt_file_new_dir(str);
-			} else {
-				file = gnt_file_new(str, (long)st.st_size);
-			}
-			*files = g_list_prepend(*files, file);
-		}
-		g_free(fp);
-	}
-	g_dir_close(dir);
-
-	*files = g_list_reverse(*files);
-	return TRUE;
-}
-
-static void
-gnt_file_free(GntFile *file)
-{
-	g_return_if_fail(file != NULL);
-
-	g_free(file->fullpath);
-	g_free(file->basename);
-	g_free(file);
-}
-
 static gboolean
 location_changed(GntFileSel *sel, GError **err)
 {
 	GntFileSelPrivate *priv = gnt_file_sel_get_instance_private(sel);
-	GList *files, *iter;
-	gboolean success;
+	GDir *dir;
+	const gchar *str;
 
 	if (!priv->dirs) {
 		return TRUE;
@@ -252,50 +183,74 @@ location_changed(GntFileSel *sel, GError **err)
 	 * XXX: This is blocking.
 	 * XXX:/
 	 */
-	files = NULL;
-	if (priv->read_fn) {
-		success = priv->read_fn(priv->current, &files, err);
-	} else {
-		success = local_read_fn(priv->current, &files, err);
-	}
-
-	if (!success || *err) {
+	dir = g_dir_open(priv->current, 0, err);
+	if (dir == NULL || *err) {
 		gnt_warning("error opening location %s (%s)", priv->current,
 		            *err ? (*err)->message : "reason unknown");
 		return FALSE;
 	}
 
-	for (iter = files; iter; iter = iter->next) {
-		GntFile *file = iter->data;
-		char *str = file->basename;
-		if (file->type == GNT_FILE_DIR) {
-			gnt_tree_add_row_after(
-			        GNT_TREE(priv->dirs), g_strdup(str),
-			        gnt_tree_create_row(GNT_TREE(priv->dirs), str),
-			        NULL, NULL);
-			if (priv->multiselect && priv->dirsonly &&
-			    is_tagged(sel, str)) {
-				gnt_tree_set_row_flags(GNT_TREE(priv->dirs),
-				                       (gpointer)str,
-				                       GNT_TEXT_FLAG_BOLD);
-			}
-		} else if (!priv->dirsonly) {
-			char size[128];
-			snprintf(size, sizeof(size), "%ld", file->size);
-
-			gnt_tree_add_row_after(
-			        GNT_TREE(priv->files), g_strdup(str),
-			        gnt_tree_create_row(GNT_TREE(priv->files), str,
-			                            size, ""),
-			        NULL, NULL);
-			if (priv->multiselect && is_tagged(sel, str)) {
-				gnt_tree_set_row_flags(GNT_TREE(priv->files),
-				                       (gpointer)str,
-				                       GNT_TEXT_FLAG_BOLD);
-			}
+	if (*priv->current != '\0' &&
+	    g_path_is_absolute(priv->current) &&
+	    *g_path_skip_root(priv->current) != '\0') {
+		gnt_tree_add_row_after(
+		        GNT_TREE(priv->dirs), g_strdup(".."),
+		        gnt_tree_create_row(GNT_TREE(priv->dirs), ".."), NULL,
+		        NULL);
+		if (priv->multiselect && priv->dirsonly &&
+		    is_tagged(sel, "..")) {
+			gnt_tree_set_row_flags(GNT_TREE(priv->dirs), "..",
+			                       GNT_TEXT_FLAG_BOLD);
 		}
 	}
-	g_list_free_full(files, (GDestroyNotify)gnt_file_free);
+
+	while ((str = g_dir_read_name(dir)) != NULL) {
+		gchar *fp = g_build_filename(priv->current, str, NULL);
+		GStatBuf st;
+
+		if (g_stat(fp, &st)) {
+			gnt_warning("Error stating location %s", fp);
+		} else {
+			/* Just there to silence const warnings; the key is
+			 * suitably copied when necessary. */
+			gchar *key = (gchar *)str;
+
+			if (S_ISDIR(st.st_mode)) {
+				gnt_tree_add_row_after(
+				        GNT_TREE(priv->dirs), g_strdup(str),
+				        gnt_tree_create_row(
+				                GNT_TREE(priv->dirs), key),
+				        NULL, NULL);
+				if (priv->multiselect && priv->dirsonly &&
+				    is_tagged(sel, str)) {
+					gnt_tree_set_row_flags(
+					        GNT_TREE(priv->dirs), key,
+					        GNT_TEXT_FLAG_BOLD);
+				}
+			} else {
+				gchar *size;
+
+				size = g_format_size((guint64)st.st_size);
+
+				gnt_tree_add_row_after(
+				        GNT_TREE(priv->files), g_strdup(str),
+				        gnt_tree_create_row(
+				                GNT_TREE(priv->files), key,
+				                size, ""),
+				        NULL, NULL);
+				if (priv->multiselect && is_tagged(sel, str)) {
+					gnt_tree_set_row_flags(
+					        GNT_TREE(priv->files), key,
+					        GNT_TEXT_FLAG_BOLD);
+				}
+
+				g_free(size);
+			}
+		}
+		g_free(fp);
+	}
+	g_dir_close(dir);
+
 	if (gnt_widget_get_mapped(GNT_WIDGET(sel))) {
 		gnt_widget_draw(GNT_WIDGET(sel));
 	}
@@ -785,47 +740,4 @@ GList *gnt_file_sel_get_selected_multi_files(GntFileSel *sel)
 		list = g_list_prepend(list, str);
 	list = g_list_reverse(list);
 	return list;
-}
-
-void gnt_file_sel_set_read_fn(GntFileSel *sel, gboolean (*read_fn)(const char *path, GList **files, GError **error))
-{
-	GntFileSelPrivate *priv = NULL;
-
-	g_return_if_fail(GNT_IS_FILE_SEL(sel));
-	priv = gnt_file_sel_get_instance_private(sel);
-
-	priv->read_fn = read_fn;
-}
-
-/**************************************************************************
- * GntFile GBoxed API
- **************************************************************************/
-static GntFile *
-gnt_file_copy(GntFile *file)
-{
-	GntFile *file_new;
-
-	g_return_val_if_fail(file != NULL, NULL);
-
-	file_new = g_new(GntFile, 1);
-	*file_new = *file;
-
-	file_new->fullpath = g_strdup(file->fullpath);
-	file_new->basename = g_strdup(file->basename);
-
-	return file_new;
-}
-
-GType
-gnt_file_get_type(void)
-{
-	static GType type = 0;
-
-	if (type == 0) {
-		type = g_boxed_type_register_static("GntFile",
-				(GBoxedCopyFunc)gnt_file_copy,
-				(GBoxedFreeFunc)gnt_file_free);
-	}
-
-	return type;
 }

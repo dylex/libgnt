@@ -35,35 +35,6 @@
 #include "gntwindow.h"
 
 #define GNT_TYPE_FILE_SEL gnt_file_sel_get_type()
-#define GNT_TYPE_FILE gnt_file_get_type()
-
-#ifndef GNT_DISABLE_DEPRECATED
-/**
- * GntFileType:
- *
- * Deprecated: 2.14.0: This is an internal implementation detail. Use #GFile
- * from GIO for a similar abstraction.
- */
-typedef enum
-{
-	GNT_FILE_REGULAR,
-	GNT_FILE_DIR
-} GntFileType;
-
-/**
- * GntFile:
- *
- * Deprecated: 2.14.0: This is an internal implementation detail. Use #GFile
- * from GIO for a similar abstraction.
- */
-typedef struct
-{
-	char *fullpath;
-	char *basename;
-	GntFileType type;
-	unsigned long size;
-} GntFile;
-#endif
 
 G_BEGIN_DECLS
 
@@ -88,17 +59,6 @@ struct _GntFileSelClass
 	void (*gnt_reserved3)(void);
 	void (*gnt_reserved4)(void);
 };
-
-#ifndef GNT_DISABLE_DEPRECATED
-/**
- * gnt_file_get_type:
- *
- * Returns: The #GType for the #GntFile boxed structure.
- *
- * Deprecated: 2.14.0: This is an internal implementation detail.
- */
-GType gnt_file_get_type(void);
-#endif
 
 /**
  * gnt_file_sel_new:
@@ -200,44 +160,6 @@ void gnt_file_sel_set_multi_select(GntFileSel *sel, gboolean set);
  * Set the suggested file to have selected at startup.
  */
 void gnt_file_sel_set_suggested_filename(GntFileSel *sel, const char *suggest);
-
-#ifndef GNT_DISABLE_DEPRECATED
-/**
- * gnt_file_sel_set_read_fn:
- * @sel:      The file selector.
- * @read_fn:  The custom read function.
- *
- * Set custom functions to read the names of files.
- *
- * Deprecated: 2.14.0: This is an internal implementation detail.
- */
-void gnt_file_sel_set_read_fn(GntFileSel *sel, gboolean (*read_fn)(const char *path, GList **files, GError **error));
-
-/**
- * gnt_file_new:
- * @name:   The name of the file.
- * @size:   The size of the file.
- *
- * Create a new GntFile.
- *
- * Returns:  The newly created GntFile.
- *
- * Deprecated: 2.14.0: This is an internal implementation detail.
- */
-GntFile* gnt_file_new(const char *name, unsigned long size);
-
-/**
- * gnt_file_new_dir:
- * @name:  The name of the directory.
- *
- * Create a new GntFile for a directory.
- *
- * Returns:  The newly created GntFile.
- *
- * Deprecated: 2.14.0: This is an internal implementation detail.
- */
-GntFile* gnt_file_new_dir(const char *name);
-#endif
 
 G_END_DECLS
 
