@@ -36,7 +36,12 @@
 
 #define GNT_TYPE_ENTRY gnt_entry_get_type()
 
-#define	GNT_ENTRY_CHAR		'_'			/* The character to use to fill in the blank places */
+/**
+ * GNT_ENTRY_CHAR:
+ *
+ * The character to use to fill in the blank places.
+ */
+#define GNT_ENTRY_CHAR '_'
 
 /**
  * GntEntryFlag:
