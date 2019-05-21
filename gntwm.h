@@ -49,19 +49,6 @@ typedef struct _GntNode
 	GntWS *ws;
 } GntNode;
 
-#ifndef GNT_DISABLE_DEPRECATED
-/**
- * GntPosition:
- *
- * Deprecated: 2.14.0: This is an internal implementation detail.
- */
-typedef struct _GntPosition
-{
-	int x;
-	int y;
-} GntPosition;
-#endif
-
 /**
  * GntAction:
  *

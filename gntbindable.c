@@ -54,6 +54,22 @@ typedef struct
 	GntTree *tree;
 } BindingView;
 
+typedef struct
+{
+	char *name; /* The name of the action */
+	union
+	{
+		GntBindableActionCallback action;
+		GntBindableActionCallbackNoParam action_noparam;
+	} u;
+} GntBindableAction;
+
+typedef struct
+{
+	GntBindableAction *action;
+	GList *list;
+} GntBindableActionParam;
+
 /******************************************************************************
  * Helpers
  *****************************************************************************/
@@ -251,6 +267,21 @@ binding_clone(GntBindableActionParam *param)
 	return p;
 }
 
+static void
+gnt_bindable_action_free(GntBindableAction *action)
+{
+	g_free(action->name);
+	g_free(action);
+}
+
+static void
+gnt_bindable_action_param_free(GntBindableActionParam *param)
+{
+	g_list_free(param->list); /* XXX: There may be a leak here for string
+	                             parameters */
+	g_free(param);
+}
+
 /******************************************************************************
  * GObject Implementation
  *****************************************************************************/
@@ -422,18 +453,6 @@ void gnt_bindable_class_register_action(GntBindableClass *klass, const char *nam
 
 		register_binding(klass, name, trigger, list);
 	}
-}
-
-void gnt_bindable_action_free(GntBindableAction *action)
-{
-	g_free(action->name);
-	g_free(action);
-}
-
-void gnt_bindable_action_param_free(GntBindableActionParam *param)
-{
-	g_list_free(param->list);   /* XXX: There may be a leak here for string parameters */
-	g_free(param);
 }
 
 GntBindable * gnt_bindable_bindings_view(GntBindable *bind)
