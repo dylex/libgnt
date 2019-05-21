@@ -89,6 +89,20 @@
     </chapter>
   </part>
 
+  <!-- Migration guides -->
+  <part id="migrating">
+    <title>Migrating from Previous Versions of GNT</title>
+
+    <partintro>
+      <para>
+        This part describes what you need to change in programs using older
+        versions of GNT so that they can use the new features.
+      </para>
+    </partintro>
+
+    <xi:include href="migrating-2to3.xml" />
+  </part>
+
   <part>
     <title>Appendices</title>
     <index id="api-index-full">

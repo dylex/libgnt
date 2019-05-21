@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!ENTITY % local.common.attrib "xmlns:xi  CDATA  #FIXED 'http://www.w3.org/2003/XInclude'">
+]>
+<chapter id="migrating-2-to-3">
+  <title>Migrating from GNT 2.x to 3</title>
+
+  <para>
+    GNT 3 is a major new version of GNT that breaks both API and ABI compared
+    to GNT 2.x. There are a number of steps that you can take to prepare your
+    GNT 2.x application for the switch to GNT 3. After that, there's a small
+    number of adjustments that you may have to do when you actually switch your
+    application to build against GNT 3.
+  </para>
+
+  <section>
+    <title>Preparation in GNT 2.x</title>
+
+    <para>
+      The steps outlined in the following sections assume that your application
+      is working with GNT 2.14, which is the final stable release of GNT 2.x.
+      It includes all the necessary APIs and tools to help you port your
+      application to GNT 3. If you are still using an older version of GNT 2.x,
+      you should first get your application to build and work with the latest
+      minor release in the 2.14 series.
+    </para>
+
+    <section>
+      <title>Do not use deprecated symbols</title>
+      <para>
+        Over the years, a number of functions have been deprecated. These
+        deprecations are clearly spelled out in the API reference, with hints
+        about the recommended replacements. The API reference for GNT 2 also
+        includes an <ulink
+          url="https://docs.pidgin.im/libgnt/next/api-deprecated.html">index of
+        all deprecated symbols</ulink>.
+      </para>
+      <para>
+        To verify that your program does not use any deprecated symbols, you
+        can use preprocessor defines to remove deprecated symbols from the
+        header files. As part of your compilation process, you may define the
+        following:
+        <itemizedlist>
+          <listitem>
+            <code>GNT_DISABLE_DEPRECATED</code> to hide deprecated symbols.
+          </listitem>
+          <listitem>
+            <code>GNTSEAL_ENABLE</code> to hide internal struct members.
+          </listitem>
+        </itemizedlist>
+      </para>
+      <para>
+        Note that some parts of our API, such as enumeration values, are not
+        well covered by the deprecation warnings. In most cases, using them
+        will require you to also use deprecated functions, which will trigger
+        warnings.
+      </para>
+    </section>
+  </section>
+
+  <section>
+    <title>Changes that need to be done at the time of the switch</title>
+
+    <para>
+      This section outlines porting tasks that you need to tackle when you get
+      to the point that you actually build your application against GNT 3.
+      Making it possible to prepare for these in GNT 2 would have been either
+      impossible or impractical.
+    </para>
+
+    <section>
+      <title>Removed internal API</title>
+
+      <para>
+        The following tag names have been removed from the API entirely; use
+        the name without the underscore instead:
+        <itemizedlist>
+          <listitem><code>enum _GntFileType</code></listitem>
+          <listitem><code>enum _GntMouseEvent</code></listitem>
+          <listitem><code>enum _GntParamFlags</code></listitem>
+          <listitem><code>enum _GntProgressBarOrientation</code></listitem>
+          <listitem><code>enum _GntTreeColumnFlag</code></listitem>
+        </itemizedlist>
+
+        The following items were removed entirely:
+        <itemizedlist>
+          <listitem>
+            <code>enum _GntKeyPressMode</code> and <code>GntKeyPressMode</code>
+          </listitem>
+          <listitem>
+            <code>enum _GntWidgetFlags</code> and <code>GntWidgetFlags</code>
+          </listitem>
+        </itemizedlist>
+      </para>
+    </section>
+
+    <section>
+      <title>Changed API</title>
+      <para>
+        The following items have been changed as part of the API break:
+        <itemizedlist>
+          <listitem>
+            <code>ENTRY_CHAR</code> renamed to %GNT_ENTRY_CHAR
+          </listitem>
+          <listitem>
+            <code>g_hash_table_duplicate</code> renamed to
+            gnt_hash_table_duplicate()
+          </listitem>
+          <listitem>
+            <code>GDupFunc</code> renamed to #GntDuplicateFunc
+          </listitem>
+        </itemizedlist>
+      </para>
+    </section>
+  </section>
+</chapter>

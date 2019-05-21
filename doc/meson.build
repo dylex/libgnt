@@ -1,5 +1,10 @@
 DOC_MODULE = 'libgnt'
 
+# Extra content files, other than the main one.
+content_files = [
+    'migrating-2to3.xml',
+]
+
 # Header files or dirs to ignore when scanning. Use base file/dir names
 ignore_headers = [
     'test',
@@ -31,6 +36,7 @@ configure_file(
 
 gnome.gtkdoc(DOC_MODULE,
     main_xml : DOC_MODULE + '-docs.xml',
+    content_files : content_files,
     src_dir : libgnt_inc,
     dependencies : libgnt_dep,
     install : true,
