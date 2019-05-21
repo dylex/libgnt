@@ -90,7 +90,7 @@ typedef struct
 	gboolean show_separator; /* Whether to show column separators */
 
 	GString *search;
-	int search_timeout;
+	guint search_timeout;
 	int search_column;
 	gboolean (*search_func)(GntTree *tree, gpointer key, const char *search, const char *current);
 

@@ -103,7 +103,7 @@ static gchar *custom_config_dir = NULL;
 #define HOLDING_ESCAPE  (escape_stuff.timer != 0)
 
 static struct {
-	int timer;
+	guint timer;
 } escape_stuff;
 
 static gboolean
@@ -270,7 +270,7 @@ io_invoke_error(GIOChannel *source, G_GNUC_UNUSED GIOCondition cond,
 {
 	/* XXX: it throws an error after evey io_invoke, I have no idea why */
 #ifndef _WIN32
-	int id = GPOINTER_TO_INT(data);
+	guint id = GPOINTER_TO_UINT(data);
 
 	g_source_remove(id);
 	g_io_channel_unref(source);
@@ -438,7 +438,7 @@ end:
 static void
 setup_io()
 {
-	int result;
+	guint result;
 
 #ifdef _WIN32
 	channel = g_io_channel_win32_new_fd(STDIN_FILENO);
@@ -457,9 +457,9 @@ setup_io()
 					(G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_PRI),
 					io_invoke, NULL, NULL);
 
-	channel_error_callback = g_io_add_watch_full(channel,  G_PRIORITY_HIGH,
-					(G_IO_NVAL),
-					io_invoke_error, GINT_TO_POINTER(result), NULL);
+	channel_error_callback = g_io_add_watch_full(
+	        channel, G_PRIORITY_HIGH, (G_IO_NVAL), io_invoke_error,
+	        GUINT_TO_POINTER(result), NULL);
 
 	g_io_channel_unref(channel);
 }
@@ -776,8 +776,12 @@ void gnt_widget_set_urgent(GntWidget *widget)
 void gnt_quit()
 {
 	/* Prevent io_invoke() from being called after wm is destroyed */
-	g_source_remove(channel_error_callback);
-	g_source_remove(channel_read_callback);
+	if (channel_error_callback) {
+		g_source_remove(channel_error_callback);
+	}
+	if (channel_read_callback) {
+		g_source_remove(channel_read_callback);
+	}
 
 	channel_error_callback = 0;
 	channel_read_callback = 0;
@@ -907,6 +911,7 @@ gboolean gnt_giveup_console(const char *wd, char **argv, char **envp,
 	cp->callback = callback;
 	cp->data = data;
 	g_source_remove(channel_read_callback);
+	channel_read_callback = 0;
 	gnt_wm_set_keypress_mode(wm, GNT_KP_MODE_WAIT_ON_CHILD);
 	g_child_watch_add(pid, reap_child, cp);
 

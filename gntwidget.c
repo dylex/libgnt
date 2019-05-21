@@ -123,7 +123,9 @@ gnt_widget_dispose(GObject *obj)
 	GntWidgetPrivate *priv = gnt_widget_get_instance_private(self);
 
 	g_signal_emit(self, signals[SIG_DESTROY], 0);
-	g_source_remove(priv->queue_update);
+	if (priv->queue_update) {
+		g_source_remove(priv->queue_update);
+	}
 
 	G_OBJECT_CLASS(gnt_widget_parent_class)->dispose(obj);
 }

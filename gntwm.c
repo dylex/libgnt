@@ -144,7 +144,7 @@ static int widestringwidth(wchar_t *wide);
 
 static void ensure_normal_mode(GntWMPrivate *priv);
 static gboolean write_already(gpointer data);
-static int write_timeout;
+static guint write_timeout;
 static time_t last_active_time;
 static gboolean idle_update;
 static GList *act = NULL; /* list of WS with unseen activitiy */
@@ -1505,6 +1505,8 @@ gnt_wm_destroy(GObject *obj)
 	g_list_free_full(priv->workspaces, g_object_unref);
 	priv->workspaces = NULL;
 
+	g_clear_pointer(&priv->loop, g_main_loop_unref);
+
 #ifdef USE_PYTHON
 	if (started_python) {
 		Py_Finalize();
@@ -2292,7 +2294,6 @@ write_already(gpointer data)
 	}
 
 	g_free(filename);
-	g_source_remove(write_timeout);
 	write_timeout = 0;
 	return FALSE;
 }
