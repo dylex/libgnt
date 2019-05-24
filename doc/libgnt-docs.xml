@@ -22,7 +22,6 @@
     <title>Core API Reference</title>
 
     <xi:include href="xml/gnt.xml" />
-    <xi:include href="xml/gntversion.xml" />
     <xi:include href="xml/gntcolors.xml" />
     <xi:include href="xml/gntkeys.xml" />
     <xi:include href="xml/gntstyle.xml" />
@@ -97,10 +96,6 @@
       <title>Index of new symbols in 2.14.0</title>
       <xi:include href="xml/api-index-2.14.0.xml"><xi:fallback /></xi:include>
     </index>
-    <index id="api-2.8.0">
-      <title>Index of new symbols in 2.8.0</title>
-      <xi:include href="xml/api-index-2.8.0.xml"><xi:fallback /></xi:include>
-    </index>
     <index id="api-2.7.3">
       <title>Index of new symbols in 2.7.3</title>
       <xi:include href="xml/api-index-2.7.3.xml"><xi:fallback /></xi:include>
@@ -132,10 +127,6 @@
     <index id="api-2.1.0">
       <title>Index of new symbols in 2.1.0</title>
       <xi:include href="xml/api-index-2.1.0.xml"><xi:fallback /></xi:include>
-    </index>
-    <index id="api-2.0.0">
-      <title>Index of new symbols in 2.0.0</title>
-      <xi:include href="xml/api-index-2.0.0.xml"><xi:fallback /></xi:include>
     </index>
     <xi:include href="xml/annotation-glossary.xml"><xi:fallback /></xi:include>
   </part>
