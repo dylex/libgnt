@@ -74,7 +74,9 @@
 #endif
 
 typedef struct _GntWidget			GntWidget;
+#ifndef GNT_DISABLE_DEPRECATED
 typedef struct _GntWidgetPriv		GntWidgetPriv;
+#endif
 typedef struct _GntWidgetClass		GntWidgetClass;
 
 /**
@@ -179,7 +181,7 @@ struct _GntWidget
 
 	GntWidget *GNTSEAL(parent); /* Deprecated. Use gnt_widget_get_parent. */
 
-	GntWidgetPriv GNTSEAL(priv);
+	struct _GntWidgetPriv GNTSEAL(priv);
 	WINDOW *GNTSEAL(window);
 
 	/*< private >*/

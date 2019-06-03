@@ -144,16 +144,12 @@ struct _GntFile
 
 G_BEGIN_DECLS
 
-#ifndef GNT_DISABLE_DEPRECATED
 /**
  * gnt_file_sel_get_gtype:
  *
  * Returns: GType for GntFileSel.
- *
- * Deprecated: 2.14.0: This is an internal implementation detail.
  */
 GType gnt_file_sel_get_gtype(void);
-#endif
 
 /**
  * gnt_file_sel_new:

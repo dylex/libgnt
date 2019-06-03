@@ -89,7 +89,7 @@ struct _GntWindow
 {
 	GntBox parent;
 	GntMenu *GNTSEAL(menu);
-	GntWindowPriv *GNTSEAL(priv);
+	struct _GntWindowPriv *GNTSEAL(priv);
 };
 
 struct _GntWindowClass

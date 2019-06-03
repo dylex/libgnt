@@ -108,7 +108,7 @@ struct _GntBindableAction
 
 struct _GntBindableActionParam
 {
-	GntBindableAction *action;
+	struct _GntBindableAction *action;
 	GList *list;
 };
 

@@ -57,6 +57,10 @@ typedef enum _GntKeyPressMode
 	GNT_KP_MODE_MOVE,
 	GNT_KP_MODE_WAIT_ON_CHILD
 } GntKeyPressMode;
+#else
+typedef enum {
+	GNT_KP_MODE_SEALED__DO_NOT_USE
+} GntKeyPressMode;
 #endif
 
 typedef struct _GntNode

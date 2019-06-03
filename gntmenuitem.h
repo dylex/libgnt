@@ -64,12 +64,13 @@
 #endif
 
 typedef struct _GntMenuItem			GntMenuItem;
+#ifndef GNT_DISABLE_DEPRECATED
 typedef struct _GntMenuItemPriv		GntMenuItemPriv;
+#endif
 typedef struct _GntMenuItemClass		GntMenuItemClass;
 
 #include "gntmenu.h"
 
-#ifndef GNT_DISABLE_DEPRECATED
 /**
  * GntMenuItemPriv:
  *
@@ -84,7 +85,6 @@ struct _GntMenuItemPriv
 	char GNTSEAL(trigger); /* Use gnt_menuitem_get_trigger(). */
 	char *GNTSEAL(id);     /* Use gnt_menuitem_get_id(). */
 };
-#endif
 
 typedef void (*GntMenuItemCallback)(GntMenuItem *item, gpointer data);
 
@@ -96,7 +96,7 @@ typedef void (*GntMenuItemCallback)(GntMenuItem *item, gpointer data);
 struct _GntMenuItem
 {
 	GObject parent;
-	GntMenuItemPriv GNTSEAL(priv);
+	struct _GntMenuItemPriv GNTSEAL(priv);
 
 	char *GNTSEAL(text);
 

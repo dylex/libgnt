@@ -73,6 +73,10 @@ typedef enum _GntTreeColumnFlag {
 	GNT_TREE_COLUMN_BINARY_DATA  = 1 << 2,
 	GNT_TREE_COLUMN_RIGHT_ALIGNED = 1 << 3,
 } GntTreeColumnFlag;
+#else
+typedef enum {
+	GNT_TREE_COLUMN_SEALED__DO_NOT_USE
+} GntTreeColumnFlag;
 #endif
 
 /**
@@ -109,7 +113,7 @@ struct _GntTree
 	gboolean GNTSEAL(show_title);
 	gboolean GNTSEAL(show_separator); /* Whether to show column separators */
 
-	GntTreePriv *GNTSEAL(priv);
+	struct _GntTreePriv *GNTSEAL(priv);
 };
 
 struct _GntTreeClass
