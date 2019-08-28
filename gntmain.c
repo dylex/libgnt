@@ -820,7 +820,7 @@ void gnt_screen_rename_widget(GntWidget *widget, const char *text)
 	gnt_wm_update_window(wm, widget);
 }
 
-void gnt_register_action(const char *label, void (*callback)(void))
+void gnt_register_action(const gchar *label, GCallback callback)
 {
 	GntAction *action = g_new0(GntAction, 1);
 	action->label = g_strdup(label);

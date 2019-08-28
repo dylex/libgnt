@@ -138,12 +138,12 @@ void gnt_widget_set_urgent(GntWidget *widget);
 
 /**
  * gnt_register_action:
- * @label:      The user-visible label for the action.
- * @callback:   The callback function for the action.
+ * @label: The user-visible label for the action.
+ * @callback: (scope async): The callback function for the action.
  *
  * Register a global action.
  */
-void gnt_register_action(const char *label, void (*callback)(void));
+void gnt_register_action(const gchar *label, GCallback callback);
 
 /**
  * gnt_screen_menu_show:

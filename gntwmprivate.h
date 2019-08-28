@@ -34,6 +34,18 @@ typedef enum
 	GNT_KP_MODE_WAIT_ON_CHILD
 } GntKeyPressMode;
 
+/**
+ * GntAction:
+ *
+ * An application can register actions which will show up in a 'start-menu'
+ * like popup.
+ */
+typedef struct _GntAction
+{
+	const gchar *label;
+	GCallback callback;
+} GntAction;
+
 G_BEGIN_DECLS
 /* Private access to some internals. Contact us if you need these. */
 

@@ -49,17 +49,6 @@ typedef struct _GntNode
 	GntWS *ws;
 } GntNode;
 
-/**
- * GntAction:
- *
- * An application can register actions which will show up in a 'start-menu' like popup
- */
-typedef struct _GntAction
-{
-	const char *label;
-	void (*callback)(void);
-} GntAction;
-
 G_BEGIN_DECLS
 
 /**
