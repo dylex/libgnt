@@ -66,18 +66,42 @@ struct _GntSliderClass
 	gpointer reserved[4];
 };
 
+/**
+ * gnt_hslider_new:
+ * @max: The maximum value for the slider.
+ * @min: The minimum value for the slider.
+ *
+ * Create a new horizontal slider.
+ *
+ * Returns: The newly created slider.
+ *
+ * Since: 2.1.0
+ */
 #define gnt_hslider_new(max, min) gnt_slider_new(FALSE, max, min)
+
+/**
+ * gnt_vslider_new:
+ * @max: The maximum value for the slider.
+ * @min: The minimum value for the slider.
+ *
+ * Create a new vertical slider.
+ *
+ * Returns: The newly created slider.
+ *
+ * Since: 2.1.0
+ */
 #define gnt_vslider_new(max, min) gnt_slider_new(TRUE, max, min)
 
 /**
  * gnt_slider_new:
- * @orient: A vertical slider is created if %TRUE, otherwise the slider is horizontal.
- * @max:    The maximum value for the slider
- * @min:    The minimum value for the slider
+ * @orient: A vertical slider is created if %TRUE, otherwise the slider is
+ *          horizontal.
+ * @max: The maximum value for the slider.
+ * @min: The minimum value for the slider.
  *
  * Create a new slider.
  *
- * Returns:  The newly created slider
+ * Returns: The newly created slider.
  *
  * Since: 2.1.0
  */
