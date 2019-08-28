@@ -53,10 +53,20 @@ G_BEGIN_DECLS
  */
 G_DECLARE_DERIVABLE_TYPE(GntTree, gnt_tree, GNT, TREE, GntWidget)
 
+/**
+ * GntTreeClass:
+ * @selection_changed: The class closure for the #GntTree::selection-changed
+ *                     signal.
+ * @toggled: The class closure for the #GntTree::toggled signal.
+ *
+ * The class structure for #GntTree.
+ */
 struct _GntTreeClass
 {
+	/*< private >*/
 	GntWidgetClass parent;
 
+	/*< public >*/
 	void (*selection_changed)(GntTreeRow *old, GntTreeRow * current);
 	void (*toggled)(GntTree *tree, gpointer key);
 

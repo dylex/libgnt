@@ -47,10 +47,18 @@ G_BEGIN_DECLS
  */
 G_DECLARE_DERIVABLE_TYPE(GntWS, gnt_ws, GNT, WS, GntBindable)
 
+/**
+ * GntWSClass:
+ * @draw_taskbar: This is never called?
+ *
+ * The class structure for #GntWS.
+ */
 struct _GntWSClass
 {
+	/*< private >*/
 	GntBindableClass parent;
 
+	/*< public >*/
 	void (*draw_taskbar)(GntWS *ws, gboolean reposition);
 
 	/*< private >*/

@@ -61,8 +61,14 @@ typedef enum
 	GNT_ALIGN_BOTTOM
 } GntAlignment;
 
+/**
+ * GntBoxClass:
+ *
+ * The class structure for #GntBox.
+ */
 struct _GntBoxClass
 {
+	/*< private >*/
 	GntWidgetClass parent;
 
 	/*< private >*/

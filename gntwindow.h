@@ -52,8 +52,14 @@ typedef enum
 	GNT_WINDOW_MAXIMIZE_Y = 1 << 1,
 } GntWindowFlags;
 
+/**
+ * GntWindowClass:
+ *
+ * The class structure for #GntWindow.
+ */
 struct _GntWindowClass
 {
+	/*< private >*/
 	GntBoxClass parent;
 
 	/*< private >*/

@@ -37,10 +37,18 @@
 
 #define GNT_TYPE_CHECK_BOX gnt_check_box_get_type()
 
+/**
+ * GntCheckBoxClass:
+ * @toggled: The class closure for the #GntCheckBox::toggled signal.
+ *
+ * The class structure for #GntCheckBox.
+ */
 struct _GntCheckBoxClass
 {
+	/*< private >*/
 	GntButtonClass parent;
 
+	/*< public >*/
 	void (*toggled)(void);
 
 	/*< private >*/

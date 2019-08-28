@@ -46,10 +46,20 @@ G_BEGIN_DECLS
  */
 G_DECLARE_DERIVABLE_TYPE(GntSlider, gnt_slider, GNT, SLIDER, GntWidget)
 
+/**
+ * GntSliderClass:
+ * @changed: The class closure for the #GntSlider::changed signal.
+ *
+ * The class structure for #GntSlider.
+ *
+ * Since: 2.1.0
+ */
 struct _GntSliderClass
 {
+	/*< private >*/
 	GntWidgetClass parent;
 
+	/*< public >*/
 	void (*changed)(GntSlider *slider, int value);
 
 	/*< private >*/

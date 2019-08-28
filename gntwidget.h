@@ -68,14 +68,37 @@ G_BEGIN_DECLS
  */
 G_DECLARE_DERIVABLE_TYPE(GntWidget, gnt_widget, GNT, WIDGET, GntBindable)
 
+/**
+ * GntWidgetClass:
+ * @map: The class closure for the #GntWidget::map signal.
+ * @show: This will call draw() and take focus (if it can take focus).
+ * @destroy: The class closure for the #GntWidget::destroy signal.
+ * @draw: The class closure for the #GntWidget::draw signal. This will draw the
+ *        widget.
+ * @hide: The class closure for the #GntWidget::hide signal.
+ * @expose: The class closure for the #GntWidget::expose signal.
+ * @gained_focus: The class closure for the #GntWidget::gained-focus signal.
+ * @lost_focus: The class closure for the #GntWidget::lost-focus signal.
+ * @size_request: The class closure for the #GntWidget::size-request signal.
+ * @confirm_size: The class closure for the #GntWidget::confirm-size signal.
+ * @size_changed: The class closure for the #GntWidget::size-changed signal.
+ * @set_position: The class closure for the #GntWidget::position-set signal.
+ * @key_pressed: The class closure for the #GntWidget::key-pressed signal.
+ * @activate: The class closure for the #GntWidget::activate signal.
+ * @clicked: The class closure for the #GntWidget::clicked signal.
+ *
+ * The class structure for #GntWidget.
+ */
 struct _GntWidgetClass
 {
+	/*< private >*/
 	GntBindableClass parent;
 
+	/*< public >*/
 	void (*map)(GntWidget *widget);
-	void (*show)(GntWidget *widget);		/* This will call draw() and take focus (if it can take focus) */
+	void (*show)(GntWidget *widget);
 	void (*destroy)(GntWidget *widget);
-	void (*draw)(GntWidget *widget);		/* This will draw the widget */
+	void (*draw)(GntWidget *widget);
 	void (*hide)(GntWidget *widget);
 	void (*expose)(GntWidget *widget, int x, int y, int width, int height);
 	void (*gained_focus)(GntWidget *widget);

@@ -37,13 +37,27 @@
 
 typedef struct _GntBindable GntBindable;
 
+/**
+ * GntBindableClass:
+ * @remaps: A table of key remaps from one key to another.
+ * @actions: A table of registered names to actions, added by
+ *           gnt_bindable_class_register_action().
+ * @bindings: A table of registered keys to actions, added by
+ *            gnt_bindable_register_binding().
+ * @help_window: A #GntWindow used for displaying key binding help.
+ *
+ * The class structure for #GntBindable. Note, while documented, the fields here
+ * are private.
+ */
 struct _GntBindableClass
 {
+	/*< private >*/
 	GObjectClass parent;
 
-	GHashTable *remaps;   /* Key remaps */
-	GHashTable *actions;  /* name -> Action */
-	GHashTable *bindings; /* key -> ActionParam */
+	/*< public >*/
+	GHashTable *remaps;
+	GHashTable *actions;
+	GHashTable *bindings;
 
 	GntBindable * help_window;
 

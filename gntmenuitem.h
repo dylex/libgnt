@@ -41,8 +41,14 @@ typedef struct _GntMenuItem GntMenuItem;
 
 typedef void (*GntMenuItemCallback)(GntMenuItem *item, gpointer data);
 
+/**
+ * GntMenuItemClass:
+ *
+ * The class structure for #GntMenuItem.
+ */
 struct _GntMenuItemClass
 {
+	/*< private >*/
 	GObjectClass parent;
 
 	/*< private >*/
