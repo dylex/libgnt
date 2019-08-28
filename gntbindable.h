@@ -48,9 +48,7 @@ struct _GntBindableClass
 	GntBindable * help_window;
 
 	/*< private >*/
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
+	gpointer reserved[4];
 };
 
 G_BEGIN_DECLS

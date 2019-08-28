@@ -121,9 +121,8 @@ struct _GntWMClass
 	 */
 	void (*terminal_refresh)(GntWM *wm);
 
-	void (*res1)(void);
-	void (*res2)(void);
-	void (*res3)(void);
+	/*< private >*/
+	gpointer reserved[4];
 };
 
 /**

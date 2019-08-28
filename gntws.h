@@ -53,10 +53,8 @@ struct _GntWSClass
 
 	void (*draw_taskbar)(GntWS *ws, gboolean reposition);
 
-	void (*res1)(void);
-	void (*res2)(void);
-	void (*res3)(void);
-	void (*res4)(void);
+	/*< private >*/
+	gpointer reserved[4];
 };
 
 /**

@@ -53,10 +53,7 @@ struct _GntSliderClass
 	void (*changed)(GntSlider *slider, int value);
 
 	/*< private >*/
-	void (*gnt_reserved1)(void);
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
+	gpointer reserved[4];
 };
 
 #define gnt_hslider_new(max, min) gnt_slider_new(FALSE, max, min)
