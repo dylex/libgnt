@@ -39,6 +39,16 @@
 
 #define GNT_TYPE_WM gnt_wm_get_type()
 
+/**
+ * GntNode:
+ * @me: The widget handled by this node.
+ * @window: The ncurses window that backs this node.
+ * @scroll: The scroll position of the node.
+ * @panel: The ncurses panel that backs this node.
+ * @ws: The workspace of this node.
+ *
+ * A node in the window management tree.
+ */
 typedef struct _GntNode
 {
 	GntWidget *me;
