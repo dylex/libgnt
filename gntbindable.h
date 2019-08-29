@@ -74,10 +74,24 @@ G_DECLARE_DERIVABLE_TYPE(GntBindable, gnt_bindable, GNT, BINDABLE, GObject)
 /******************/
 const char * gnt_bindable_remap_keys(GntBindable *bindable, const char *text);
 
-/******************/
+/********************/
 /* Bindable Actions */
-/******************/
-typedef gboolean (*GntBindableActionCallback) (GntBindable *bindable, GList *params);
+/********************/
+/**
+ * GntBindableActionCallback:
+ * @bindable: A bindable object.
+ * @params: Parameters passed to gnt_bindable_class_register_action().
+ *
+ * A callback for an action registered by gnt_bindable_class_register_action().
+ */
+typedef gboolean (*GntBindableActionCallback)(GntBindable *bindable,
+                                              GList *params);
+/**
+ * GntBindableActionCallbackNoParam:
+ * @bindable: A bindable object.
+ *
+ * A callback for an action with no parameters.
+ */
 typedef gboolean (*GntBindableActionCallbackNoParam)(GntBindable *bindable);
 
 /**
