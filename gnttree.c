@@ -2113,8 +2113,8 @@ void gnt_tree_adjust_columns(GntTree *tree)
 }
 
 void
-gnt_tree_set_hash_fns(GntTree *tree, GntTreeHashFunc hash,
-                      GntTreeHashEqualityFunc eq, GDestroyNotify kd)
+gnt_tree_set_hash_fns(GntTree *tree, GHashFunc hash, GEqualFunc eq,
+                      GDestroyNotify kd)
 {
 	GntTreePrivate *priv = NULL;
 

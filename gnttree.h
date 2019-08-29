@@ -39,9 +39,6 @@
 
 #define GNT_TYPE_TREE_ROW			(gnt_tree_row_get_type())
 
-typedef guint (*GntTreeHashFunc)(gconstpointer key);
-typedef gboolean (*GntTreeHashEqualityFunc)(gconstpointer a, gconstpointer b);
-
 typedef struct _GntTreeRow		GntTreeRow;
 
 G_BEGIN_DECLS
@@ -537,8 +534,8 @@ void gnt_tree_adjust_columns(GntTree *tree);
  *
  * Set the hash functions to use to hash, compare and free the keys.
  */
-void gnt_tree_set_hash_fns(GntTree *tree, GntTreeHashFunc hash,
-                           GntTreeHashEqualityFunc eq, GDestroyNotify kd);
+void gnt_tree_set_hash_fns(GntTree *tree, GHashFunc hash, GEqualFunc eq,
+                           GDestroyNotify kd);
 
 /**
  * gnt_tree_set_column_visible:

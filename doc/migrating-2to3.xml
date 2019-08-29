@@ -110,6 +110,12 @@
           <listitem>
             <code>GDupFunc</code> renamed to #GntDuplicateFunc
           </listitem>
+          <listitem>
+            <code>GntTreeHashFunc</code> removed in favor of #GHashFunc
+          </listitem>
+          <listitem>
+            <code>GntTreeHashEqualityFunc</code> removed in favor of #GEqualFunc
+          </listitem>
         </itemizedlist>
       </para>
     </section>
