@@ -50,19 +50,41 @@ G_BEGIN_DECLS
  */
 G_DECLARE_DERIVABLE_TYPE(GntTree, gnt_tree, GNT, TREE, GntWidget)
 
+/**
+ * GntTreeClass:
+ * @selection_changed: The class closure for the #GntTree::selection-changed
+ *                     signal.
+ * @toggled: The class closure for the #GntTree::toggled signal.
+ *
+ * The class structure for #GntTree.
+ */
 struct _GntTreeClass
 {
+	/*< private >*/
 	GntWidgetClass parent;
 
+	/*< public >*/
 	void (*selection_changed)(GntTreeRow *old, GntTreeRow * current);
 	void (*toggled)(GntTree *tree, gpointer key);
 
 	/*< private >*/
-	void (*gnt_reserved1)(void);
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
+	gpointer reserved[4];
 };
+
+/**
+ * GntTreeSearchFunc:
+ * @tree: The tree being searched.
+ * @key: The key of a row.
+ * @search: The search string.
+ * @current: The content of row in the search column.
+ *
+ * A custom tree search function.
+ *
+ * Returns: If %TRUE, the row should be displayed, otherwise it's not.
+ */
+typedef gboolean (*GntTreeSearchFunc)(GntTree *tree, gpointer key,
+                                      const gchar *search,
+                                      const gchar *current);
 
 /**
  * gnt_tree_row_get_type:
@@ -630,18 +652,13 @@ gboolean gnt_tree_is_searching(GntTree *tree);
 /**
  * gnt_tree_set_search_function:
  * @tree:  The tree
- * @func:  The custom search function. The search function is
- *              sent the tree itself, the key of a row, the search
- *              string and the content of row in the search column.
- *              If the function returns %TRUE, the row is dislayed,
- *              otherwise it's not.
+ * @func:  The custom search function.
  *
  * Set a custom search function.
  *
  * Since: 2.1.0
  */
-void gnt_tree_set_search_function(GntTree *tree,
-		gboolean (*func)(GntTree *tree, gpointer key, const char *search, const char *current));
+void gnt_tree_set_search_function(GntTree *tree, GntTreeSearchFunc func);
 
 /**
  * gnt_tree_get_parent_key:

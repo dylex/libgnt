@@ -37,15 +37,18 @@
 
 #define GNT_TYPE_BUTTON gnt_button_get_type()
 
+/**
+ * GntButtonClass:
+ *
+ * The class structure for #GntButton.
+ */
 struct _GntButtonClass
 {
+	/*< private >*/
 	GntWidgetClass parent;
 
 	/*< private >*/
-	void (*gnt_reserved1)(void);
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
+	gpointer reserved[4];
 };
 
 G_BEGIN_DECLS

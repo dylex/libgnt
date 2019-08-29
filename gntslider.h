@@ -46,31 +46,62 @@ G_BEGIN_DECLS
  */
 G_DECLARE_DERIVABLE_TYPE(GntSlider, gnt_slider, GNT, SLIDER, GntWidget)
 
+/**
+ * GntSliderClass:
+ * @changed: The class closure for the #GntSlider::changed signal.
+ *
+ * The class structure for #GntSlider.
+ *
+ * Since: 2.1.0
+ */
 struct _GntSliderClass
 {
+	/*< private >*/
 	GntWidgetClass parent;
 
+	/*< public >*/
 	void (*changed)(GntSlider *slider, int value);
 
 	/*< private >*/
-	void (*gnt_reserved1)(void);
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
+	gpointer reserved[4];
 };
 
+/**
+ * gnt_hslider_new:
+ * @max: The maximum value for the slider.
+ * @min: The minimum value for the slider.
+ *
+ * Create a new horizontal slider.
+ *
+ * Returns: The newly created slider.
+ *
+ * Since: 2.1.0
+ */
 #define gnt_hslider_new(max, min) gnt_slider_new(FALSE, max, min)
+
+/**
+ * gnt_vslider_new:
+ * @max: The maximum value for the slider.
+ * @min: The minimum value for the slider.
+ *
+ * Create a new vertical slider.
+ *
+ * Returns: The newly created slider.
+ *
+ * Since: 2.1.0
+ */
 #define gnt_vslider_new(max, min) gnt_slider_new(TRUE, max, min)
 
 /**
  * gnt_slider_new:
- * @orient: A vertical slider is created if %TRUE, otherwise the slider is horizontal.
- * @max:    The maximum value for the slider
- * @min:    The minimum value for the slider
+ * @orient: A vertical slider is created if %TRUE, otherwise the slider is
+ *          horizontal.
+ * @max: The maximum value for the slider.
+ * @min: The minimum value for the slider.
  *
  * Create a new slider.
  *
- * Returns:  The newly created slider
+ * Returns: The newly created slider.
  *
  * Since: 2.1.0
  */

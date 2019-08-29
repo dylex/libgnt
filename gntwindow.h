@@ -52,15 +52,18 @@ typedef enum
 	GNT_WINDOW_MAXIMIZE_Y = 1 << 1,
 } GntWindowFlags;
 
+/**
+ * GntWindowClass:
+ *
+ * The class structure for #GntWindow.
+ */
 struct _GntWindowClass
 {
+	/*< private >*/
 	GntBoxClass parent;
 
 	/*< private >*/
-	void (*gnt_reserved1)(void);
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
+	gpointer reserved[4];
 };
 
 G_BEGIN_DECLS
@@ -72,8 +75,27 @@ G_BEGIN_DECLS
  */
 G_DECLARE_DERIVABLE_TYPE(GntWindow, gnt_window, GNT, WINDOW, GntBox)
 
-#define gnt_vwindow_new(homogeneous) gnt_window_box_new(homogeneous, TRUE)
+/**
+ * gnt_hwindow_new:
+ * @homogeneous: %TRUE if the widgets inside the window should have the same
+ *               dimensions.
+ *
+ * Create a new window with widgets stacked horizontally.
+ *
+ * Returns:  The newly created window.
+ */
 #define gnt_hwindow_new(homogeneous) gnt_window_box_new(homogeneous, FALSE)
+
+/**
+ * gnt_vwindow_new:
+ * @homogeneous: %TRUE if the widgets inside the window should have the same
+ *               dimensions.
+ *
+ * Create a new window with widgets stacked vertically.
+ *
+ * Returns:  The newly created window.
+ */
+#define gnt_vwindow_new(homogeneous) gnt_window_box_new(homogeneous, TRUE)
 
 /**
  * gnt_window_new:

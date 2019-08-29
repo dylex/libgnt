@@ -39,17 +39,27 @@ typedef struct _GntMenuItem GntMenuItem;
 
 #define GNT_TYPE_MENU_ITEM gnt_menuitem_get_type()
 
+/**
+ * GntMenuItemCallback:
+ * @item: The menu item which was activated.
+ * @data: The user data specified in gnt_menuitem_set_callback().
+ *
+ * A callback for when a menu item is activated.
+ */
 typedef void (*GntMenuItemCallback)(GntMenuItem *item, gpointer data);
 
+/**
+ * GntMenuItemClass:
+ *
+ * The class structure for #GntMenuItem.
+ */
 struct _GntMenuItemClass
 {
+	/*< private >*/
 	GObjectClass parent;
 
 	/*< private >*/
-	void (*gnt_reserved1)(void);
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
+	gpointer reserved[4];
 };
 
 G_BEGIN_DECLS
@@ -74,7 +84,7 @@ GntMenuItem *gnt_menuitem_new(const gchar *text);
 /**
  * gnt_menuitem_set_callback:
  * @item:     The menuitem.
- * @callback: (scope call): The callback function.
+ * @callback: (scope async): The callback function.
  * @data:     Data to send to the callback function.
  *
  * Set a callback function for a menuitem.

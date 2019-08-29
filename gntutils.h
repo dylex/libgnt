@@ -35,6 +35,13 @@
 #include "gnttextview.h"
 #include "gntwidget.h"
 
+/**
+ * GntDuplicateFunc:
+ * @data: The data to be copied.
+ *
+ * A function used to duplicate some data in a hash table. See
+ * gnt_hash_table_duplicate().
+ */
 typedef gpointer (*GntDuplicateFunc)(gconstpointer data);
 
 /**

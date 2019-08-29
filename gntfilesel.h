@@ -45,19 +45,25 @@ G_BEGIN_DECLS
  */
 G_DECLARE_DERIVABLE_TYPE(GntFileSel, gnt_file_sel, GNT, FILE_SEL, GntWindow)
 
+/**
+ * GntFileSelClass:
+ * @file_selected: The class closure for the #GntFileSel::file-selected signal.
+ * @cancelled: The class closure for the #GntFileSel::cancelled signal.
+ *
+ * The class structure for #GntFileSel.
+ */
 struct _GntFileSelClass
 {
+	/*< private >*/
 	GntWindowClass parent;
 
+	/*< public >*/
 	void (*file_selected)(GntFileSel *sel, const char *path,
 	                      const char *filename);
 	void (*cancelled)(GntFileSel *sel);
 
 	/*< private >*/
-	void (*gnt_reserved1)(void);
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
+	gpointer reserved[4];
 };
 
 /**

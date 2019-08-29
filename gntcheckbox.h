@@ -25,7 +25,7 @@
 /**
  * SECTION:gntcheckbox
  * @section_id: libgnt-gntcheckbox
- * @title: GntCheckbox
+ * @title: GntCheckBox
  * @short_description: A widget that can be toggled
  * @see_also: #GntButton
  */
@@ -37,17 +37,22 @@
 
 #define GNT_TYPE_CHECK_BOX gnt_check_box_get_type()
 
+/**
+ * GntCheckBoxClass:
+ * @toggled: The class closure for the #GntCheckBox::toggled signal.
+ *
+ * The class structure for #GntCheckBox.
+ */
 struct _GntCheckBoxClass
 {
+	/*< private >*/
 	GntButtonClass parent;
 
+	/*< public >*/
 	void (*toggled)(void);
 
 	/*< private >*/
-	void (*gnt_reserved1)(void);
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
+	gpointer reserved[4];
 };
 
 G_BEGIN_DECLS

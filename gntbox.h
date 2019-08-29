@@ -61,15 +61,18 @@ typedef enum
 	GNT_ALIGN_BOTTOM
 } GntAlignment;
 
+/**
+ * GntBoxClass:
+ *
+ * The class structure for #GntBox.
+ */
 struct _GntBoxClass
 {
+	/*< private >*/
 	GntWidgetClass parent;
 
 	/*< private >*/
-	void (*gnt_reserved1)(void);
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
+	gpointer reserved[4];
 };
 
 G_BEGIN_DECLS
@@ -83,19 +86,36 @@ G_BEGIN_DECLS
  */
 G_DECLARE_DERIVABLE_TYPE(GntBox, gnt_box, GNT, BOX, GntWidget)
 
-#define gnt_vbox_new(homogeneous) gnt_box_new(homogeneous, TRUE)
+/**
+ * gnt_hbox_new:
+ * @homogeneous: If %TRUE, all the widgets in it will have the same width.
+ *
+ * Create a new horizontal box.
+ *
+ * Returns: The new box.
+ */
 #define gnt_hbox_new(homogeneous) gnt_box_new(homogeneous, FALSE)
 
 /**
+ * gnt_vbox_new:
+ * @homogeneous: If %TRUE, all the widgets in it will have the same height.
+ *
+ * Create a new vertical box.
+ *
+ * Returns: The new box.
+ */
+#define gnt_vbox_new(homogeneous) gnt_box_new(homogeneous, TRUE)
+
+/**
  * gnt_box_new:
- * @homogeneous: If %TRUE, all the widgets in it will have the same width (or
- *               height)
+ * @homogeneous: If %TRUE, all the widgets in it will have the same height (or
+ *               width).
  * @vert: Whether the widgets in it should be stacked vertically (if %TRUE) or
  *        horizontally (if %FALSE).
  *
- * Create a new GntBox.
+ * Create a new box.
  *
- * Returns: The new GntBox.
+ * Returns: The new box.
  */
 GntWidget *gnt_box_new(gboolean homogeneous, gboolean vert);
 

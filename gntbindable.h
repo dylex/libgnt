@@ -37,20 +37,32 @@
 
 typedef struct _GntBindable GntBindable;
 
+/**
+ * GntBindableClass:
+ * @remaps: A table of key remaps from one key to another.
+ * @actions: A table of registered names to actions, added by
+ *           gnt_bindable_class_register_action().
+ * @bindings: A table of registered keys to actions, added by
+ *            gnt_bindable_register_binding().
+ * @help_window: A #GntWindow used for displaying key binding help.
+ *
+ * The class structure for #GntBindable. Note, while documented, the fields here
+ * are private.
+ */
 struct _GntBindableClass
 {
+	/*< private >*/
 	GObjectClass parent;
 
-	GHashTable *remaps;   /* Key remaps */
-	GHashTable *actions;  /* name -> Action */
-	GHashTable *bindings; /* key -> ActionParam */
+	/*< public >*/
+	GHashTable *remaps;
+	GHashTable *actions;
+	GHashTable *bindings;
 
 	GntBindable * help_window;
 
 	/*< private >*/
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
+	gpointer reserved[4];
 };
 
 G_BEGIN_DECLS
@@ -62,10 +74,24 @@ G_DECLARE_DERIVABLE_TYPE(GntBindable, gnt_bindable, GNT, BINDABLE, GObject)
 /******************/
 const char * gnt_bindable_remap_keys(GntBindable *bindable, const char *text);
 
-/******************/
+/********************/
 /* Bindable Actions */
-/******************/
-typedef gboolean (*GntBindableActionCallback) (GntBindable *bindable, GList *params);
+/********************/
+/**
+ * GntBindableActionCallback:
+ * @bindable: A bindable object.
+ * @params: Parameters passed to gnt_bindable_class_register_action().
+ *
+ * A callback for an action registered by gnt_bindable_class_register_action().
+ */
+typedef gboolean (*GntBindableActionCallback)(GntBindable *bindable,
+                                              GList *params);
+/**
+ * GntBindableActionCallbackNoParam:
+ * @bindable: A bindable object.
+ *
+ * A callback for an action with no parameters.
+ */
 typedef gboolean (*GntBindableActionCallbackNoParam)(GntBindable *bindable);
 
 /**

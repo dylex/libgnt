@@ -45,14 +45,30 @@ G_BEGIN_DECLS
  */
 G_DECLARE_FINAL_TYPE(GntLine, gnt_line, GNT, LINE, GntWidget)
 
+/**
+ * gnt_hline_new:
+ *
+ * Create new horizontal line.
+ *
+ * Returns:  The newly created line.
+ */
 #define gnt_hline_new() gnt_line_new(FALSE)
+
+/**
+ * gnt_vline_new:
+ *
+ * Create new vertical line.
+ *
+ * Returns:  The newly created line.
+ */
 #define gnt_vline_new() gnt_line_new(TRUE)
 
 /**
  * gnt_line_new:
- * @vertical:  %TRUE if the line should be vertical, %FALSE for a horizontal line.
+ * @vertical: %TRUE if the line should be vertical, %FALSE for a horizontal
+ *            line.
  *
- * Create new line
+ * Create new line.
  *
  * Returns:  The newly created line.
  */

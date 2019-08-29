@@ -78,17 +78,22 @@ G_BEGIN_DECLS
  */
 G_DECLARE_DERIVABLE_TYPE(GntEntry, gnt_entry, GNT, ENTRY, GntWidget)
 
+/**
+ * GntEntryClass:
+ * @text_changed: The class closure for the #GntEntry::text-changed signal.
+ *
+ * The class structure for #GntEntry.
+ */
 struct _GntEntryClass
 {
+	/*< private >*/
 	GntWidgetClass parent;
 
+	/*< public >*/
 	void (*text_changed)(GntEntry *entry);
 
 	/*< private >*/
-	void (*gnt_reserved1)(void);
-	void (*gnt_reserved2)(void);
-	void (*gnt_reserved3)(void);
-	void (*gnt_reserved4)(void);
+	gpointer reserved[4];
 };
 
 /**

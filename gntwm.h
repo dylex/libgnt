@@ -39,6 +39,16 @@
 
 #define GNT_TYPE_WM gnt_wm_get_type()
 
+/**
+ * GntNode:
+ * @me: The widget handled by this node.
+ * @window: The ncurses window that backs this node.
+ * @scroll: The scroll position of the node.
+ * @panel: The ncurses panel that backs this node.
+ * @ws: The workspace of this node.
+ *
+ * A node in the window management tree.
+ */
 typedef struct _GntNode
 {
 	GntWidget *me;
@@ -58,61 +68,68 @@ G_BEGIN_DECLS
  */
 G_DECLARE_DERIVABLE_TYPE(GntWM, gnt_wm, GNT, WM, GntBindable)
 
+/**
+ * GntWMClass:
+ * @new_window: The class closure for the #GntWM::new-win signal. This is called
+ *              when a new window is shown.
+ * @decorate_window: The class closure for the #GntWM::decorate-win signal.
+ * @close_window: The class closure for the #GntWM::close-win signal. This is
+ *                called when a window is being closed.
+ * @window_resize_confirm: The class closure for the #GntWM::confirm-resize
+ *                         signal. The WM may want to confirm a size for a
+ *                         window first.
+ * @window_resized: The class closure for the #GntWM::window-resized signal.
+ * @window_move_confirm: The class closure for the #GntWM::confirm-move signal.
+ *                       The WM may want to confirm the position of a window.
+ * @window_moved: The class closure for the #GntWM::window-moved signal.
+ * @window_update: The class closure for the #GntWM::window-update signal. This
+ *                 gets called when:
+ *                 - the title of the window changes
+ *                 - the 'urgency' of the window changes
+ * @key_pressed: This should usually return %NULL if the keys were processed by
+ *               the WM. If not, the WM can simply return the original string,
+ *               which will be processed by the default WM. The custom WM can
+ *               also return a different static string for the default WM to
+ *               process.
+ * @mouse_clicked: The class closure for the #GntWM::mouse-clicked signal.
+ * @give_focus: The class closure for the #GntWM::give-focus signal. Whatever
+ *              the WM wants to do when a window is given focus.
+ * @terminal_refresh: The class closure for the #GntWM::terminal-refresh signal.
+ *                    This is invoked whenever the terminal window is resized,
+ *                    or the screen session is attached to a new terminal.
+ *                    (i.e., from the SIGWINCH callback)
+ *                    Since: 2.1.0
+ *
+ * The class structure for #GntWM.
+ */
 struct _GntWMClass
 {
+	/*< private >*/
 	GntBindableClass parent;
 
-	/* This is called when a new window is shown */
-	void (*new_window)(GntWM *wm, GntWidget *widget);
+	/*< public >*/
 
+	void (*new_window)(GntWM *wm, GntWidget *widget);
 	void (*decorate_window)(GntWM *wm, GntWidget *win);
-	/* This is called when a window is being closed */
 	gboolean (*close_window)(GntWM *wm, GntWidget *win);
 
-	/* The WM may want to confirm a size for a window first */
 	gboolean (*window_resize_confirm)(GntWM *wm, GntWidget *win, int *w, int *h);
-
 	void (*window_resized)(GntWM *wm, GntNode *node);
 
-	/* The WM may want to confirm the position of a window */
 	gboolean (*window_move_confirm)(GntWM *wm, GntWidget *win, int *x, int *y);
-
 	void (*window_moved)(GntWM *wm, GntNode *node);
 
-	/* This gets called when:
-	 * 	 - the title of the window changes
-	 * 	 - the 'urgency' of the window changes
-	 */
 	void (*window_update)(GntWM *wm, GntNode *node);
 
-	/* This should usually return NULL if the keys were processed by the WM.
-	 * If not, the WM can simply return the original string, which will be
-	 * processed by the default WM. The custom WM can also return a different
-	 * static string for the default WM to process.
-	 */
 	gboolean (*key_pressed)(GntWM *wm, const char *key);
-
 	gboolean (*mouse_clicked)(GntWM *wm, GntMouseEvent event, int x, int y, GntWidget *widget);
 
-	/* Whatever the WM wants to do when a window is given focus */
 	void (*give_focus)(GntWM *wm, GntWidget *widget);
 
-	/* List of windows. Although the WM can keep a list of its own for the windows,
-	 * it'd be better if there was a way to share between the 'core' and the WM.
-	 */
-	/*GList *(*window_list)();*/
-
-	/* This is invoked whenever the terminal window is resized, or the
-	 * screen session is attached to a new terminal. (ie, from the
-	 * SIGWINCH callback)
-	 *
-	 * Since: 2.1.0
-	 */
 	void (*terminal_refresh)(GntWM *wm);
 
-	void (*res1)(void);
-	void (*res2)(void);
-	void (*res3)(void);
+	/*< private >*/
+	gpointer reserved[4];
 };
 
 /**
