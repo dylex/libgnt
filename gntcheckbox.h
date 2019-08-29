@@ -25,7 +25,7 @@
 /**
  * SECTION:gntcheckbox
  * @section_id: libgnt-gntcheckbox
- * @title: GntCheckbox
+ * @title: GntCheckBox
  * @short_description: A widget that can be toggled
  * @see_also: #GntButton
  */

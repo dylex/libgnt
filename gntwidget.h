@@ -536,7 +536,7 @@ gboolean gnt_widget_get_has_focus(GntWidget *widget);
 void gnt_widget_set_is_urgent(GntWidget *widget, gboolean urgent);
 
 /**
- * gnt_widget_get_urgent:
+ * gnt_widget_get_is_urgent:
  * @widget: The widget
  *
  * Returns whether the widget has the URGENT hint set.
