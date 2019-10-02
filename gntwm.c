@@ -263,11 +263,12 @@ update_act_msg(void)
 	GntWidget *label;
 	GList *iter;
 	static GntWidget *message = NULL;
-	GString *text = g_string_new("act: ");
+	GString *text;
 	if (message)
 		gnt_widget_destroy(message);
 	if (!act)
 		return;
+	text = g_string_new("act: ");
 	for (iter = act; iter; iter = iter->next) {
 		GntWS *ws = iter->data;
 		g_string_append_printf(text, "%s, ", gnt_ws_get_name(ws));
