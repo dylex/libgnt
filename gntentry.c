@@ -1202,8 +1202,6 @@ gnt_entry_set_text_internal(GntEntry *entry, const char *text)
 	int len;
 	int scroll, cursor;
 
-	g_free(priv->start);
-
 	if (text && text[0])
 	{
 		len = strlen(text);
@@ -1218,6 +1216,7 @@ gnt_entry_set_text_internal(GntEntry *entry, const char *text)
 	scroll = priv->scroll - priv->start;
 	cursor = priv->end - priv->cursor;
 
+	g_free(priv->start);
 	priv->start = g_new0(char, priv->buffer);
 	if (text) {
 		snprintf(priv->start, len + 1, "%s", text);

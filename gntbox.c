@@ -309,11 +309,13 @@ find_next_focus(GntBoxPrivate *priv)
 	gpointer last = priv->active;
 	do
 	{
-		GList *iter = g_list_find(priv->focus, priv->active);
-		if (iter && iter->next) {
-			priv->active = iter->next->data;
-		} else if (priv->focus) {
-			priv->active = priv->focus->data;
+		if (priv->focus) {
+			GList *iter = g_list_find(priv->focus, priv->active);
+			if (iter && iter->next) {
+				priv->active = iter->next->data;
+			} else {
+				priv->active = priv->focus->data;
+			}
 		}
 		if (gnt_widget_get_visible(priv->active) &&
 		    gnt_widget_get_take_focus(priv->active)) {
