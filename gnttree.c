@@ -1517,7 +1517,7 @@ GntTreeRow *gnt_tree_add_row_after(GntTree *tree, void *key, GntTreeRow *row, vo
 		{
 			GntTreeRow *r = priv->root;
 			row->next = r;
-			if (r) r->prev = row;
+			r->prev = row;
 			if (priv->current == priv->root) {
 				priv->current = row;
 			}

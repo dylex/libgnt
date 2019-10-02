@@ -481,7 +481,7 @@ gnt_box_confirm_size(GntWidget *widget, int width, int height)
 
 		gnt_widget_get_size(wid, &w, &h);
 
-		if (wid != last && !child && w > 0 && h > 0 &&
+		if (wid != last && w > 0 && h > 0 &&
 		    gnt_widget_get_visible(wid) &&
 		    gnt_widget_confirm_size(wid, w - wchange, h - hchange)) {
 			child = wid;
@@ -1021,7 +1021,7 @@ void gnt_box_move_focus(GntBox *box, int dir)
 	else if (dir == -1)
 		find_prev_focus(priv);
 
-	if (now && now != priv->active) {
+	if (now != priv->active) {
 		gnt_widget_set_focus(now, FALSE);
 		gnt_widget_set_focus(priv->active, TRUE);
 	}

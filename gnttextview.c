@@ -433,7 +433,7 @@ gnt_text_view_reflow(GntTextView *view)
 	}
 	g_list_free(list);
 
-	list = view->list = g_list_first(view->list);
+	list = g_list_first(view->list);
 	/* Go back to the line that was in view before resizing started */
 	while (pos--) {
 		while (((GntTextLine*)list->data)->soft)
@@ -770,11 +770,8 @@ int gnt_text_view_tag_change(GntTextView *view, const char *name, const char *te
 					continue;
 				}
 
-				for (segs = line->segments; segs; segs = snext) {
+				for (segs = line->segments; line && segs; segs = snext) {
 					GntTextSegment *seg = segs->data;
-
-					if (!line)
-						break;
 
 					snext = segs->next;
 					if (seg->start >= tag->end) {
@@ -787,10 +784,6 @@ int gnt_text_view_tag_change(GntTextView *view, const char *name, const char *te
 						/* This segment starts in the middle of the tag */
 						if (text == NULL) {
 							g_free(seg);
-							if (G_UNLIKELY(line == NULL)) {
-								g_warn_if_reached();
-								break;
-							}
 							line->segments = g_list_delete_link(line->segments, segs);
 							if (line->segments == NULL) {
 								free_text_line(line);

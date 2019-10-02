@@ -295,11 +295,7 @@ show_suggest_dropdown(GntEntry *entry)
 			priv->ddown = NULL;
 			gnt_entry_key_pressed(GNT_WIDGET(entry), match);
 			g_free(match);
-			if (priv->ddown) {
-				gnt_widget_destroy(ddown);
-			} else {
-				priv->ddown = ddown;
-			}
+			priv->ddown = ddown;
 		}
 		gnt_widget_draw(gnt_widget_get_parent(priv->ddown));
 	}

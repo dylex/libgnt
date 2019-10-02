@@ -2404,8 +2404,9 @@ void gnt_wm_update_window(GntWM *wm, GntWidget *widget)
 		gnt_ws_draw_taskbar(priv->cws, FALSE);
 		update_screen(priv);
 	} else if (ws && ws != priv->cws && gnt_widget_get_is_urgent(widget)) {
-		if (!act || (act && !g_list_find(act, ws)))
+		if (!act || !g_list_find(act, ws)) {
 			act = g_list_prepend(act, ws);
+		}
 		update_act_msg();
 	}
 }
