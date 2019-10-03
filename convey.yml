@@ -23,6 +23,7 @@ tasks:
     type: convey/clean
     files:
       - build-convey
+      - pvs-studio
 
   build-docs:
     type: docker/run
