@@ -161,7 +161,7 @@ irssi_new_window(GntWM *wm, GntWidget *win)
 	name = gnt_widget_get_name(win);
 	if (!name || !strstr(name, "conversation-window")) {
 		if (!GNT_IS_MENU(win) && !gnt_widget_get_transient(win)) {
-			if ((!name || strcmp(name, "buddylist"))) {
+			if (!name || strcmp(name, "buddylist")) {
 				gnt_widget_get_size(win, &w, &h);
 				x = (getmaxx(stdscr) - w) / 2;
 				y = (getmaxy(stdscr) - h) / 2;
