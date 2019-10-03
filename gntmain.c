@@ -397,7 +397,7 @@ io_invoke(GIOChannel *source, G_GNUC_UNUSED GIOCondition cond,
 
 	rd += HOLDING_ESCAPE;
 	if (HOLDING_ESCAPE) {
-		keys[0] = '\033';
+		keys[0] = 033;
 		g_source_remove(escape_stuff.timer);
 		escape_stuff.timer = 0;
 	}
@@ -413,7 +413,7 @@ io_invoke(GIOChannel *source, G_GNUC_UNUSED GIOCondition cond,
 		char back;
 		int p;
 
-		if (k[0] == '\033' && rd == 1) {
+		if (k[0] == 033 && rd == 1) {
 			escape_stuff.timer = g_timeout_add(250, escape_timeout, NULL);
 			break;
 		}
