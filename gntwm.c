@@ -216,7 +216,6 @@ work_around_for_ncurses_bug(void)
 	PANEL *panel = NULL;
 	while ((panel = panel_below(panel)) != NULL) {
 		int sx, ex, sy, ey, w, y;
-		cchar_t ch;
 		PANEL *below = panel;
 
 		sx = getbegx(panel_window(panel));
@@ -232,6 +231,8 @@ work_around_for_ncurses_bug(void)
 					ex < getbegx(panel_window(below)))
 				continue;
 			for (y = MAX(sy, getbegy(panel_window(below))); y <= MIN(ey, getbegy(panel_window(below)) + getmaxy(panel_window(below))); y++) {
+				cchar_t ch;
+				memset(&ch, 0, sizeof(ch));
 				if (mvwin_wch(panel_window(below), y - getbegy(panel_window(below)), sx - 1 - getbegx(panel_window(below)), &ch) != OK)
 					goto right;
 				w = widestringwidth(ch.chars);
@@ -826,6 +827,7 @@ dump_file_save(GntFileSel *fs, const char *path, G_GNUC_UNUSED const char *f,
 #else
 			cchar_t wch;
 			char unicode[12];
+			memset(&wch, 0, sizeof(wch));
 			mvwin_wch(curscr, y, x, &wch);
 			now = wch.attr;
 			ch[0] = (char)(wch.chars[0] & 0xff);
@@ -1079,15 +1081,21 @@ list_actions(GntBindable *bindable, G_GNUC_UNUSED GList *params)
 static int
 widestringwidth(wchar_t *wide)
 {
-	int len, ret;
-	char *string;
+	gint len;
+	gchar *str;
 
 	len = wcstombs(NULL, wide, 0) + 1;
-	string = g_new0(char, len);
-	wcstombs(string, wide, len);
-	ret = string ? gnt_util_onscreen_width(string, NULL) : 1;
-	g_free(string);
-	return ret;
+	str = g_new0(char, len);
+	if(str != NULL) {
+		gint ret;
+		wcstombs(str, wide, len);
+		ret = gnt_util_onscreen_width(str, NULL);
+		g_free(str);
+
+		return ret;
+	}
+
+	return 1;
 }
 #endif
 
