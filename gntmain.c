@@ -924,23 +924,34 @@ gboolean gnt_is_refugee()
 	        gnt_wm_get_keypress_mode(wm) == GNT_KP_MODE_WAIT_ON_CHILD);
 }
 
+/* to save other's time... this ugly function converts the given string to the
+ * locale if necessary and returns it as a const gchar *.  Since it needs to
+ * return a const gchar * there's a bunch of messing around with a static
+ * variable.  While this works, this makes this non-thread safe and who knows
+ * what else.
+ */
 const char *C_(const char *x)
 {
 	static char *c = NULL;
 	if (gnt_need_conversation_to_locale) {
 		GError *error = NULL;
-		g_free(c);
-		c = g_locale_from_utf8(x, -1, NULL, NULL, &error);
-		if (c == NULL || error) {
-			char *store = c;
-			c = NULL;
+		gchar *newc = NULL;
+
+		newc = g_locale_from_utf8(x, -1, NULL, NULL, &error);
+		if(error != NULL) {
 			gnt_warning("Error: %s\n", error ? error->message : "(unknown)");
+
 			g_error_free(error);
-			error = NULL;
-			g_free(c);
-			c = store;
+
+			return x;
 		}
-		return c ? c : x;
+
+		if(newc != NULL) {
+			g_free(c);
+			c = newc;
+		}
+
+		return c != NULL ? c : x;
 	} else
 		return x;
 }
