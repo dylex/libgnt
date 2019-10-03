@@ -161,7 +161,7 @@ gnt_text_view_draw(GntWidget *widget)
 
 	scrcol = width - 1;
 	rows = height - 2;
-	if (has_scroll && rows > 0)
+	if (has_scroll && rows > 0 && lines != NULL)
 	{
 		int total = g_list_length(g_list_first(view->list));
 		int showing, position, up, down;
@@ -174,14 +174,14 @@ gnt_text_view_draw(GntWidget *widget)
 		down = total - up;
 
 		position = (rows - showing) * up / MAX(1, up + down);
-		position = MAX((lines != NULL), position);
+		position = MAX(1, position);
 
 		if (showing + position > rows)
 			position = rows - showing;
 
-		if (showing + position == rows && view->list && view->list->prev)
+		if (showing + position == rows && view->list->prev)
 			position = MAX(1, rows - 1 - showing);
-		else if (showing + position < rows && view->list && !view->list->prev)
+		else if (showing + position < rows && !view->list->prev)
 			position = rows - showing;
 
 		mvwvline(window, position + 1, scrcol,
@@ -647,10 +647,9 @@ void gnt_text_view_scroll(GntTextView *view, int scroll)
 void gnt_text_view_next_line(GntTextView *view)
 {
 	GntTextLine *line = g_new0(GntTextLine, 1);
-	GList *list = view->list;
 
 	view->list = g_list_prepend(g_list_first(view->list), line);
-	view->list = list;
+
 	gnt_widget_draw(GNT_WIDGET(view));
 }
 
