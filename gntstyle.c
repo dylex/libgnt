@@ -136,7 +136,7 @@ refine(char *text)
 	{
 		if (*s == '^' && *(s + 1) == '[')
 		{
-			*t = 033;  /* escape */
+			*t = GNT_ESCAPE;
 			s++;
 		}
 		else if (*s == '\\')

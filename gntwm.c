@@ -2191,7 +2191,7 @@ gboolean gnt_wm_process_input(GntWM *wm, const char *keys)
 			gnt_widget_destroy(priv->list.window);
 			return TRUE;
 		}
-	} else if (keys[0] == 033 && isdigit(keys[1]) && keys[2] == '\0') {
+	} else if (keys[0] == GNT_ESCAPE && isdigit(keys[1]) && keys[2] == '\0') {
 		/* Alt+x for quick switch */
 		int n = *(keys + 1) - '0';
 		GList *list = NULL;
