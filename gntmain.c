@@ -93,7 +93,7 @@ static void setup_io(void);
 
 static gboolean refresh_screen(void);
 
-static GntWM *wm;
+static GntWM *wm; // -V707
 static GntClipboard *clipboard;
 
 int gnt_need_conversation_to_locale;
