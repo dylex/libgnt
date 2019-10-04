@@ -932,7 +932,11 @@ gboolean gnt_is_refugee()
  */
 const char *C_(const char *x)
 {
-	static char *c = NULL;
+	static gchar *c = NULL;
+
+	/* clear the old value we had for cm since it's no longer needed */
+	g_free(c);
+
 	if (gnt_need_conversation_to_locale) {
 		GError *error = NULL;
 		gchar *newc = NULL;
@@ -947,12 +951,12 @@ const char *C_(const char *x)
 		}
 
 		if(newc != NULL) {
-			g_free(c);
 			c = newc;
-		}
 
-		return c != NULL ? c : x;
-	} else
-		return x;
+			return c;
+		}
+	}
+
+	return x;
 }
 
