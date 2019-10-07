@@ -27,6 +27,7 @@ key_pressed(GntWidget *w, const char *key, GntWidget *view)
 
 		return TRUE;
 
+#ifndef _WIN32
 	} else if (strcmp(key, "\033e") == 0) {
 		if (fork() == 0) {
 			endwin();
@@ -37,6 +38,7 @@ key_pressed(GntWidget *w, const char *key, GntWidget *view)
 			refresh();
 			exit(0);
 		}
+#endif
 
 	} else if (key[0] == 27) {
 		if (strcmp(key, GNT_KEY_UP) == 0)
