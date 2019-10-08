@@ -647,8 +647,10 @@ void gnt_text_view_scroll(GntTextView *view, int scroll)
 void gnt_text_view_next_line(GntTextView *view)
 {
 	GntTextLine *line = g_new0(GntTextLine, 1);
+	GList *list = view->list;
 
 	view->list = g_list_prepend(g_list_first(view->list), line);
+	view->list = list; // -V519
 
 	gnt_widget_draw(GNT_WIDGET(view));
 }
