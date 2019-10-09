@@ -26,6 +26,8 @@
 #undef G_LOG_DOMAIN
 #define G_LOG_DOMAIN "Gnt"
 
+#define GNT_ESCAPE '\033'
+
 #ifdef __GNUC__
 # ifndef GNT_LOG_DOMAIN
 #  define GNT_LOG_DOMAIN ""

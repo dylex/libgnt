@@ -93,7 +93,7 @@ static void setup_io(void);
 
 static gboolean refresh_screen(void);
 
-static GntWM *wm;
+static GntWM *wm; // -V707
 static GntClipboard *clipboard;
 
 int gnt_need_conversation_to_locale;
@@ -315,7 +315,7 @@ io_invoke(GIOChannel *source, G_GNUC_UNUSED GIOCondition cond,
 		is_escape = TRUE;
 	}
 	if (is_escape) {
-		*k = '\033';
+		*k = GNT_ESCAPE;
 		k++;
 	}
 
@@ -328,7 +328,7 @@ io_invoke(GIOChannel *source, G_GNUC_UNUSED GIOCondition cond,
 	if (ch == 0xE0 || ch == 0xE1) {
 		is_special = TRUE;
 		if (!is_escape) {
-			*k = '\033';
+			*k = GNT_ESCAPE;
 			k++;
 		}
 		*k = ch;
@@ -397,7 +397,7 @@ io_invoke(GIOChannel *source, G_GNUC_UNUSED GIOCondition cond,
 
 	rd += HOLDING_ESCAPE;
 	if (HOLDING_ESCAPE) {
-		keys[0] = '\033';
+		keys[0] = GNT_ESCAPE;
 		g_source_remove(escape_stuff.timer);
 		escape_stuff.timer = 0;
 	}
@@ -413,7 +413,7 @@ io_invoke(GIOChannel *source, G_GNUC_UNUSED GIOCondition cond,
 		char back;
 		int p;
 
-		if (k[0] == '\033' && rd == 1) {
+		if (k[0] == GNT_ESCAPE && rd == 1) {
 			escape_stuff.timer = g_timeout_add(250, escape_timeout, NULL);
 			break;
 		}
@@ -924,24 +924,39 @@ gboolean gnt_is_refugee()
 	        gnt_wm_get_keypress_mode(wm) == GNT_KP_MODE_WAIT_ON_CHILD);
 }
 
+/* to save other's time... this ugly function converts the given string to the
+ * locale if necessary and returns it as a const gchar *.  Since it needs to
+ * return a const gchar * there's a bunch of messing around with a static
+ * variable.  While this works, this makes this non-thread safe and who knows
+ * what else.
+ */
 const char *C_(const char *x)
 {
-	static char *c = NULL;
+	static gchar *c = NULL;
+
+	/* clear the old value we had for cm since it's no longer needed */
+	g_free(c);
+
 	if (gnt_need_conversation_to_locale) {
 		GError *error = NULL;
-		g_free(c);
-		c = g_locale_from_utf8(x, -1, NULL, NULL, &error);
-		if (c == NULL || error) {
-			char *store = c;
-			c = NULL;
-			gnt_warning("Error: %s\n", error ? error->message : "(unknown)");
+		gchar *newc = NULL;
+
+		newc = g_locale_from_utf8(x, -1, NULL, NULL, &error);
+		if(error != NULL) {
+			gnt_warning("Error: %s\n", error->message ? error->message : "(unknown)");
+
 			g_error_free(error);
-			error = NULL;
-			g_free(c);
-			c = store;
+
+			return x;
 		}
-		return c ? c : x;
-	} else
-		return x;
+
+		if(newc != NULL) {
+			c = newc;
+
+			return c;
+		}
+	}
+
+	return x;
 }
 

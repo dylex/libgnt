@@ -946,10 +946,6 @@ gnt_tree_key_pressed(GntWidget *widget, const char *text)
 		return FALSE;
 	}
 
-	if (old != priv->current) {
-		tree_selection_changed(tree, old, priv->current);
-	}
-
 	return TRUE;
 }
 

@@ -1058,7 +1058,7 @@ gnt_entry_class_init(GntEntryClass *klass)
 {
 	GntBindableClass *bindable = GNT_BINDABLE_CLASS(klass);
 	GntWidgetClass *widget_class = GNT_WIDGET_CLASS(klass);
-	char s[3] = {'\033', erasechar(), 0};
+	char s[3] = {GNT_ESCAPE, erasechar(), 0};
 
 	widget_class->clicked = gnt_entry_clicked;
 	widget_class->destroy = gnt_entry_destroy;

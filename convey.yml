@@ -1,7 +1,9 @@
 # vi:et:ts=2 sw=2 sts=2
 environment:
   - GNT_VERSION=latest
-  - DOCS_TAG=libgnt/docs:${GNT_VERSION}
+  - DOCS_REPOSITORY=libgnt/docs
+  - REGISTRY_HOST=docker.io
+  - REPOSITORY=libgnt/builders
 
 tasks:
   import:
@@ -21,10 +23,11 @@ tasks:
     type: convey/clean
     files:
       - build-convey
+      - pvs-studio
 
   build-docs:
     type: docker/run
-    image: libgnt/builders:debian-buster-amd64
+    image: ${REGISTRY_HOST}/${REPOSITORY}:debian-buster-amd64
     script:
       - set -ex
       - cd ${CONVEY_WORKSPACE}
@@ -33,12 +36,20 @@ tasks:
   build-docs-image:
     type: docker/build
     dockerfile: doc/Dockerfile
-    tag: ${DOCS_TAG}
+    tag: ${REGISTRY_HOST}/${DOCS_REPOSITORY}:${GNT_VERSION}
     files:
       - build-convey/doc/html:.
   publish-docs-image:
     type: docker/push
-    image: ${DOCS_TAG}
+    image: ${REGISTRY_HOST}/${DOCS_REPOSITORY}:${GNT_VERSION}
+
+  build-target:
+    type: docker/run
+    image: ${REGISTRY_HOST}/${REPOSITORY}:${TARGET}
+
+  export-target:
+    type: docker/export
+    files: ${TARGET}
 
 plans:
   docs:
@@ -66,4 +77,11 @@ plans:
   clean:
     stages:
       - tasks: clean
+
+  pvs-studio:
+    environment: [TARGET=pvs-studio, PVS_STUDIO_KEY, PVS_STUDIO_USERNAME]
+    stages:
+      - tasks: [import, build-target]
+      - tasks: [export-target]
+        run: always
 
