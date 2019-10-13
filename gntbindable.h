@@ -69,9 +69,6 @@ G_BEGIN_DECLS
 
 G_DECLARE_DERIVABLE_TYPE(GntBindable, gnt_bindable, GNT, BINDABLE, GObject)
 
-/******************/
-/*   Key Remaps   */
-/******************/
 const char * gnt_bindable_remap_keys(GntBindable *bindable, const char *text);
 
 /********************/
