@@ -41,118 +41,125 @@ extern char *gnt_key_cdown;
 extern char *gnt_key_cleft;
 extern char *gnt_key_cright;
 
-#define SAFE(x)   ((cur_term && (x)) ? (x) : "")
+/**
+ * GNT_KEY_SAFE: (skip)
+ */
+#define GNT_KEY_SAFE(x)   ((cur_term && (x)) ? (x) : "")
 
-/* This is needed so that g-ir-scanner does not take GNT_KEY_CTRL_* as
-   constants -- because if it does, the .gir contains the following invalid XML
-   characters, and parsing explodes */
-#define CONSTCH(x) x
+/**
+ * GNT_KEY_CONSTCH: (skip)
+ *
+ * This is needed so that g-ir-scanner does not take GNT_KEY_CTRL_* as
+ * constants -- because if it does, the .gir contains the following invalid XML
+ * characters, and parsing explodes.
+ */
+#define GNT_KEY_CONSTCH(x) x
 
 #ifdef _WIN32
 
 /* XXX: \xe1 is a hacky alias for \x00 key code */
 
-#define GNT_KEY_POPUP CONSTCH("") /* not supported? */
+#define GNT_KEY_POPUP GNT_KEY_CONSTCH("") /* not supported? */
 
-#define GNT_KEY_UP CONSTCH("\033\xe0\x48")
-#define GNT_KEY_DOWN CONSTCH("\033\xe0\x50")
-#define GNT_KEY_LEFT CONSTCH("\033\xe0\x4B")
-#define GNT_KEY_RIGHT CONSTCH("\033\xe0\x4D")
+#define GNT_KEY_UP GNT_KEY_CONSTCH("\033\xe0\x48")
+#define GNT_KEY_DOWN GNT_KEY_CONSTCH("\033\xe0\x50")
+#define GNT_KEY_LEFT GNT_KEY_CONSTCH("\033\xe0\x4B")
+#define GNT_KEY_RIGHT GNT_KEY_CONSTCH("\033\xe0\x4D")
 
-#define GNT_KEY_CTRL_UP CONSTCH("\033\xe0\x8d")
-#define GNT_KEY_CTRL_DOWN CONSTCH("\033\xe0\x91")
-#define GNT_KEY_CTRL_LEFT CONSTCH("\033\xe0\x73")
-#define GNT_KEY_CTRL_RIGHT CONSTCH("\033\xe0\x74")
+#define GNT_KEY_CTRL_UP GNT_KEY_CONSTCH("\033\xe0\x8d")
+#define GNT_KEY_CTRL_DOWN GNT_KEY_CONSTCH("\033\xe0\x91")
+#define GNT_KEY_CTRL_LEFT GNT_KEY_CONSTCH("\033\xe0\x73")
+#define GNT_KEY_CTRL_RIGHT GNT_KEY_CONSTCH("\033\xe0\x74")
 
-#define GNT_KEY_PGUP CONSTCH("\033\xe0\x49")
-#define GNT_KEY_PGDOWN CONSTCH("\033\xe0\x51")
-#define GNT_KEY_HOME CONSTCH("\033\xe0\x47")
-#define GNT_KEY_END CONSTCH("\033\xe0\x4f")
+#define GNT_KEY_PGUP GNT_KEY_CONSTCH("\033\xe0\x49")
+#define GNT_KEY_PGDOWN GNT_KEY_CONSTCH("\033\xe0\x51")
+#define GNT_KEY_HOME GNT_KEY_CONSTCH("\033\xe0\x47")
+#define GNT_KEY_END GNT_KEY_CONSTCH("\033\xe0\x4f")
 
-#define GNT_KEY_ENTER CONSTCH("\x0d")
+#define GNT_KEY_ENTER GNT_KEY_CONSTCH("\x0d")
 
-#define GNT_KEY_BACKSPACE CONSTCH("\x08")
-#define GNT_KEY_DEL CONSTCH("\033\xe0\x53")
-#define GNT_KEY_INS CONSTCH("\033\xe0\x52")
-#define GNT_KEY_BACK_TAB CONSTCH("\033\xe1\x94")
+#define GNT_KEY_BACKSPACE GNT_KEY_CONSTCH("\x08")
+#define GNT_KEY_DEL GNT_KEY_CONSTCH("\033\xe0\x53")
+#define GNT_KEY_INS GNT_KEY_CONSTCH("\033\xe0\x52")
+#define GNT_KEY_BACK_TAB GNT_KEY_CONSTCH("\033\xe1\x94")
 
-#define GNT_KEY_F1 CONSTCH("\033\xe1\x3b")
-#define GNT_KEY_F2 CONSTCH("\033\xe1\x3c")
-#define GNT_KEY_F3 CONSTCH("\033\xe1\x3d")
-#define GNT_KEY_F4 CONSTCH("\033\xe1\x3e")
-#define GNT_KEY_F5 CONSTCH("\033\xe1\x3f")
-#define GNT_KEY_F6 CONSTCH("\033\xe1\x40")
-#define GNT_KEY_F7 CONSTCH("\033\xe1\x41")
-#define GNT_KEY_F8 CONSTCH("\033\xe1\x42")
-#define GNT_KEY_F9 CONSTCH("\033\xe1\x43")
-#define GNT_KEY_F10 CONSTCH("\033\xe1\x44")
-#define GNT_KEY_F11 CONSTCH("\033\xe0\x85")
-#define GNT_KEY_F12 CONSTCH("\033\xe0\x86")
+#define GNT_KEY_F1 GNT_KEY_CONSTCH("\033\xe1\x3b")
+#define GNT_KEY_F2 GNT_KEY_CONSTCH("\033\xe1\x3c")
+#define GNT_KEY_F3 GNT_KEY_CONSTCH("\033\xe1\x3d")
+#define GNT_KEY_F4 GNT_KEY_CONSTCH("\033\xe1\x3e")
+#define GNT_KEY_F5 GNT_KEY_CONSTCH("\033\xe1\x3f")
+#define GNT_KEY_F6 GNT_KEY_CONSTCH("\033\xe1\x40")
+#define GNT_KEY_F7 GNT_KEY_CONSTCH("\033\xe1\x41")
+#define GNT_KEY_F8 GNT_KEY_CONSTCH("\033\xe1\x42")
+#define GNT_KEY_F9 GNT_KEY_CONSTCH("\033\xe1\x43")
+#define GNT_KEY_F10 GNT_KEY_CONSTCH("\033\xe1\x44")
+#define GNT_KEY_F11 GNT_KEY_CONSTCH("\033\xe0\x85")
+#define GNT_KEY_F12 GNT_KEY_CONSTCH("\033\xe0\x86")
 
 #else
 
-#define GNT_KEY_POPUP   SAFE(key_f16)   /* Apparently */
+#define GNT_KEY_POPUP   GNT_KEY_SAFE(key_f16)   /* Apparently */
 
 /* Arrow keys */
-#define GNT_KEY_LEFT   SAFE(key_left)
-#define GNT_KEY_RIGHT  SAFE(key_right)
-#define GNT_KEY_UP     SAFE(key_up)
-#define GNT_KEY_DOWN   SAFE(key_down)
+#define GNT_KEY_LEFT   GNT_KEY_SAFE(key_left)
+#define GNT_KEY_RIGHT  GNT_KEY_SAFE(key_right)
+#define GNT_KEY_UP     GNT_KEY_SAFE(key_up)
+#define GNT_KEY_DOWN   GNT_KEY_SAFE(key_down)
 
-#define GNT_KEY_CTRL_UP     SAFE(gnt_key_cup)
-#define GNT_KEY_CTRL_DOWN   SAFE(gnt_key_cdown)
-#define GNT_KEY_CTRL_RIGHT  SAFE(gnt_key_cright)
-#define GNT_KEY_CTRL_LEFT   SAFE(gnt_key_cleft)
+#define GNT_KEY_CTRL_UP     GNT_KEY_SAFE(gnt_key_cup)
+#define GNT_KEY_CTRL_DOWN   GNT_KEY_SAFE(gnt_key_cdown)
+#define GNT_KEY_CTRL_RIGHT  GNT_KEY_SAFE(gnt_key_cright)
+#define GNT_KEY_CTRL_LEFT   GNT_KEY_SAFE(gnt_key_cleft)
 
-#define GNT_KEY_PGUP   SAFE(key_ppage)
-#define GNT_KEY_PGDOWN SAFE(key_npage)
-#define GNT_KEY_HOME   SAFE(key_home)
-#define GNT_KEY_END    SAFE(key_end)
+#define GNT_KEY_PGUP   GNT_KEY_SAFE(key_ppage)
+#define GNT_KEY_PGDOWN GNT_KEY_SAFE(key_npage)
+#define GNT_KEY_HOME   GNT_KEY_SAFE(key_home)
+#define GNT_KEY_END    GNT_KEY_SAFE(key_end)
 
-#define GNT_KEY_ENTER  SAFE(carriage_return)
+#define GNT_KEY_ENTER  GNT_KEY_SAFE(carriage_return)
 
-#define GNT_KEY_BACKSPACE SAFE(key_backspace)
-#define GNT_KEY_DEL    SAFE(key_dc)
-#define GNT_KEY_INS    SAFE(key_ic)
-#define GNT_KEY_BACK_TAB ((cur_term && back_tab) ? back_tab : SAFE(key_btab))
+#define GNT_KEY_BACKSPACE GNT_KEY_SAFE(key_backspace)
+#define GNT_KEY_DEL    GNT_KEY_SAFE(key_dc)
+#define GNT_KEY_INS    GNT_KEY_SAFE(key_ic)
+#define GNT_KEY_BACK_TAB ((cur_term && back_tab) ? back_tab : GNT_KEY_SAFE(key_btab))
 
-#define GNT_KEY_F1         SAFE(key_f1)
-#define GNT_KEY_F2         SAFE(key_f2)
-#define GNT_KEY_F3         SAFE(key_f3)
-#define GNT_KEY_F4         SAFE(key_f4)
-#define GNT_KEY_F5         SAFE(key_f5)
-#define GNT_KEY_F6         SAFE(key_f6)
-#define GNT_KEY_F7         SAFE(key_f7)
-#define GNT_KEY_F8         SAFE(key_f8)
-#define GNT_KEY_F9         SAFE(key_f9)
-#define GNT_KEY_F10        SAFE(key_f10)
-#define GNT_KEY_F11        SAFE(key_f11)
-#define GNT_KEY_F12        SAFE(key_f12)
+#define GNT_KEY_F1         GNT_KEY_SAFE(key_f1)
+#define GNT_KEY_F2         GNT_KEY_SAFE(key_f2)
+#define GNT_KEY_F3         GNT_KEY_SAFE(key_f3)
+#define GNT_KEY_F4         GNT_KEY_SAFE(key_f4)
+#define GNT_KEY_F5         GNT_KEY_SAFE(key_f5)
+#define GNT_KEY_F6         GNT_KEY_SAFE(key_f6)
+#define GNT_KEY_F7         GNT_KEY_SAFE(key_f7)
+#define GNT_KEY_F8         GNT_KEY_SAFE(key_f8)
+#define GNT_KEY_F9         GNT_KEY_SAFE(key_f9)
+#define GNT_KEY_F10        GNT_KEY_SAFE(key_f10)
+#define GNT_KEY_F11        GNT_KEY_SAFE(key_f11)
+#define GNT_KEY_F12        GNT_KEY_SAFE(key_f12)
 
 #endif
 
-#define GNT_KEY_CTRL_A     CONSTCH("\001")
-#define GNT_KEY_CTRL_B     CONSTCH("\002")
-#define GNT_KEY_CTRL_D     CONSTCH("\004")
-#define GNT_KEY_CTRL_E     CONSTCH("\005")
-#define GNT_KEY_CTRL_F     CONSTCH("\006")
-#define GNT_KEY_CTRL_G     CONSTCH("\007")
-#define GNT_KEY_CTRL_H     CONSTCH("\010")
-#define GNT_KEY_CTRL_I     CONSTCH("\011")
-#define GNT_KEY_CTRL_J     CONSTCH("\012")
-#define GNT_KEY_CTRL_K     CONSTCH("\013")
-#define GNT_KEY_CTRL_L     CONSTCH("\014")
-#define GNT_KEY_CTRL_M     CONSTCH("\012")
-#define GNT_KEY_CTRL_N     CONSTCH("\016")
-#define GNT_KEY_CTRL_O     CONSTCH("\017")
-#define GNT_KEY_CTRL_P     CONSTCH("\020")
-#define GNT_KEY_CTRL_R     CONSTCH("\022")
-#define GNT_KEY_CTRL_T     CONSTCH("\024")
-#define GNT_KEY_CTRL_U     CONSTCH("\025")
-#define GNT_KEY_CTRL_V     CONSTCH("\026")
-#define GNT_KEY_CTRL_W     CONSTCH("\027")
-#define GNT_KEY_CTRL_X     CONSTCH("\030")
-#define GNT_KEY_CTRL_Y     CONSTCH("\031")
+#define GNT_KEY_CTRL_A     GNT_KEY_CONSTCH("\001")
+#define GNT_KEY_CTRL_B     GNT_KEY_CONSTCH("\002")
+#define GNT_KEY_CTRL_D     GNT_KEY_CONSTCH("\004")
+#define GNT_KEY_CTRL_E     GNT_KEY_CONSTCH("\005")
+#define GNT_KEY_CTRL_F     GNT_KEY_CONSTCH("\006")
+#define GNT_KEY_CTRL_G     GNT_KEY_CONSTCH("\007")
+#define GNT_KEY_CTRL_H     GNT_KEY_CONSTCH("\010")
+#define GNT_KEY_CTRL_I     GNT_KEY_CONSTCH("\011")
+#define GNT_KEY_CTRL_J     GNT_KEY_CONSTCH("\012")
+#define GNT_KEY_CTRL_K     GNT_KEY_CONSTCH("\013")
+#define GNT_KEY_CTRL_L     GNT_KEY_CONSTCH("\014")
+#define GNT_KEY_CTRL_M     GNT_KEY_CONSTCH("\012")
+#define GNT_KEY_CTRL_N     GNT_KEY_CONSTCH("\016")
+#define GNT_KEY_CTRL_O     GNT_KEY_CONSTCH("\017")
+#define GNT_KEY_CTRL_P     GNT_KEY_CONSTCH("\020")
+#define GNT_KEY_CTRL_R     GNT_KEY_CONSTCH("\022")
+#define GNT_KEY_CTRL_T     GNT_KEY_CONSTCH("\024")
+#define GNT_KEY_CTRL_U     GNT_KEY_CONSTCH("\025")
+#define GNT_KEY_CTRL_V     GNT_KEY_CONSTCH("\026")
+#define GNT_KEY_CTRL_W     GNT_KEY_CONSTCH("\027")
+#define GNT_KEY_CTRL_X     GNT_KEY_CONSTCH("\030")
+#define GNT_KEY_CTRL_Y     GNT_KEY_CONSTCH("\031")
 
 /**
  * gnt_init_keys:

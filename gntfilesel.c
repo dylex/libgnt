@@ -135,8 +135,8 @@ update_location(GntFileSel *sel)
 	                    : (const char *)gnt_tree_get_selection_data(
 	                              priv->dirsonly ? GNT_TREE(priv->dirs)
 	                                             : GNT_TREE(priv->files));
-	old = g_strdup_printf("%s%s%s", SAFE(priv->current),
-	                      SAFE(priv->current)[1] ? G_DIR_SEPARATOR_S : "",
+	old = g_strdup_printf("%s%s%s", GNT_KEY_SAFE(priv->current),
+	                      GNT_KEY_SAFE(priv->current)[1] ? G_DIR_SEPARATOR_S : "",
 	                      tmp ? tmp : "");
 	gnt_entry_set_text(GNT_ENTRY(priv->location), old);
 	g_free(old);
