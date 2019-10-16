@@ -270,4 +270,6 @@ endif
 
 subdir('wms')
 subdir('test')
-subdir('doc')
+if get_option('doc')
+	subdir('doc')
+endif
