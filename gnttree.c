@@ -903,7 +903,6 @@ gnt_tree_key_pressed(GntWidget *widget, const char *text)
 {
 	GntTree *tree = GNT_TREE(widget);
 	GntTreePrivate *priv = gnt_tree_get_instance_private(tree);
-	GntTreeRow *old = priv->current;
 
 	if (text[0] == '\r' || text[0] == '\n') {
 		end_search(tree);

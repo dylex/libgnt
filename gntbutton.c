@@ -129,7 +129,6 @@ gnt_button_class_init(GntButtonClass *klass)
 	GntBindableClass *bindable = GNT_BINDABLE_CLASS(klass);
 	GntWidgetClass *widget_class = GNT_WIDGET_CLASS(klass);
 
-	widget_class = GNT_WIDGET_CLASS(klass);
 	widget_class->draw = gnt_button_draw;
 	widget_class->map = gnt_button_map;
 	widget_class->size_request = gnt_button_size_request;
