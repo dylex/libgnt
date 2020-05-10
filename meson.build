@@ -27,7 +27,7 @@
 
 project('libgnt', 'c',
     version : '3.0.0-devel',
-    meson_version : '>=0.37.0')
+    meson_version : '>=0.50.0')
 gnt_soversion = 1
 
 parts = meson.project_version().split('-')
@@ -215,12 +215,12 @@ configure_file(output : 'gntconfig.h',
 configure_file(input : 'gntversion.h.in', output : 'gntversion.h',
     configuration : gnt_config,
     install : true,
-    install_dir : join_paths(get_option('includedir'), 'gnt3'))
+    install_dir : get_option('includedir') / 'gnt3')
 # This is temporary until we can hide GObject internals:
 gnt_h = configure_file(input : 'gnt.h.in', output : 'gnt.h',
     configuration : gnt_config,
     install : true,
-    install_dir : join_paths(get_option('includedir'), 'gnt3'))
+    install_dir : get_option('includedir') / 'gnt3')
 
 gmodule = dependency('gmodule-2.0')
 
@@ -249,13 +249,12 @@ libgnt_dep = declare_dependency(
     dependencies : [ncurses, glib])
 
 pkgconfig.generate(
+    libgnt,
     name : 'LibGNT',
     description : 'Glib Ncurses Toolkit is a collection of curses-widgets.',
-    version : meson.project_version(),
     filebase : 'gnt3',
     subdirs : 'gnt3',
-    libraries : [libgnt],
-    requires : ['glib-2.0'],
+    requires : [glib],
     variables : ['plugindir = ${libdir}/gnt3'],
     )
 
