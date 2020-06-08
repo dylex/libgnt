@@ -32,7 +32,7 @@
 #define _GNU_SOURCE
 #endif
 
-#if !defined _XOPEN_SOURCE_EXTENDED && (defined(__APPLE__) || defined(__unix__)) && !defined(__FreeBSD__)
+#if !defined _XOPEN_SOURCE_EXTENDED && (defined(__APPLE__) || defined(__unix__))
 #define _XOPEN_SOURCE_EXTENDED
 #endif
 
