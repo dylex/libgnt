@@ -55,6 +55,7 @@ and so the tag and the version will remain in sync.
 
 Tagged   | Released   | Recorded
 -------- | ---------- | ----------
+v2.14.0  | 2.14.0     | 2.14.0
 v2.13.0  | 2.8.10     | 2.8.0devel
 v2.12.0  | 2.8.10     | 2.8.0devel
 v2.11.0  | 2.8.10     | 2.8.0devel
