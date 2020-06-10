@@ -28,6 +28,7 @@ configure_file(
 
 gnome.gtkdoc(DOC_MODULE,
     main_xml : DOC_MODULE + '-docs.xml',
+    namespace : 'gnt',
     src_dir : libgnt_inc,
     dependencies : libgnt_dep,
     install : true,
