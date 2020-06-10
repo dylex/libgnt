@@ -3,8 +3,10 @@ GNT: The GLib Ncurses Toolkit
 
 Please see notes about versioning in README.md.
 
-version 2.14.0 (????/??/??):
-	...
+version 2.14.0 (2020/06/10):
+	* Split libgnt out of the Pidgin repository. (Elliott Sales de Andrade)
+	* Switched build system to Meson. (Elliott Sales de Andrade)
+	* Fixed a build issue on FreeBSD. (Steve Wills)
 
 version 2.13.0 (2018/03/08):
 	* Fixed build against curses 6.0 with opaque structs set. (#16764 dimstar)
