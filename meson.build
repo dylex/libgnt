@@ -72,6 +72,7 @@ gnt_config.set('NO_LIBXML', not libxml.found())
 ncurses_available = true
 ncurses_inc = []
 ncurses_libs = [
+	compiler.find_library('tinfow', required : false),
 	compiler.find_library('ncursesw', required : false),
 	compiler.find_library('panelw', required : false)
 ]
@@ -113,6 +114,7 @@ if ncurses_available
 else
 	# ncursesw was not found. Look for plain old ncurses
 	ncurses_libs = [
+		compiler.find_library('tinfo', required : false),
 		compiler.find_library('ncurses', required : false),
 		compiler.find_library('panel', required : false)
 	]
