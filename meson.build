@@ -71,10 +71,11 @@ gnt_config.set('NO_LIBXML', not libxml.found())
 #######################################################################
 ncurses_available = true
 ncurses_inc = []
+# The order of this list is important to the condition that follows.
 ncurses_libs = [
-	compiler.find_library('tinfow', required : false),
 	compiler.find_library('ncursesw', required : false),
 	compiler.find_library('panelw', required : false)
+	compiler.find_library('tinfow', required : false),
 ]
 if not ncurses_libs[0].found() or not ncurses_libs[1].found()
 	ncurses_available = false
@@ -113,10 +114,11 @@ if ncurses_available
 	endif
 else
 	# ncursesw was not found. Look for plain old ncurses
+	# The order of this list is important to the condition that follows.
 	ncurses_libs = [
-		compiler.find_library('tinfo', required : false),
 		compiler.find_library('ncurses', required : false),
 		compiler.find_library('panel', required : false)
+		compiler.find_library('tinfo', required : false),
 	]
 	ncurses_available = ncurses_libs[0].found() and ncurses_libs[1].found()
 	gnt_config.set('NO_WIDECHAR', true)
