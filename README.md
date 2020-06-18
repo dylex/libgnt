@@ -1,6 +1,9 @@
 GNT: The GLib Ncurses Toolkit
 =============================
 
+[ ![Download](https://api.bintray.com/packages/pidgin/releases/libgnt/images/download.svg) ](https://bintray.com/pidgin/releases/libgnt/_latestVersion)
+[ ![Issues](https://img.shields.io/badge/Issues-YouTrack-ee3b8b.svg) ](https://issues.imfreedom.org/issues/LIBGNT)
+
 GNT is an ncurses toolkit for creating text-mode graphical user interfaces in a
 fast and easy way. It is based on [GLib](https://wiki.gnome.org/Projects/GLib)
 and [ncurses](https://www.gnu.org/software/ncurses/ncurses.html).
