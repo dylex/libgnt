@@ -1,4 +1,5 @@
-REVIEWBOARD_URL = 'https://reviews.imfreedom.org/'
-REPOSITORY = 'libgnt/libgnt'
+REVIEWBOARD_URL = "https://reviews.imfreedom.org/"
+REPOSITORY = "libgnt/libgnt"
 REPOSITORY_TYPE = "mercurial"
-
+LAND_DEST_BRANCH = "release-2.x.y"
+LAND_PUSH = False
