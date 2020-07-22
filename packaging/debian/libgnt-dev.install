@@ -1,0 +1,3 @@
+/usr/include/gnt/*
+/usr/lib/*/libgnt.so
+/usr/lib/*/pkgconfig/gnt.pc

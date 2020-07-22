@@ -1,0 +1,60 @@
+libgnt
+
+This file is intended to be a comprehensive list of contributors to
+this project.  If you have contributed to this project then you deserve
+to be on this list.  Contact us (see: AUTHORS) and we'll add you.
+
+Many open source projects list contributor names at the top of each
+source file containing their contribution.  However, we've found
+that it is difficult to keep this list accurate, especially when old
+code is removed or existing code is moved to a different file.  So
+instead we chose to list a generic message at the top of each source
+file that points here.
+
+If concerns are raised as to the copyright holder of a particular
+piece of code, then that code should be traced through our version
+control system to see from where it came and who has modified it.
+
+Copyright (C) 2006-2020 by the following:
+
+Ankit Vani
+Brad Smith
+Christopher O'Brien
+convert-repo
+Daniel Atallah
+Daniel Kamil Kozar
+dx
+Ed Catmur
+Elliott Sales de Andrade
+Eric Polino
+Ethan Blanton
+Evan Schoenberg
+Gabriel Schulhof
+Gary Kramlich
+James Geboski
+Jochen Kemnade
+John Bailey
+Jorge Villaseñor
+Ka-Hing Cheung
+kdex
+Lars Wendler
+Luke Schierer
+Marcus Lundblad
+Mark Doliner
+Mark Schneider
+Michael McConville
+Michael Ruprecht
+Mike Ruprecht
+Olaf Hering
+Paul Aurich
+Petteri Pitkänen
+Richard Laager
+Richard Nelson
+Sadrul Habib Chowdhury
+Saleem Abdulrasool
+Sean Egan
+Shawn Napora
+Stu Tomlinson
+Tomasz Mon
+Tomasz Wasilczyk
+Will Thompson

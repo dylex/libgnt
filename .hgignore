@@ -1,3 +1,9 @@
 syntax: regexp
 ^build(.+)?\/
-
+^obj-.+\/
+packaging\/debian\/.+\.substvars$
+packaging\/debian\/.debhelper\/
+packaging\/debian\/debhelper-build-stamp$
+packaging\/debian\/files$
+packaging\/debian\/libgnt.+\/
+packaging\/debian\/tmp\/
