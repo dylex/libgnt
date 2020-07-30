@@ -191,6 +191,7 @@ const gchar *gnt_text_view_get_text(GntTextView *view);
  */
 void gnt_text_view_next_line(GntTextView *view);
 
+#ifndef GNT_DISABLE_DEPRECATED
 /**
  * gnt_text_format_flag_to_chtype:
  * @flags:  The GNT text format.
@@ -198,8 +199,11 @@ void gnt_text_view_next_line(GntTextView *view);
  * Convert GNT-text formats to ncurses-text attributes.
  *
  * Returns:  Nucrses text attribute.
+ *
+ * Deprecated: 2.14.1: This is an internal implementation detail.
  */
 chtype gnt_text_format_flag_to_chtype(GntTextFormatFlags flags);
+#endif
 
 /**
  * gnt_text_view_clear:
