@@ -1,0 +1,69 @@
+# vi:et:ts=2 sw=2 sts=2
+environment:
+  - GNT_VERSION=next
+  - DOCS_TAG=libgnt/docs:${GNT_VERSION}
+
+tasks:
+  import:
+    type: docker/import
+    files: .:.
+
+  login:
+    type: docker/login
+    username: ${DOCKERHUB_USERNAME}
+    password: ${DOCKERHUB_PASSWORD}
+    server: docker.io
+  logout:
+    type: docker/logout
+    server: docker.io
+
+  clean:
+    type: convey/clean
+    files:
+      - build-convey
+
+  build-docs:
+    type: docker/run
+    image: libgnt/builders:debian-buster-amd64
+    script:
+      - set -ex
+      - cd ${CONVEY_WORKSPACE}
+      - meson build-convey
+      - ninja -C build-convey libgnt-doc
+  build-docs-image:
+    type: docker/build
+    dockerfile: doc/Dockerfile
+    tag: ${DOCS_TAG}
+    files:
+      - build-convey/doc/html:.
+  publish-docs-image:
+    type: docker/push
+    image: ${DOCS_TAG}
+
+plans:
+  docs:
+    stages:
+      - tasks:
+          - import
+          - build-docs
+          - build-docs-image
+  ci-docs:
+    stages:
+      - name: prep
+        tasks:
+          - login
+      - name: build
+        tasks:
+          - import
+          - build-docs
+          - build-docs-image
+          - publish-docs-image
+      - name: final
+        run: always
+        tasks:
+          - logout
+
+  clean:
+    stages:
+      - tasks: clean
+

@@ -1,4 +1,4 @@
-/**
+/*
  * GNT - The GLib Ncurses Toolkit
  *
  * GNT is the legal property of its developers, whose names are too numerous
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02111-1301  USA
  */
 
-#include "config.h"
+#include "gntconfig.h"
 
 #include "gntinternal.h"
 #undef GNT_LOG_DOMAIN
@@ -41,7 +41,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "libpurple/util.h"
 #ifndef NO_LIBXML
 #include <libxml/parser.h>
 #include <libxml/tree.h>
@@ -187,52 +186,9 @@ gboolean gnt_boolean_handled_accumulator(GSignalInvocationHint *ihint,
 	return continue_emission;
 }
 
-typedef struct {
-	GHashTable *hash;
-	GntTree *tree;
-} BindingView;
-
-static void
-add_binding(gpointer key, gpointer value, gpointer data)
-{
-	BindingView *bv = data;
-	GntBindableActionParam *act = value;
-	const char *name = g_hash_table_lookup(bv->hash, act->action);
-	if (name && *name) {
-		const char *k = gnt_key_lookup(key);
-		if (!k)
-			k = key;
-		gnt_tree_add_row_after(bv->tree, (gpointer)k,
-				gnt_tree_create_row(bv->tree, k, name), NULL, NULL);
-	}
-}
-
-static void
-add_action(gpointer key, gpointer value, gpointer data)
-{
-	BindingView *bv = data;
-	g_hash_table_insert(bv->hash, value, key);
-}
-
 GntWidget *gnt_widget_bindings_view(GntWidget *widget)
 {
-	GntBindable *bind = GNT_BINDABLE(widget);
-	GntWidget *tree = gnt_tree_new_with_columns(2);
-	GntBindableClass *klass = GNT_BINDABLE_CLASS(GNT_BINDABLE_GET_CLASS(bind));
-	GHashTable *hash = g_hash_table_new(g_direct_hash, g_direct_equal);
-	BindingView bv = {hash, GNT_TREE(tree)};
-
-	gnt_tree_set_compare_func(bv.tree, (GCompareFunc)g_utf8_collate);
-	g_hash_table_foreach(klass->actions, add_action, &bv);
-	g_hash_table_foreach(klass->bindings, add_binding, &bv);
-	if (GNT_TREE(tree)->list == NULL) {
-		gnt_widget_destroy(tree);
-		tree = NULL;
-	} else
-		gnt_tree_adjust_columns(bv.tree);
-	g_hash_table_destroy(hash);
-
-	return tree;
+	return GNT_WIDGET(gnt_bindable_bindings_view(GNT_BINDABLE(widget)));
 }
 
 #ifndef NO_LIBXML
@@ -326,10 +282,7 @@ gnt_widget_from_xmlnode(xmlNode *node, GntWidget **data[], int max)
 	if (prop) {
 		int val;
 		if (sscanf(prop, "%d", &val) == 1) {
-			if (val)
-				GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_NO_BORDER);
-			else
-				GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_BORDER);
+			gnt_widget_set_has_border(widget, !!val);
 		}
 		xmlFree(prop);
 	}
@@ -338,10 +291,7 @@ gnt_widget_from_xmlnode(xmlNode *node, GntWidget **data[], int max)
 	if (prop) {
 		int val;
 		if (sscanf(prop, "%d", &val) == 1) {
-			if (val)
-				GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_NO_BORDER);
-			else
-				GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_BORDER);
+			gnt_widget_set_has_border(widget, !!val);
 		}
 		xmlFree(prop);
 	}
@@ -380,6 +330,158 @@ void gnt_util_parse_widgets(const char *string, int num, ...)
 }
 
 #ifndef NO_LIBXML
+static const char *
+purple_markup_unescape_entity(const char *text, int *length)
+{
+	const char *pln;
+	int len;
+
+	if (!text || *text != '&')
+		return NULL;
+
+#define IS_ENTITY(s)  (!g_ascii_strncasecmp(text, s, (len = sizeof(s) - 1)))
+
+	if(IS_ENTITY("&amp;"))
+		pln = "&";
+	else if(IS_ENTITY("&lt;"))
+		pln = "<";
+	else if(IS_ENTITY("&gt;"))
+		pln = ">";
+	else if(IS_ENTITY("&nbsp;"))
+		pln = " ";
+	else if(IS_ENTITY("&copy;"))
+		pln = "\302\251";      /* or use g_unichar_to_utf8(0xa9); */
+	else if(IS_ENTITY("&quot;"))
+		pln = "\"";
+	else if(IS_ENTITY("&reg;"))
+		pln = "\302\256";      /* or use g_unichar_to_utf8(0xae); */
+	else if(IS_ENTITY("&apos;"))
+		pln = "\'";
+	else if(text[1] == '#' && (g_ascii_isxdigit(text[2]) || text[2] == 'x')) {
+		static char buf[7];
+		const char *start = text + 2;
+		char *end;
+		guint64 pound;
+		int base = 10;
+		int buflen;
+
+		if (*start == 'x') {
+			base = 16;
+			start++;
+		}
+
+		pound = g_ascii_strtoull(start, &end, base);
+		if (pound == 0 || pound > INT_MAX || *end != ';') {
+			return NULL;
+		}
+
+		len = (end - text) + 1;
+
+		buflen = g_unichar_to_utf8((gunichar)pound, buf);
+		buf[buflen] = '\0';
+		pln = buf;
+	}
+	else
+		return NULL;
+
+	if (length)
+		*length = len;
+	return pln;
+}
+
+static char *purple_unescape_html(const char *html)
+{
+	GString *ret;
+	const char *c = html;
+
+	if (html == NULL)
+		return NULL;
+
+	ret = g_string_new("");
+	while (*c) {
+		int len;
+		const char *ent;
+
+		if ((ent = purple_markup_unescape_entity(c, &len)) != NULL) {
+			g_string_append(ret, ent);
+			c += len;
+		} else if (!strncmp(c, "<br>", 4)) {
+			g_string_append_c(ret, '\n');
+			c += 4;
+		} else {
+			g_string_append_c(ret, *c);
+			c++;
+		}
+	}
+
+	return g_string_free(ret, FALSE);
+}
+
+static char *
+purple_markup_get_css_property(const gchar *style,
+				const gchar *opt)
+{
+	const gchar *css_str = style;
+	const gchar *css_value_start;
+	const gchar *css_value_end;
+	gchar *tmp;
+	gchar *ret;
+
+	g_return_val_if_fail(opt != NULL, NULL);
+
+	if (!css_str)
+		return NULL;
+
+	/* find the CSS property */
+	while (1)
+	{
+		/* skip whitespace characters */
+		while (*css_str && g_ascii_isspace(*css_str))
+			css_str++;
+		if (!g_ascii_isalpha(*css_str))
+			return NULL;
+		if (g_ascii_strncasecmp(css_str, opt, strlen(opt)))
+		{
+			/* go to next css property positioned after the next ';' */
+			while (*css_str && *css_str != '"' && *css_str != ';')
+				css_str++;
+			if(*css_str != ';')
+				return NULL;
+			css_str++;
+		}
+		else
+			break;
+	}
+
+	/* find the CSS value position in the string */
+	css_str += strlen(opt);
+	while (*css_str && g_ascii_isspace(*css_str))
+		css_str++;
+	if (*css_str != ':')
+		return NULL;
+	css_str++;
+	while (*css_str && g_ascii_isspace(*css_str))
+		css_str++;
+	if (*css_str == '\0' || *css_str == '"' || *css_str == ';')
+		return NULL;
+
+	/* mark the CSS value */
+	css_value_start = css_str;
+	while (*css_str && *css_str != '"' && *css_str != ';')
+		css_str++;
+	css_value_end = css_str - 1;
+
+	/* Removes trailing whitespace */
+	while (css_value_end > css_value_start && g_ascii_isspace(*css_value_end))
+		css_value_end--;
+
+	tmp = g_strndup(css_value_start, css_value_end - css_value_start + 1);
+	ret = purple_unescape_html(tmp);
+	g_free(tmp);
+
+	return ret;
+}
+
 static void
 util_parse_html_to_tv(xmlNode *node, GntTextView *tv, GntTextFormatFlags flag)
 {

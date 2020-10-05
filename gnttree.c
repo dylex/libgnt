@@ -1,4 +1,4 @@
-/**
+/*
  * GNT - The GLib Ncurses Toolkit
  *
  * GNT is the legal property of its developers, whose names are too numerous
@@ -109,8 +109,9 @@ readjust_columns(GntTree *tree)
 	int width;
 #define WIDTH(i) (tree->columns[i].width_ratio ? tree->columns[i].width_ratio : tree->columns[i].width)
 	gnt_widget_get_size(GNT_WIDGET(tree), &width, NULL);
-	if (!GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(tree), GNT_WIDGET_NO_BORDER))
+	if (gnt_widget_get_has_border(GNT_WIDGET(tree))) {
 		width -= 2;
+	}
 	width -= 1;  /* Exclude the scrollbar from the calculation */
 	for (i = 0, total = 0; i < tree->ncol ; i++) {
 		if (tree->columns[i].flags & GNT_TREE_COLUMN_INVISIBLE)
@@ -423,13 +424,10 @@ redraw_tree(GntTree *tree)
 	int rows, scrcol;
 	int current = 0;
 
-	if (!GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(tree), GNT_WIDGET_MAPPED))
+	if (!gnt_widget_get_mapped(GNT_WIDGET(tree)))
 		return;
 
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER))
-		pos = 0;
-	else
-		pos = 1;
+	pos = gnt_widget_get_has_border(widget) ? 1 : 0;
 
 	if (tree->top == NULL)
 		tree->top = tree->root;
@@ -618,7 +616,9 @@ redraw_tree(GntTree *tree)
 	}
 	wmove(widget->window, current, pos);
 
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	gnt_widget_queue_update(widget);
+G_GNUC_END_IGNORE_DEPRECATIONS
 }
 
 static void
@@ -640,7 +640,7 @@ gnt_tree_size_request(GntWidget *widget)
 	{
 		GntTree *tree = GNT_TREE(widget);
 		int i, width = 0;
-		width = 1 + 2 * (!GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(tree), GNT_WIDGET_NO_BORDER));
+		width = gnt_widget_get_has_border(GNT_WIDGET(tree)) ? 3 : 1;
 		for (i = 0; i < tree->ncol; i++)
 			if (!COLUMN_INVISIBLE(tree, i)) {
 				width = width + tree->columns[i].width;
@@ -764,8 +764,10 @@ action_page_up(GntBindable *bind, GList *null)
 	if (tree->top != tree->root)
 	{
 		int dist = get_distance(tree->top, tree->current);
-		row = get_prev_n(tree->top, widget->priv.height - 1 -
-			tree->show_title * 2 - 2 * (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER) == 0));
+		row = get_prev_n(
+		        tree->top,
+		        widget->priv.height - 1 - tree->show_title * 2 -
+		                (gnt_widget_get_has_border(widget) ? 2 : 0));
 		if (row == NULL)
 			row = tree->root;
 		tree->top = row;
@@ -790,7 +792,7 @@ end_search(GntTree *tree)
 		g_string_free(tree->priv->search, TRUE);
 		tree->priv->search = NULL;
 		tree->priv->search_timeout = 0;
-		GNT_WIDGET_UNSET_FLAGS(GNT_WIDGET(tree), GNT_WIDGET_DISABLE_ACTIONS);
+		gnt_widget_set_disable_actions(GNT_WIDGET(tree), FALSE);
 	}
 }
 
@@ -893,9 +895,7 @@ gnt_tree_clicked(GntWidget *widget, GntMouseEvent event, int x, int y)
 	} else if (event == GNT_LEFT_MOUSE_DOWN) {
 		GntTreeRow *row;
 		GntTree *tree = GNT_TREE(widget);
-		int pos = 1;
-		if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER))
-			pos = 0;
+		int pos = gnt_widget_get_has_border(widget) ? 1 : 0;
 		if (tree->show_title)
 			pos += 2;
 		pos = y - widget->priv.y - pos;
@@ -939,7 +939,7 @@ start_search(GntBindable *bindable, GList *list)
 	GntTree *tree = GNT_TREE(bindable);
 	if (tree->priv->search)
 		return FALSE;
-	GNT_WIDGET_SET_FLAGS(GNT_WIDGET(tree), GNT_WIDGET_DISABLE_ACTIONS);
+	gnt_widget_set_disable_actions(GNT_WIDGET(tree), TRUE);
 	tree->priv->search = g_string_new(NULL);
 	tree->priv->search_timeout = g_timeout_add_seconds(SEARCH_TIMEOUT_S, search_timeout, tree);
 	return TRUE;
@@ -951,7 +951,7 @@ end_search_action(GntBindable *bindable, GList *list)
 	GntTree *tree = GNT_TREE(bindable);
 	if (tree->priv->search == NULL)
 		return FALSE;
-	GNT_WIDGET_UNSET_FLAGS(GNT_WIDGET(tree), GNT_WIDGET_DISABLE_ACTIONS);
+	gnt_widget_set_disable_actions(GNT_WIDGET(tree), FALSE);
 	end_search(tree);
 	redraw_tree(tree);
 	return TRUE;
@@ -1131,8 +1131,10 @@ gnt_tree_init(GTypeInstance *instance, gpointer class)
 	GntTree *tree = GNT_TREE(widget);
 	tree->show_separator = TRUE;
 	tree->priv = g_new0(GntTreePriv, 1);
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_GROW_X | GNT_WIDGET_GROW_Y |
-			GNT_WIDGET_CAN_TAKE_FOCUS | GNT_WIDGET_NO_SHADOW);
+
+	gnt_widget_set_grow_x(widget, TRUE);
+	gnt_widget_set_grow_y(widget, TRUE);
+	gnt_widget_set_has_shadow(widget, FALSE);
 	gnt_widget_set_take_focus(widget, TRUE);
 	widget->priv.minw = 4;
 	widget->priv.minh = 1;
@@ -1201,16 +1203,18 @@ void gnt_tree_set_visible_rows(GntTree *tree, int rows)
 {
 	GntWidget *widget = GNT_WIDGET(tree);
 	widget->priv.height = rows;
-	if (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER))
+	if (gnt_widget_get_has_border(widget)) {
 		widget->priv.height += 2;
+	}
 }
 
 int gnt_tree_get_visible_rows(GntTree *tree)
 {
 	GntWidget *widget = GNT_WIDGET(tree);
 	int ret = widget->priv.height;
-	if (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER))
+	if (gnt_widget_get_has_border(widget)) {
 		ret -= 2;
+	}
 	return ret;
 }
 
@@ -1555,7 +1559,7 @@ void gnt_tree_remove_all(GntTree *tree)
 int gnt_tree_get_selection_visible_line(GntTree *tree)
 {
 	return get_distance(tree->top, tree->current) +
-			!!(GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(tree), GNT_WIDGET_NO_BORDER));
+	       !gnt_widget_get_has_border(GNT_WIDGET(tree));
 }
 
 void gnt_tree_change_text(GntTree *tree, gpointer key, int colno, const char *text)
@@ -1576,9 +1580,11 @@ void gnt_tree_change_text(GntTree *tree, gpointer key, int colno, const char *te
 			col->text = g_strdup(text ? text : "");
 		}
 
-		if (GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(tree), GNT_WIDGET_MAPPED) &&
-			get_distance(tree->top, row) >= 0 && get_distance(row, tree->bottom) >= 0)
+		if (gnt_widget_get_mapped(GNT_WIDGET(tree)) &&
+		    get_distance(tree->top, row) >= 0 &&
+		    get_distance(row, tree->bottom) >= 0) {
 			redraw_tree(tree);
+		}
 	}
 }
 
@@ -1824,7 +1830,7 @@ void gnt_tree_adjust_columns(GntTree *tree)
 		row = get_next(row);
 	}
 
-	twidth = 1 + 2 * (!GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(tree), GNT_WIDGET_NO_BORDER));
+	twidth = gnt_widget_get_has_border(GNT_WIDGET(tree)) ? 3 : 1;
 	for (i = 0; i < tree->ncol; i++) {
 		if (tree->columns[i].flags & GNT_TREE_COLUMN_FIXED_SIZE)
 			widths[i] = tree->columns[i].width;
@@ -1872,7 +1878,7 @@ void gnt_tree_set_column_visible(GntTree *tree, int col, gboolean vis)
 					break;
 			}
 	}
-	if (GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(tree), GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(GNT_WIDGET(tree)))
 		readjust_columns(tree);
 }
 

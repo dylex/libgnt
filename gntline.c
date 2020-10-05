@@ -1,4 +1,4 @@
-/**
+/*
  * GNT - The GLib Ncurses Toolkit
  *
  * GNT is the legal property of its developers, whose names are too numerous
@@ -80,9 +80,9 @@ gnt_line_set_property(GObject *obj, guint prop_id, const GValue *value,
 		case PROP_VERTICAL:
 			line->vertical = g_value_get_boolean(value);
 			if (line->vertical) {
-				GNT_WIDGET_SET_FLAGS(line, GNT_WIDGET_GROW_Y);
+				gnt_widget_set_grow_y(GNT_WIDGET(line), TRUE);
 			} else {
-				GNT_WIDGET_SET_FLAGS(line, GNT_WIDGET_GROW_X);
+				gnt_widget_set_grow_x(GNT_WIDGET(line), TRUE);
 			}
 			break;
 		default:
@@ -129,7 +129,8 @@ static void
 gnt_line_init(GTypeInstance *instance, gpointer class)
 {
 	GntWidget *widget = GNT_WIDGET(instance);
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_SHADOW | GNT_WIDGET_NO_BORDER);
+	gnt_widget_set_has_shadow(widget, FALSE);
+	gnt_widget_set_has_border(widget, FALSE);
 	widget->priv.minw = 1;
 	widget->priv.minh = 1;
 	GNTDEBUG;

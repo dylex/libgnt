@@ -60,7 +60,8 @@ int main()
 	gnt_tree_add_row_after(GNT_TREE(tree), "e", gnt_tree_create_row(GNT_TREE(tree), "e"), "a", NULL);
 	gnt_tree_add_choice(GNT_TREE(tree), "b", gnt_tree_create_row(GNT_TREE(tree), "b"), "d", NULL);
 
-	GNT_WIDGET_UNSET_FLAGS(hbox, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW);
+	gnt_widget_set_has_border(hbox, TRUE);
+	gnt_widget_set_has_shadow(hbox, TRUE);
 	gnt_box_set_title(GNT_BOX(hbox), "\u4e0a\u6d77\u6700\u4f4e\u6708\u5de5 \u4e0a\u6d77\u6700\u4f4e\u6708\u5de5 ……\u4e0a\u6d77\u6700\u4f4e\u6708\u5de5 …");
 
 	g_signal_connect(G_OBJECT(tree), "toggled", G_CALLBACK(toggled), NULL);

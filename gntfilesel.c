@@ -1,4 +1,4 @@
-/**
+/*
  * GNT - The GLib Ncurses Toolkit
  *
  * GNT is the legal property of its developers, whose names are too numerous
@@ -44,6 +44,7 @@
 enum
 {
 	SIG_FILE_SELECTED,
+	SIG_CANCELLED,
 	SIGS
 };
 
@@ -53,6 +54,7 @@ static void (*orig_map)(GntWidget *widget);
 static void (*orig_size_request)(GntWidget *widget);
 
 static void select_activated_cb(GntWidget *button, GntFileSel *sel);
+static void cancel_activated_cb(GntWidget *button, GntFileSel *sel);
 
 static void
 gnt_file_sel_destroy(GntWidget *widget)
@@ -65,106 +67,6 @@ gnt_file_sel_destroy(GntWidget *widget)
 		g_list_free(sel->tags);
 	}
 }
-
-#if !GLIB_CHECK_VERSION(2,8,0)
-/* ripped from glib/gfileutils.c */
-static gchar *
-g_build_path_va (const gchar  *separator,
-		gchar       **str_array)
-{
-	GString *result;
-	gint separator_len = strlen (separator);
-	gboolean is_first = TRUE;
-	gboolean have_leading = FALSE;
-	const gchar *single_element = NULL;
-	const gchar *next_element;
-	const gchar *last_trailing = NULL;
-	gint i = 0;
-
-	result = g_string_new (NULL);
-
-	next_element = str_array[i++];
-
-	while (TRUE) {
-		const gchar *element;
-		const gchar *start;
-		const gchar *end;
-
-		if (next_element) {
-			element = next_element;
-			next_element = str_array[i++];
-		} else
-			break;
-
-		/* Ignore empty elements */
-		if (!*element)
-			continue;
-
-		start = element;
-
-		if (separator_len) {
-			while (start &&
-					strncmp (start, separator, separator_len) == 0)
-				start += separator_len;
-		}
-
-		end = start + strlen (start);
-
-		if (separator_len) {
-			while (end >= start + separator_len &&
-					strncmp (end - separator_len, separator, separator_len) == 0)
-				end -= separator_len;
-
-			last_trailing = end;
-			while (last_trailing >= element + separator_len &&
-					strncmp (last_trailing - separator_len, separator, separator_len) == 0)
-				last_trailing -= separator_len;
-
-			if (!have_leading) {
-				/* If the leading and trailing separator strings are in the
-				 * same element and overlap, the result is exactly that element
-				 */
-				if (last_trailing <= start)
-					single_element = element;
-
-				g_string_append_len (result, element, start - element);
-				have_leading = TRUE;
-			} else
-				single_element = NULL;
-		}
-
-		if (end == start)
-			continue;
-
-		if (!is_first)
-			g_string_append (result, separator);
-
-		g_string_append_len (result, start, end - start);
-		is_first = FALSE;
-	}
-
-	if (single_element) {
-		g_string_free (result, TRUE);
-		return g_strdup (single_element);
-	} else {
-		if (last_trailing)
-			g_string_append (result, last_trailing);
-
-		return g_string_free (result, FALSE);
-	}
-}
-
-static gchar *
-g_build_pathv (const gchar  *separator,
-		gchar       **args)
-{
-	if (!args)
-		return NULL;
-
-	return g_build_path_va (separator, args);
-}
-
-#endif
 
 static char *
 process_path(const char *path)
@@ -301,8 +203,9 @@ location_changed(GntFileSel *sel, GError **err)
 		gnt_tree_remove_all(GNT_TREE(sel->files));
 	gnt_entry_set_text(GNT_ENTRY(sel->location), NULL);
 	if (sel->current == NULL) {
-		if (GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(sel), GNT_WIDGET_MAPPED))
+		if (gnt_widget_get_mapped(GNT_WIDGET(sel))) {
 			gnt_widget_draw(GNT_WIDGET(sel));
+		}
 		return TRUE;
 	}
 
@@ -342,8 +245,9 @@ location_changed(GntFileSel *sel, GError **err)
 	}
 	g_list_foreach(files, (GFunc)gnt_file_free, NULL);
 	g_list_free(files);
-	if (GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(sel), GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(GNT_WIDGET(sel))) {
 		gnt_widget_draw(GNT_WIDGET(sel));
+	}
 	return TRUE;
 }
 
@@ -447,7 +351,7 @@ success:
 static void
 file_sel_changed(GntWidget *widget, gpointer old, gpointer current, GntFileSel *sel)
 {
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_HAS_FOCUS)) {
+	if (gnt_widget_get_has_focus(widget)) {
 		g_free(sel->suggest);
 		sel->suggest = NULL;
 		update_location(sel);
@@ -597,6 +501,17 @@ gnt_file_sel_class_init(GntFileSelClass *klass)
 	orig_size_request = kl->size_request;
 	kl->size_request = gnt_file_sel_size_request;
 
+	/**
+	 * GntFileSel::file-selected:
+	 * @widget: The file selection window that received the signal
+	 * @path: The full path to the selected file
+	 * @file: The name of the file only
+	 *
+	 * The ::file-selected signal is emitted when the Select button or the
+	 * file tree on a #GntFileSel is activated.
+	 *
+	 * Since: 2.1.0
+	 */
 	signals[SIG_FILE_SELECTED] =
 		g_signal_new("file_selected",
 					 G_TYPE_FROM_CLASS(klass),
@@ -605,6 +520,24 @@ gnt_file_sel_class_init(GntFileSelClass *klass)
 					 NULL, NULL,
 					 gnt_closure_marshal_VOID__STRING_STRING,
 					 G_TYPE_NONE, 2, G_TYPE_STRING, G_TYPE_STRING);
+
+	/**
+	 * GntFileSel::cancelled:
+	 * @widget: The file selection window that received the signal
+	 *
+	 * The ::cancelled signal is emitted when the Cancel button on a
+	 * #GntFileSel is activated.
+	 *
+	 * Since: 2.14.0
+	 */
+	signals[SIG_CANCELLED] =
+		g_signal_new("cancelled",
+				G_TYPE_FROM_CLASS(klass),
+				G_SIGNAL_RUN_LAST,
+				G_STRUCT_OFFSET(GntFileSelClass, cancelled),
+				NULL, NULL,
+				g_cclosure_marshal_VOID__VOID,
+				G_TYPE_NONE, 0);
 
 	gnt_bindable_class_register_action(bindable, "toggle-tag", toggle_tag_selection, "t", NULL);
 	gnt_bindable_class_register_action(bindable, "clear-tags", clear_tags, "c", NULL);
@@ -642,6 +575,8 @@ gnt_file_sel_init(GTypeInstance *instance, gpointer class)
 	g_signal_connect(G_OBJECT(sel->location), "key_pressed", G_CALLBACK(location_key_pressed), sel);
 
 	sel->cancel = gnt_button_new("Cancel");
+	g_signal_connect(G_OBJECT(sel->cancel), "activate", G_CALLBACK(cancel_activated_cb), sel);
+
 	sel->select = gnt_button_new("Select");
 
 	g_signal_connect_swapped(G_OBJECT(sel->files), "activate", G_CALLBACK(gnt_widget_activate), sel->select);
@@ -687,6 +622,12 @@ select_activated_cb(GntWidget *button, GntFileSel *sel)
 	g_signal_emit(sel, signals[SIG_FILE_SELECTED], 0, path, file);
 	g_free(file);
 	g_free(path);
+}
+
+static void
+cancel_activated_cb(GntWidget *button, GntFileSel *sel)
+{
+	g_signal_emit(sel, signals[SIG_CANCELLED], 0);
 }
 
 GntWidget *gnt_file_sel_new(void)

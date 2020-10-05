@@ -1,7 +1,3 @@
-/**
- * @file gntclipboard.h Clipboard API
- * @ingroup gnt
- */
 /*
  * GNT - The GLib Ncurses Toolkit
  *
@@ -26,10 +22,24 @@
 
 #ifndef GNT_CLIPBOARD_H
 #define GNT_CLIPBOARD_H
+/**
+ * SECTION:gntclipboard
+ * @section_id: libgnt-gntclipboard
+ * @title: GntClipboard
+ * @short_description: A short-term text storage buffer
+ */
 
 #include <stdio.h>
 #include <glib.h>
 #include <glib-object.h>
+
+#ifndef GNTSEAL
+#  if defined(GNTSEAL_ENABLE)
+#    define GNTSEAL(ident)      _gnt_sealed__ ## ident
+#  else
+#    define GNTSEAL(ident)      ident
+#  endif
+#endif /* !GNTSEAL */
 
 #define GNT_TYPE_CLIPBOARD				(gnt_clipboard_get_gtype())
 #define GNT_CLIPBOARD(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), GNT_TYPE_CLIPBOARD, GntClipboard))
@@ -41,16 +51,22 @@
 typedef struct _GntClipboard			GntClipboard;
 typedef struct _GntClipboardClass		GntClipboardClass;
 
+/**
+ * GntClipboard:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntClipboard
 {
 	GObject inherit;
-	gchar *string;
+	gchar *GNTSEAL(string);
 };
 
 struct _GntClipboardClass
 {
 	GObjectClass parent;
 
+	/*< private >*/
 	void (*gnt_reserved1)(void);
 	void (*gnt_reserved2)(void);
 	void (*gnt_reserved3)(void);
@@ -60,25 +76,29 @@ struct _GntClipboardClass
 G_BEGIN_DECLS
 
 /**
- * @return GType for GntClipboard.
+ * gnt_clipboard_get_gtype:
+ *
+ * Returns: GType for GntClipboard.
  */
 GType gnt_clipboard_get_gtype(void);
 
 /**
+ * gnt_clipboard_get_string:
+ * @clip:  The clipboard.
+ *
  * Get the current text from the clipboard.
  *
- * @param clip  The clipboard.
- *
- * @return  A copy of the string in the clipboard. The caller should free the
+ * Returns:  A copy of the string in the clipboard. The caller should free the
  *          returned value.
  */
 gchar * gnt_clipboard_get_string(GntClipboard *clip);
 
 /**
- * Set the text in the clipboard.
+ * gnt_clipboard_set_string:
+ * @clip:     The clipboard.
+ * @string:   New string for the clipboard.
  *
- * @param clip     The clipboard.
- * @param string   New string for the clipboard.
+ * Set the text in the clipboard.
  */
 void gnt_clipboard_set_string(GntClipboard *clip, const gchar *string);
 

@@ -12,7 +12,8 @@ key_pressed(GntWidget *widget, const char *text, gpointer null)
 	GntWidget *label = gnt_label_new("so wassup!!");
 
 	gnt_box_add_widget(GNT_BOX(box), label);
-	GNT_WIDGET_UNSET_FLAGS(box, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW);
+	gnt_widget_set_has_border(box, TRUE);
+	gnt_widget_set_has_shadow(box, TRUE);
 	gnt_box_set_title(GNT_BOX(box), "This is a test");
 
 	gnt_widget_show(box);
@@ -103,7 +104,8 @@ int main()
 	gnt_tree_add_row_after(GNT_TREE(tree), "e", "e", "a", NULL);
 	gnt_tree_add_row_after(GNT_TREE(tree), "b", "b", "d", NULL);
 
-	GNT_WIDGET_UNSET_FLAGS(hbox, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW);
+	gnt_widget_set_has_border(hbox, TRUE);
+	gnt_widget_set_has_shadow(hbox, TRUE);
 	gnt_box_set_title(GNT_BOX(hbox), "111111111111111111111111111111111111111111111111111111111111111This is the title …");
 
 	/*gnt_widget_set_take_focus(vbox, TRUE);*/

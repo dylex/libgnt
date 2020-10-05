@@ -1,4 +1,4 @@
-/**
+/*
  * GNT - The GLib Ncurses Toolkit
  *
  * GNT is the legal property of its developers, whose names are too numerous
@@ -25,7 +25,7 @@
 #define _XOPEN_SOURCE_EXTENDED
 #endif
 
-#include "config.h"
+#include "gntconfig.h"
 
 #include <gmodule.h>
 
@@ -61,11 +61,11 @@
 #include <ctype.h>
 #include <errno.h>
 
-/**
+/*
  * Notes: Interesting functions to look at:
- * 	scr_dump, scr_init, scr_restore: for workspaces
+ * scr_dump, scr_init, scr_restore: for workspaces
  *
- * 	Need to wattrset for colors to use with PDCurses.
+ * Need to wattrset for colors to use with PDCurses.
  */
 
 static GIOChannel *channel = NULL;
@@ -99,7 +99,10 @@ escape_timeout(gpointer data)
 }
 
 /**
+ * detect_mouse_action:
+ *
  * Mouse support:
+ *
  *  - bring a window on top if you click on its taskbar
  *  - click on the top-bar of the active window and drag+drop to move a window
  *  - click on a window to bring it to focus
@@ -178,8 +181,8 @@ detect_mouse_action(const char *buffer)
 	if (widget && gnt_wm_process_click(wm, event, x, y, widget))
 		return TRUE;
 
-	if (event == GNT_LEFT_MOUSE_DOWN && widget && widget != wm->_list.window &&
-			!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_TRANSIENT)) {
+	if (event == GNT_LEFT_MOUSE_DOWN && widget &&
+	    widget != wm->_list.window && !gnt_widget_get_transient(widget)) {
 		if (widget != wm->cws->ordered->data) {
 			gnt_wm_raise_window(wm, widget);
 		}
@@ -258,7 +261,9 @@ io_invoke(GIOChannel *source, GIOCondition cond, gpointer null)
 		escape_stuff.timer = 0;
 	}
 	keys[rd] = 0;
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	gnt_wm_set_event_stack(wm, TRUE);
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 	cvrt = g_locale_to_utf8(keys, rd, (gsize*)&rd, NULL, NULL);
 	k = cvrt ? cvrt : keys;
@@ -295,8 +300,11 @@ io_invoke(GIOChannel *source, GIOCondition cond, gpointer null)
 		k += p;
 	}
 end:
-	if (wm)
+	if (wm) {
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 		gnt_wm_set_event_stack(wm, FALSE);
+G_GNUC_END_IGNORE_DEPRECATIONS
+	}
 	g_free(cvrt);
 	return TRUE;
 }
@@ -602,7 +610,7 @@ void gnt_widget_set_urgent(GntWidget *widget)
 	if (wm->cws->ordered && wm->cws->ordered->data == widget)
 		return;
 
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_URGENT);
+	gnt_widget_set_is_urgent(widget, TRUE);
 
 	gnt_wm_update_window(wm, widget);
 }
@@ -672,7 +680,7 @@ gboolean gnt_screen_menu_show(gpointer newmenu)
 	}
 
 	wm->menu = newmenu;
-	GNT_WIDGET_UNSET_FLAGS(GNT_WIDGET(wm->menu), GNT_WIDGET_INVISIBLE);
+	gnt_widget_set_visible(GNT_WIDGET(wm->menu), TRUE);
 	gnt_widget_draw(GNT_WIDGET(wm->menu));
 
 	g_signal_connect(G_OBJECT(wm->menu), "hide", G_CALLBACK(reset_menu), NULL);
@@ -696,7 +704,6 @@ gchar *gnt_get_clipboard_string()
 	return gnt_clipboard_get_string(clipboard);
 }
 
-#if GLIB_CHECK_VERSION(2,4,0)
 typedef struct
 {
 	void (*callback)(int status, gpointer data);
@@ -718,13 +725,11 @@ reap_child(GPid pid, gint status, gpointer data)
 	refresh();
 	refresh_screen();
 }
-#endif
 
 gboolean gnt_giveup_console(const char *wd, char **argv, char **envp,
 		gint *stin, gint *stout, gint *sterr,
 		void (*callback)(int status, gpointer data), gpointer data)
 {
-#if GLIB_CHECK_VERSION(2,4,0)
 	GPid pid = 0;
 	ChildProcess *cp = NULL;
 
@@ -742,18 +747,11 @@ gboolean gnt_giveup_console(const char *wd, char **argv, char **envp,
 	g_child_watch_add(pid, reap_child, cp);
 
 	return TRUE;
-#else
-	return FALSE;
-#endif
 }
 
 gboolean gnt_is_refugee()
 {
-#if GLIB_CHECK_VERSION(2,4,0)
 	return (wm && wm->mode == GNT_KP_MODE_WAIT_ON_CHILD);
-#else
-	return FALSE;
-#endif
 }
 
 const char *C_(const char *x)

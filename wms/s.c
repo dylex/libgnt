@@ -1,4 +1,4 @@
-#include "internal.h"
+#include "gntinternal.h"
 
 #include <string.h>
 #include <sys/types.h>
@@ -10,8 +10,6 @@
 #include "gntwm.h"
 #include "gntwindow.h"
 #include "gntlabel.h"
-
-#include "blist.h"
 
 #define TYPE_S				(s_get_gtype())
 
@@ -35,7 +33,7 @@ void gntwm_init(GntWM **wm);
 static void (*org_new_window)(GntWM *wm, GntWidget *win);
 
 static void
-envelope_buddylist(GntWidget *win)
+envelope_main_window(GntWidget *win)
 {
 	int w, h;
 	gnt_widget_get_size(win, &w, &h);
@@ -49,7 +47,7 @@ envelope_normal_window(GntWidget *win)
 {
 	int w, h;
 
-	if (GNT_WIDGET_IS_FLAG_SET(win, GNT_WIDGET_NO_BORDER | GNT_WIDGET_TRANSIENT))
+	if (!gnt_widget_get_has_border(win) || gnt_widget_get_transient(win))
 		return;
 
 	gnt_widget_get_size(win, &w, &h);
@@ -63,8 +61,8 @@ s_decorate_window(GntWM *wm, GntWidget *win)
 	const char *name;
 
 	name = gnt_widget_get_name(win);
-	if (name && strcmp(name, "buddylist") == 0) {
-		envelope_buddylist(win);
+	if (name && strcmp(name, "MainWindow") == 0) {
+		envelope_main_window(win);
 	} else {
 		envelope_normal_window(win);
 	}
@@ -82,7 +80,7 @@ s_new_window(GntWM *wm, GntWidget *win)
 	int x, y, w, h;
 	int maxx, maxy;
 	const char *name;
-	gboolean blist = FALSE;
+	gboolean main_window = FALSE;
 
 	if (!GNT_IS_MENU(win)) {
 		getmaxyx(stdscr, maxy, maxx);
@@ -92,21 +90,21 @@ s_new_window(GntWM *wm, GntWidget *win)
 
 		name = gnt_widget_get_name(win);
 
-		if (name && strcmp(name, "buddylist") == 0) {
-			/* The buddylist doesn't have no border nor nothing! */
+		if (name && strcmp(name, "MainWindow") == 0) {
+			/* The MainWindow doesn't have no border nor nothing! */
 			x = 0;
 			y = 0;
 			h = maxy - 1;
-			blist = TRUE;
+			main_window = TRUE;
 
 			gnt_box_set_toplevel(GNT_BOX(win), FALSE);
-			GNT_WIDGET_SET_FLAGS(win, GNT_WIDGET_CAN_TAKE_FOCUS);
+			gnt_widget_set_take_focus(win, TRUE);
 
 			gnt_widget_set_position(win, x, y);
 			mvwin(win->window, y, x);
 
 			gnt_widget_set_size(win, -1, h + 2);  /* XXX: Why is the +2 needed here? -- sadrul */
-		} else if (!GNT_WIDGET_IS_FLAG_SET(win, GNT_WIDGET_TRANSIENT)) {
+		} else if (!gnt_widget_get_transient(win)) {
 			const char *title = GNT_BOX(win)->title;
 			if (title == NULL || !g_hash_table_lookup(wm->positions, title)) {
 				/* In the middle of the screen */
@@ -120,7 +118,7 @@ s_new_window(GntWM *wm, GntWidget *win)
 	}
 	org_new_window(wm, win);
 
-	if (blist)
+	if (main_window)
 		gnt_wm_raise_window(wm, win);
 }
 
@@ -147,8 +145,7 @@ s_mouse_clicked(GntWM *wm, GntMouseEvent event, int cx, int cy, GntWidget *widge
 		return FALSE;
 		/* This might be a place to bring up a context menu */
 
-	if (event != GNT_LEFT_MOUSE_DOWN ||
-			GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER))
+	if (event != GNT_LEFT_MOUSE_DOWN || !gnt_widget_get_has_border(widget))
 		return FALSE;
 
 	gnt_widget_get_position(widget, &x, &y);
@@ -163,14 +160,12 @@ s_mouse_clicked(GntWM *wm, GntMouseEvent event, int cx, int cy, GntWidget *widge
 }
 
 static gboolean
-toggle_buddylist(GntBindable *bindable, GList *null)
+raise_main_window(GntBindable *bindable, GList *null)
 {
 	GntWM *wm = GNT_WM(bindable);
-	GntWidget *blist = find_widget(wm, "buddylist");
-	if (blist)
-		gnt_widget_destroy(blist);
-	else
-		purple_blist_show();
+	GntWidget *main_window = find_widget(wm, "MainWindow");
+	if (main_window)
+		gnt_wm_raise_window(wm, main_window);
 	return TRUE;
 }
 
@@ -186,8 +181,9 @@ s_class_init(SClass *klass)
 	pclass->window_update = s_window_update;
 	pclass->mouse_clicked = s_mouse_clicked;
 
-	gnt_bindable_class_register_action(GNT_BINDABLE_CLASS(klass), "toggle-buddylist",
-				toggle_buddylist, "\033" "b", NULL);
+	gnt_bindable_class_register_action(GNT_BINDABLE_CLASS(klass),
+			"raise-main-window", raise_main_window,
+			"\033" "b", NULL);
 	gnt_style_read_actions(G_OBJECT_CLASS_TYPE(klass), GNT_BINDABLE_CLASS(klass));
 	GNTDEBUG;
 }

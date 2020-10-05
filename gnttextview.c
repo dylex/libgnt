@@ -1,4 +1,4 @@
-/**
+/*
  * GNT - The GLib Ncurses Toolkit
  *
  * GNT is the legal property of its developers, whose names are too numerous
@@ -186,8 +186,7 @@ gnt_text_view_draw(GntWidget *widget)
 static void
 gnt_text_view_size_request(GntWidget *widget)
 {
-	if (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED))
-	{
+	if (!gnt_widget_get_mapped(widget)) {
 		gnt_widget_set_size(widget, 64, 20);
 	}
 }
@@ -388,7 +387,7 @@ gnt_text_view_reflow(GntTextView *view)
 
 	view->string = g_string_set_size(view->string, string->len);
 	view->string->len = 0;
-	GNT_WIDGET_SET_FLAGS(GNT_WIDGET(view), GNT_WIDGET_DRAWING);
+	gnt_widget_set_drawing(GNT_WIDGET(view), TRUE);
 
 	for (; back; back = back->prev) {
 		line = back->data;
@@ -417,7 +416,7 @@ gnt_text_view_reflow(GntTextView *view)
 		list = list->next;
 	}
 	view->list = list;
-	GNT_WIDGET_UNSET_FLAGS(GNT_WIDGET(view), GNT_WIDGET_DRAWING);
+	gnt_widget_set_drawing(GNT_WIDGET(view), FALSE);
 	if (GNT_WIDGET(view)->window)
 		gnt_widget_draw(GNT_WIDGET(view));
 	g_string_free(string, TRUE);
@@ -426,7 +425,7 @@ gnt_text_view_reflow(GntTextView *view)
 static void
 gnt_text_view_size_changed(GntWidget *widget, int w, int h)
 {
-	if (w != widget->priv.width && GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED)) {
+	if (w != widget->priv.width && gnt_widget_get_mapped(widget)) {
 		gnt_text_view_reflow(GNT_TEXT_VIEW(widget));
 	}
 }
@@ -453,8 +452,10 @@ gnt_text_view_init(GTypeInstance *instance, gpointer class)
 	GntTextView *view = GNT_TEXT_VIEW(widget);
 	GntTextLine *line = g_new0(GntTextLine, 1);
 
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW |
-            GNT_WIDGET_GROW_Y | GNT_WIDGET_GROW_X);
+	gnt_widget_set_has_border(widget, FALSE);
+	gnt_widget_set_has_shadow(widget, FALSE);
+	gnt_widget_set_grow_x(widget, TRUE);
+	gnt_widget_set_grow_y(widget, TRUE);
 	widget->priv.minw = 5;
 	widget->priv.minh = 2;
 	view->string = g_string_new(NULL);
@@ -613,6 +614,14 @@ void gnt_text_view_append_text_with_tag(GntTextView *view, const char *text,
 	gnt_widget_draw(widget);
 }
 
+const gchar *
+gnt_text_view_get_text(GntTextView *view)
+{
+	g_return_val_if_fail(GNT_IS_TEXT_VIEW(view), NULL);
+
+	return view->string->str;
+}
+
 void gnt_text_view_scroll(GntTextView *view, int scroll)
 {
 	if (scroll == 0)
@@ -717,7 +726,7 @@ int gnt_text_view_get_lines_above(GntTextView *view)
 	return above;
 }
 
-/**
+/*
  * XXX: There are quite possibly more than a few bugs here.
  */
 int gnt_text_view_tag_change(GntTextView *view, const char *name, const char *text, gboolean all)

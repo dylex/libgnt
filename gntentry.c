@@ -1,4 +1,4 @@
-/**
+/*
  * GNT - The GLib Ncurses Toolkit
  *
  * GNT is the legal property of its developers, whose names are too numerous
@@ -210,7 +210,7 @@ show_suggest_dropdown(GntEntry *entry)
 		gnt_tree_set_compare_func(GNT_TREE(entry->ddown), (GCompareFunc)g_utf8_collate);
 		gnt_box_add_widget(GNT_BOX(box), entry->ddown);
 
-		GNT_WIDGET_SET_FLAGS(box, GNT_WIDGET_TRANSIENT);
+		gnt_widget_set_transient(box, TRUE);
 
 		gnt_widget_get_position(GNT_WIDGET(entry), &x, &y);
 		x += offset;
@@ -307,8 +307,7 @@ gnt_entry_draw(GntWidget *widget)
 static void
 gnt_entry_size_request(GntWidget *widget)
 {
-	if (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED))
-	{
+	if (!gnt_widget_get_mapped(widget)) {
 		widget->priv.height = 1;
 		widget->priv.width = 20;
 	}
@@ -326,7 +325,9 @@ static void
 entry_redraw(GntWidget *widget)
 {
 	gnt_entry_draw(widget);
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	gnt_widget_queue_update(widget);
+G_GNUC_END_IGNORE_DEPRECATIONS
 }
 
 static void
@@ -955,6 +956,11 @@ gnt_entry_class_init(GntEntryClass *klass)
 					 g_cclosure_marshal_VOID__VOID,
 					 G_TYPE_NONE, 0);
 
+	/**
+	 * GntEntry::completion:
+	 *
+	 * Since: 2.1.0
+	 */
 	signals[SIG_COMPLETION] =
 		g_signal_new("completion",
 					 G_TYPE_FROM_CLASS(klass),
@@ -1050,9 +1056,10 @@ gnt_entry_init(GTypeInstance *instance, gpointer class)
 	entry->killring = new_killring();
 	entry->search = g_new0(GntEntrySearch, 1);
 
-	GNT_WIDGET_SET_FLAGS(GNT_WIDGET(entry),
-			GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW | GNT_WIDGET_CAN_TAKE_FOCUS);
-	GNT_WIDGET_SET_FLAGS(GNT_WIDGET(entry), GNT_WIDGET_GROW_X);
+	gnt_widget_set_has_border(widget, FALSE);
+	gnt_widget_set_has_shadow(widget, FALSE);
+	gnt_widget_set_take_focus(widget, TRUE);
+	gnt_widget_set_grow_x(widget, TRUE);
 
 	widget->priv.minw = 3;
 	widget->priv.minh = 1;
@@ -1134,7 +1141,7 @@ gnt_entry_set_text_internal(GntEntry *entry, const char *text)
 	if ((entry->cursor = entry->end - cursor) > entry->end)
 		entry->cursor = entry->end;
 
-	if (GNT_WIDGET_IS_FLAG_SET(GNT_WIDGET(entry), GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(GNT_WIDGET(entry)))
 		entry_redraw(GNT_WIDGET(entry));
 }
 

@@ -1,7 +1,3 @@
-/**
- * @file gntmenu.h Menu API
- * @ingroup gnt
- */
 /*
  * GNT - The GLib Ncurses Toolkit
  *
@@ -26,7 +22,15 @@
 
 #ifndef GNT_MENU_H
 #define GNT_MENU_H
+/**
+ * SECTION:gntmenu
+ * @section_id: libgnt-gntmenu
+ * @title: GntMenu
+ * @short_description: A widget for a toplevel or popup menu
+ * @see_also: #GntMenuItem #GntMenuItemCheck
+ */
 
+#include "gnt.h"
 #include "gnttree.h"
 #include "gntcolors.h"
 #include "gntkeys.h"
@@ -38,45 +42,79 @@
 #define GNT_IS_MENU_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), GNT_TYPE_MENU))
 #define GNT_MENU_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_MENU, GntMenuClass))
 
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GNT_MENU_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_MENU_FLAGS(obj)				(GNT_MENU(obj)->priv.flags)
+/**
+ * GNT_MENU_SET_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_MENU_SET_FLAGS(obj, flags)		(GNT_MENU_FLAGS(obj) |= flags)
+/**
+ * GNT_MENU_UNSET_FLAGS:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
 #define GNT_MENU_UNSET_FLAGS(obj, flags)	(GNT_MENU_FLAGS(obj) &= ~(flags))
+#endif
 
 typedef struct _GntMenu			GntMenu;
-typedef struct _GntMenuPriv		GntMenuPriv;
 typedef struct _GntMenuClass		GntMenuClass;
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntMenuPriv:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
+typedef struct _GntMenuPriv GntMenuPriv;
+#endif
 
 #include "gntmenuitem.h"
 
 /**
+ * GntMenuType:
+ * @GNT_MENU_TOPLEVEL: Menu for a toplevel window
+ * @GNT_MENU_POPUP:    A popup menu
+ *
  * A toplevel-menu is displayed at the top of the screen, and it spans accross
  * the entire width of the screen.
  * A popup-menu could be displayed, for example, as a context menu for widgets.
  */
 typedef enum
 {
-	GNT_MENU_TOPLEVEL = 1,  /* Menu for a toplevel window */
-	GNT_MENU_POPUP,         /* A popup menu */
+	GNT_MENU_TOPLEVEL = 1,
+	GNT_MENU_POPUP,
 } GntMenuType;
 
+/**
+ * GntMenu:
+ *
+ * Access to any fields is deprecated. See inline comments for replacements.
+ */
 struct _GntMenu
 {
 	GntTree parent;
-	GntMenuType type;
+	GntMenuType GNTSEAL(type);
 
-	GList *list;
-	int selected;
+	GList *GNTSEAL(list);
+	int GNTSEAL(selected);
 
 	/* This will keep track of its immediate submenu which is visible so that
 	 * keystrokes can be passed to it. */
-	GntMenu *submenu;
-	GntMenu *parentmenu;
+	GntMenu *GNTSEAL(submenu);
+	GntMenu *GNTSEAL(parentmenu);
 };
 
 struct _GntMenuClass
 {
 	GntTreeClass parent;
 
+	/*< private >*/
 	void (*gnt_reserved1)(void);
 	void (*gnt_reserved2)(void);
 	void (*gnt_reserved3)(void);
@@ -86,36 +124,41 @@ struct _GntMenuClass
 G_BEGIN_DECLS
 
 /**
- * @return  The GType for GntMenu.
+ * gnt_menu_get_gtype:
+ *
+ * Returns:  The GType for GntMenu.
  */
 GType gnt_menu_get_gtype(void);
 
 /**
+ * gnt_menu_new:
+ * @type:  The type of the menu, whether it's a toplevel menu or a popup menu.
+ *
  * Create a new menu.
  *
- * @param type  The type of the menu, whether it's a toplevel menu or a popup menu.
- *
- * @return  The newly created menu.
+ * Returns:  The newly created menu.
  */
 GntWidget * gnt_menu_new(GntMenuType type);
 
 /**
- * Add an item to the menu.
+ * gnt_menu_add_item:
+ * @menu:   The menu.
+ * @item:   The item to add to the menu.
  *
- * @param menu   The menu.
- * @param item   The item to add to the menu.
+ * Add an item to the menu.
  */
 void gnt_menu_add_item(GntMenu *menu, GntMenuItem *item);
 
 /**
+ * gnt_menu_get_item:
+ * @menu:   The menu.
+ * @id:     The ID for an item.
+ *
  * Return the GntMenuItem with the given ID.
  *
- * @param menu   The menu.
- * @param id     The ID for an item.
+ * Returns: (transfer none): The menuitem with the given ID, or %NULL.
  *
- * @return  The menuitem with the given ID, or @c NULL.
- *
- * @since 2.3.0
+ * Since: 2.3.0
  */
 GntMenuItem *gnt_menu_get_item(GntMenu *menu, const char *id);
 

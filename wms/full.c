@@ -2,7 +2,6 @@
 #include <string.h>
 #include <sys/types.h>
 
-#include "debug.h"
 #include "gnt.h"
 #include "gntbox.h"
 #include "gntmenu.h"
@@ -10,8 +9,6 @@
 #include "gntwm.h"
 #include "gntwindow.h"
 #include "gntlabel.h"
-
-#include "blist.h"
 
 #define TYPE_FULL				(full_get_gtype())
 
@@ -120,7 +117,7 @@ full_terminal_refresh(GntWM *wm)
 static gboolean
 focus_blist(GntBindable *bindable, GList *null)
 {
-	purple_blist_show();
+	// purple_blist_show();
 	return TRUE;
 }
 

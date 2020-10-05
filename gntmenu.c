@@ -1,4 +1,4 @@
-/**
+/*
  * GNT - The GLib Ncurses Toolkit
  *
  * GNT is the legal property of its developers, whose names are too numerous
@@ -225,7 +225,7 @@ menuitem_activate(GntMenu *menu, GntMenuItem *item)
 				item->priv.y = widget->priv.y + gnt_tree_get_selection_visible_line(GNT_TREE(menu));
 			}
 			gnt_widget_set_position(GNT_WIDGET(sub), item->priv.x, item->priv.y);
-			GNT_WIDGET_UNSET_FLAGS(GNT_WIDGET(sub), GNT_WIDGET_INVISIBLE);
+			gnt_widget_set_visible(GNT_WIDGET(sub), TRUE);
 			gnt_widget_draw(GNT_WIDGET(sub));
 		} else {
 			menu_hide_all(menu);
@@ -440,9 +440,12 @@ static void
 gnt_menu_init(GTypeInstance *instance, gpointer class)
 {
 	GntWidget *widget = GNT_WIDGET(instance);
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_SHADOW | GNT_WIDGET_NO_BORDER |
-			GNT_WIDGET_CAN_TAKE_FOCUS | GNT_WIDGET_TRANSIENT | GNT_WIDGET_DISABLE_ACTIONS);
-	GNTDEBUG;
+
+	gnt_widget_set_has_shadow(widget, FALSE);
+	gnt_widget_set_has_border(widget, FALSE);
+	gnt_widget_set_take_focus(widget, TRUE);
+	gnt_widget_set_transient(widget, TRUE);
+	gnt_widget_set_disable_actions(widget, TRUE);
 }
 
 /******************************************************************************
@@ -494,7 +497,7 @@ GntWidget *gnt_menu_new(GntMenuType type)
 		gnt_tree_set_column_resizable(GNT_TREE(widget), ITEM_TRIGGER, FALSE);
 		gnt_tree_set_col_width(GNT_TREE(widget), ITEM_SUBMENU, 1);
 		gnt_tree_set_column_resizable(GNT_TREE(widget), ITEM_SUBMENU, FALSE);
-		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_NO_BORDER);
+		gnt_widget_set_has_border(widget, TRUE);
 	}
 
 	return widget;

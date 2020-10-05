@@ -1,4 +1,4 @@
-/**
+/*
  * GNT - The GLib Ncurses Toolkit
  *
  * GNT is the legal property of its developers, whose names are too numerous
@@ -65,8 +65,9 @@ gnt_button_size_request(GntWidget *widget)
 	gnt_util_get_text_bound(button->priv->text,
 			&widget->priv.width, &widget->priv.height);
 	widget->priv.width += 4;
-	if (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER))
+	if (gnt_widget_get_has_border(widget)) {
 		widget->priv.height += 2;
+	}
 }
 
 static void
@@ -133,10 +134,12 @@ gnt_button_init(GTypeInstance *instance, gpointer class)
 
 	widget->priv.minw = 4;
 	widget->priv.minh = small_button ? 1 : 3;
-	if (small_button)
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW);
-	GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_GROW_X | GNT_WIDGET_GROW_Y);
-	GNTDEBUG;
+	if (small_button) {
+		gnt_widget_set_has_border(widget, FALSE);
+		gnt_widget_set_has_shadow(widget, FALSE);
+	}
+	gnt_widget_set_grow_x(widget, FALSE);
+	gnt_widget_set_grow_y(widget, FALSE);
 }
 
 /******************************************************************************
@@ -179,3 +182,19 @@ GntWidget *gnt_button_new(const char *text)
 	return widget;
 }
 
+const gchar *
+gnt_button_get_text(GntButton *button)
+{
+	g_return_val_if_fail(GNT_IS_BUTTON(button), NULL);
+
+	return button->priv->text;
+}
+
+void
+gnt_button_set_text(GntButton *button, const gchar *text)
+{
+	g_return_if_fail(GNT_IS_BUTTON(button));
+
+	g_free(button->priv->text);
+	button->priv->text = g_strdup(text);
+}

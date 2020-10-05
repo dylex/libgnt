@@ -1,4 +1,4 @@
-/**
+/*
  * GNT - The GLib Ncurses Toolkit
  *
  * GNT is the legal property of its developers, whose names are too numerous
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02111-1301  USA
  */
 
-#include "config.h"
+#include "gntconfig.h"
 
 #include <ncurses.h>
 
@@ -120,7 +120,6 @@ gnt_uninit_colors()
 		restore_colors();
 }
 
-#if GLIB_CHECK_VERSION(2,6,0)
 int
 gnt_colors_get_color(char *key)
 {
@@ -283,8 +282,6 @@ void gnt_color_pairs_parse(GKeyFile *kfile)
 
 	g_strfreev(keys);
 }
-
-#endif  /* GKeyFile */
 
 int gnt_color_pair(int pair)
 {

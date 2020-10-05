@@ -1,4 +1,4 @@
-/**
+/*
  * GNT - The GLib Ncurses Toolkit
  *
  * GNT is the legal property of its developers, whose names are too numerous
@@ -68,7 +68,7 @@ gnt_widget_map(GntWidget *widget)
 	/* Get some default size for the widget */
 	GNTDEBUG;
 	g_signal_emit(widget, signals[SIG_MAP], 0);
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_MAPPED);
+	gnt_widget_set_mapped(widget, TRUE);
 }
 
 static void
@@ -83,21 +83,29 @@ gnt_widget_dispose(GObject *obj)
 static void
 gnt_widget_focus_change(GntWidget *widget)
 {
-	if (GNT_WIDGET_FLAGS(widget) & GNT_WIDGET_MAPPED)
+	if (gnt_widget_get_mapped(widget)) {
 		gnt_widget_draw(widget);
+	}
 }
 
 static gboolean
 gnt_widget_dummy_confirm_size(GntWidget *widget, int width, int height)
 {
 	gboolean shadow;
-	if (width < widget->priv.minw || height < widget->priv.minh)
+	if (width < widget->priv.minw || height < widget->priv.minh) {
 		return FALSE;
+	}
+
 	shadow = gnt_widget_has_shadow(widget);
-	if (widget->priv.width + shadow != width && !GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_GROW_X))
+	if (widget->priv.width + shadow != width &&
+	    !gnt_widget_get_grow_x(widget)) {
 		return FALSE;
-	if (widget->priv.height + shadow != height && !GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_GROW_Y))
+	}
+	if (widget->priv.height + shadow != height &&
+	    !gnt_widget_get_grow_y(widget)) {
 		return FALSE;
+	}
+
 	return TRUE;
 }
 
@@ -121,7 +129,9 @@ gnt_widget_class_init(GntWidgetClass *klass)
 	klass->destroy = gnt_widget_destroy;
 	klass->show = gnt_widget_show;
 	klass->draw = gnt_widget_draw;
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	klass->expose = gnt_widget_expose;
+G_GNUC_END_IGNORE_DEPRECATIONS
 	klass->map = gnt_widget_map;
 	klass->lost_focus = gnt_widget_focus_change;
 	klass->gained_focus = gnt_widget_focus_change;
@@ -232,7 +242,7 @@ gnt_widget_class_init(GntWidgetClass *klass)
 					 G_TYPE_FROM_CLASS(klass),
 					 G_SIGNAL_RUN_LAST,
 					 G_STRUCT_OFFSET(GntWidgetClass, key_pressed),
-					 gnt_boolean_handled_accumulator, NULL,
+					 g_signal_accumulator_true_handled, NULL,
 					 gnt_closure_marshal_BOOLEAN__STRING,
 					 G_TYPE_BOOLEAN, 1, G_TYPE_STRING);
 
@@ -241,7 +251,7 @@ gnt_widget_class_init(GntWidgetClass *klass)
 					 G_TYPE_FROM_CLASS(klass),
 					 G_SIGNAL_RUN_LAST,
 					 G_STRUCT_OFFSET(GntWidgetClass, clicked),
-					 gnt_boolean_handled_accumulator, NULL,
+					 g_signal_accumulator_true_handled, NULL,
 					 gnt_closure_marshal_BOOLEAN__INT_INT_INT,
 					 G_TYPE_BOOLEAN, 3, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT);
 
@@ -250,7 +260,7 @@ gnt_widget_class_init(GntWidgetClass *klass)
 					 G_TYPE_FROM_CLASS(klass),
 					 G_SIGNAL_RUN_LAST,
 					 0,
-					 gnt_boolean_handled_accumulator, NULL,
+					 g_signal_accumulator_true_handled, NULL,
 					 gnt_closure_marshal_BOOLEAN__VOID,
 					 G_TYPE_BOOLEAN, 0);
 
@@ -302,19 +312,20 @@ void gnt_widget_set_take_focus(GntWidget *widget, gboolean can)
 		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_CAN_TAKE_FOCUS);
 }
 
-/**
- * gnt_widget_destroy:
- * @obj: The #GntWidget instance.
- *
- * Emits the "destroy" signal notifying all reference holders that they
- * should release @obj.
- */
+gboolean
+gnt_widget_get_take_focus(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_CAN_TAKE_FOCUS);
+}
+
 void
 gnt_widget_destroy(GntWidget *obj)
 {
 	g_return_if_fail(GNT_IS_WIDGET(obj));
 
-	if(!(GNT_WIDGET_FLAGS(obj) & GNT_WIDGET_DESTROYING)) {
+	if (!gnt_widget_in_destruction(obj)) {
 		GNT_WIDGET_SET_FLAGS(obj, GNT_WIDGET_DESTROYING);
 		gnt_widget_hide(obj);
 		delwin(obj->window);
@@ -329,18 +340,20 @@ gnt_widget_show(GntWidget *widget)
 	g_return_if_fail(widget != NULL);
 
 	gnt_widget_draw(widget);
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	gnt_screen_occupy(widget);
+G_GNUC_END_IGNORE_DEPRECATIONS
 }
 
 void
 gnt_widget_draw(GntWidget *widget)
 {
 	/* Draw the widget */
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_DRAWING))
+	if (gnt_widget_get_drawing(widget))
 		return;
 
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_DRAWING);
-	if (!(GNT_WIDGET_FLAGS(widget) & GNT_WIDGET_MAPPED)) {
+	gnt_widget_set_drawing(widget, TRUE);
+	if (!gnt_widget_get_mapped(widget)) {
 		gnt_widget_map(widget);
 	}
 
@@ -386,20 +399,23 @@ gnt_widget_draw(GntWidget *widget)
 	}
 
 	g_signal_emit(widget, signals[SIG_DRAW], 0);
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	gnt_widget_queue_update(widget);
-	GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_DRAWING);
+G_GNUC_END_IGNORE_DEPRECATIONS
+	gnt_widget_set_drawing(widget, FALSE);
 }
 
 gboolean
 gnt_widget_key_pressed(GntWidget *widget, const char *keys)
 {
 	gboolean ret;
-	if (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_CAN_TAKE_FOCUS))
+	if (!gnt_widget_get_take_focus(widget))
 		return FALSE;
 
-	if (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_DISABLE_ACTIONS) &&
-			gnt_bindable_perform_action_key(GNT_BINDABLE(widget), keys))
+	if (!gnt_widget_get_disable_actions(widget) &&
+	    gnt_bindable_perform_action_key(GNT_BINDABLE(widget), keys)) {
 		return TRUE;
+	}
 
 	keys = gnt_bindable_remap_keys(GNT_BINDABLE(widget), keys);
 	g_signal_emit(widget, signals[SIG_KEY_PRESSED], 0, keys, &ret);
@@ -432,9 +448,31 @@ gnt_widget_hide(GntWidget *widget)
 	if (gnt_widget_has_shadow(widget))
 		mvwvline(widget->window, 1, widget->priv.width, ' ', widget->priv.height);
 #endif
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	gnt_screen_release(widget);
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_INVISIBLE);
-	GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_MAPPED);
+G_GNUC_END_IGNORE_DEPRECATIONS
+	gnt_widget_set_visible(widget, FALSE);
+	gnt_widget_set_mapped(widget, FALSE);
+}
+
+GntWidget *
+gnt_widget_get_parent(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), NULL);
+
+	return widget->parent;
+}
+
+GntWidget *
+gnt_widget_get_toplevel(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), NULL);
+
+	while (widget->parent) {
+		widget = widget->parent;
+	}
+
+	return widget;
 }
 
 void
@@ -485,8 +523,7 @@ init_widget(GntWidget *widget)
 	wbkgd(widget->window, gnt_color_pair(GNT_COLOR_NORMAL));
 	werase(widget->window);
 
-	if (!(GNT_WIDGET_FLAGS(widget) & GNT_WIDGET_NO_BORDER))
-	{
+	if (gnt_widget_get_has_border(widget)) {
 		/* - This is ugly. */
 		/* - What's your point? */
 		mvwvline(widget->window, 0, 0, ACS_VLINE | gnt_color_pair(GNT_COLOR_NORMAL), widget->priv.height);
@@ -527,8 +564,7 @@ gnt_widget_set_size(GntWidget *widget, int width, int height)
 	if (height <= 0)
 		height = widget->priv.height;
 
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED))
-	{
+	if (gnt_widget_get_mapped(widget)) {
 		ret = gnt_widget_confirm_size(widget, width, height);
 	}
 
@@ -556,10 +592,11 @@ gnt_widget_set_size(GntWidget *widget, int width, int height)
 		{
 			init_widget(widget);
 		}
-		if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED))
+		if (gnt_widget_get_mapped(widget)) {
 			init_widget(widget);
-		else
-			GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_MAPPED);
+		} else {
+			gnt_widget_set_mapped(widget, TRUE);
+		}
 	}
 
 	return ret;
@@ -568,21 +605,18 @@ gnt_widget_set_size(GntWidget *widget, int width, int height)
 gboolean
 gnt_widget_set_focus(GntWidget *widget, gboolean set)
 {
-	if (!(GNT_WIDGET_FLAGS(widget) & GNT_WIDGET_CAN_TAKE_FOCUS))
+	if (!gnt_widget_get_take_focus(widget))
 		return FALSE;
 
-	if (set && !GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_HAS_FOCUS))
-	{
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_HAS_FOCUS);
+	if (set && !gnt_widget_get_has_focus(widget)) {
+		gnt_widget_set_has_focus(widget, TRUE);
 		g_signal_emit(widget, signals[SIG_GIVE_FOCUS], 0);
-	}
-	else if (!set && GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_HAS_FOCUS))
-	{
-		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_HAS_FOCUS);
+	} else if (!set && gnt_widget_get_has_focus(widget)) {
+		gnt_widget_set_has_focus(widget, FALSE);
 		g_signal_emit(widget, signals[SIG_LOST_FOCUS], 0);
-	}
-	else
+	} else {
 		return FALSE;
+	}
 
 	return TRUE;
 }
@@ -610,8 +644,11 @@ update_queue_callback(gpointer data)
 
 	if (!g_object_get_data(G_OBJECT(widget), "gnt:queue_update"))
 		return FALSE;
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(widget)) {
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 		gnt_screen_update(widget);
+G_GNUC_END_IGNORE_DEPRECATIONS
+	}
 	g_object_set_data(G_OBJECT(widget), "gnt:queue_update", NULL);
 	return FALSE;
 }
@@ -646,9 +683,224 @@ void gnt_widget_set_visible(GntWidget *widget, gboolean set)
 		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_INVISIBLE);
 }
 
+gboolean
+gnt_widget_get_visible(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return !GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_INVISIBLE);
+}
+
 gboolean gnt_widget_has_shadow(GntWidget *widget)
 {
 	return (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_SHADOW) &&
 			gnt_style_get_bool(GNT_STYLE_SHADOW, FALSE));
 }
 
+gboolean
+gnt_widget_in_destruction(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_DESTROYING);
+}
+
+void
+gnt_widget_set_drawing(GntWidget *widget, gboolean drawing)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (drawing) {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_DRAWING);
+	} else {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_DRAWING);
+	}
+}
+
+gboolean
+gnt_widget_get_drawing(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_DRAWING);
+}
+
+void
+gnt_widget_set_mapped(GntWidget *widget, gboolean mapped)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (mapped) {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_MAPPED);
+	} else {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_MAPPED);
+	}
+}
+
+gboolean
+gnt_widget_get_mapped(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED);
+}
+
+void
+gnt_widget_set_has_border(GntWidget *widget, gboolean has_border)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (has_border) {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_NO_BORDER);
+	} else {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_BORDER);
+	}
+}
+
+gboolean
+gnt_widget_get_has_border(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return !GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_BORDER);
+}
+
+void
+gnt_widget_set_has_shadow(GntWidget *widget, gboolean has_shadow)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (has_shadow) {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_NO_SHADOW);
+	} else {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_SHADOW);
+	}
+}
+
+gboolean
+gnt_widget_get_has_shadow(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return !GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_NO_SHADOW);
+}
+
+void
+gnt_widget_set_has_focus(GntWidget *widget, gboolean has_focus)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (has_focus) {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_HAS_FOCUS);
+	} else {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_HAS_FOCUS);
+	}
+}
+
+gboolean
+gnt_widget_get_has_focus(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_HAS_FOCUS);
+}
+
+void
+gnt_widget_set_is_urgent(GntWidget *widget, gboolean urgent)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (urgent) {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_URGENT);
+	} else {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_URGENT);
+	}
+}
+
+gboolean
+gnt_widget_get_is_urgent(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_URGENT);
+}
+
+void
+gnt_widget_set_grow_x(GntWidget *widget, gboolean grow_x)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (grow_x) {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_GROW_X);
+	} else {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_GROW_X);
+	}
+}
+
+gboolean
+gnt_widget_get_grow_x(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_GROW_X);
+}
+
+void
+gnt_widget_set_grow_y(GntWidget *widget, gboolean grow_y)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (grow_y) {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_GROW_Y);
+	} else {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_GROW_Y);
+	}
+}
+
+gboolean
+gnt_widget_get_grow_y(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_GROW_Y);
+}
+
+void
+gnt_widget_set_transient(GntWidget *widget, gboolean transient)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (transient) {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_TRANSIENT);
+	} else {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_TRANSIENT);
+	}
+}
+
+gboolean
+gnt_widget_get_transient(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_TRANSIENT);
+}
+
+void
+gnt_widget_set_disable_actions(GntWidget *widget, gboolean disable_actions)
+{
+	g_return_if_fail(GNT_IS_WIDGET(widget));
+
+	if (disable_actions) {
+		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_DISABLE_ACTIONS);
+	} else {
+		GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_DISABLE_ACTIONS);
+	}
+}
+
+gboolean
+gnt_widget_get_disable_actions(GntWidget *widget)
+{
+	g_return_val_if_fail(GNT_IS_WIDGET(widget), FALSE);
+
+	return GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_DISABLE_ACTIONS);
+}

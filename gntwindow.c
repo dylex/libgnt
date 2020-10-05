@@ -1,4 +1,4 @@
-/**
+/*
  * GNT - The GLib Ncurses Toolkit
  *
  * GNT is the legal property of its developers, whose names are too numerous
@@ -120,8 +120,11 @@ gnt_window_init(GTypeInstance *instance, gpointer class)
 {
 	GntWidget *widget = GNT_WIDGET(instance);
 	GntWindow *win = GNT_WINDOW(widget);
-	GNT_WIDGET_UNSET_FLAGS(widget, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW);
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_CAN_TAKE_FOCUS);
+
+	gnt_widget_set_has_border(widget, TRUE);
+	gnt_widget_set_has_shadow(widget, TRUE);
+	gnt_widget_set_take_focus(widget, TRUE);
+
 	win->priv = g_new0(GntWindowPriv, 1);
 	win->priv->accels = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
 	GNTDEBUG;
@@ -204,6 +207,14 @@ void gnt_window_set_menu(GntWindow *window, GntMenu *menu)
 			window->priv->accels = NULL;
 		}
 	}
+}
+
+GntMenu *
+gnt_window_get_menu(GntWindow *window)
+{
+	g_return_val_if_fail(GNT_IS_WINDOW(window), NULL);
+
+	return window->menu;
 }
 
 const char * gnt_window_get_accel_item(GntWindow *window, const char *key)

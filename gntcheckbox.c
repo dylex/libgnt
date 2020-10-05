@@ -1,4 +1,4 @@
-/**
+/*
  * GNT - The GLib Ncurses Toolkit
  *
  * GNT is the legal property of its developers, whose names are too numerous
@@ -51,7 +51,8 @@ gnt_check_box_draw(GntWidget *widget)
 	mvwaddch(widget->window, 0, 2, ']');
 
 	wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_NORMAL));
-	mvwaddstr(widget->window, 0, 4, C_(GNT_BUTTON(cb)->priv->text));
+	mvwaddstr(widget->window, 0, 4,
+	          C_(gnt_button_get_text(GNT_BUTTON(cb))));
 	(void)wmove(widget->window, 0, 1);
 
 	GNTDEBUG;
@@ -117,8 +118,8 @@ gnt_check_box_init(GTypeInstance *instance, gpointer class)
 	GntWidget *widget = GNT_WIDGET(instance);
 	widget->priv.minh = 1;
 	widget->priv.minw = 4;
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW);
-	GNTDEBUG;
+	gnt_widget_set_has_border(widget, FALSE);
+	gnt_widget_set_has_shadow(widget, FALSE);
 }
 
 /******************************************************************************
@@ -156,7 +157,7 @@ GntWidget *gnt_check_box_new(const char *text)
 {
 	GntWidget *widget = g_object_new(GNT_TYPE_CHECK_BOX, NULL);
 
-	GNT_BUTTON(widget)->priv->text = g_strdup(text);
+	gnt_button_set_text(GNT_BUTTON(widget), text);
 	gnt_widget_set_take_focus(widget, TRUE);
 
 	return widget;

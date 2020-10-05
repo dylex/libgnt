@@ -1,4 +1,4 @@
-/**
+/*
  * GNT - The GLib Ncurses Toolkit
  *
  * GNT is the legal property of its developers, whose names are too numerous
@@ -105,8 +105,7 @@ gnt_combo_box_draw(GntWidget *widget)
 static void
 gnt_combo_box_size_request(GntWidget *widget)
 {
-	if (!GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED))
-	{
+	if (!gnt_widget_get_mapped(widget)) {
 		GntWidget *dd = GNT_COMBO_BOX(widget)->dropdown;
 		gnt_widget_size_request(dd);
 		widget->priv.height = 3;   /* For now, a combobox will have border */
@@ -142,7 +141,7 @@ popup_dropdown(GntComboBox *box)
 	parent->priv.width = widget->priv.width;
 	parent->priv.height = height + 2;
 
-	GNT_WIDGET_UNSET_FLAGS(parent, GNT_WIDGET_INVISIBLE);
+	gnt_widget_set_visible(parent, TRUE);
 	gnt_widget_draw(parent);
 }
 
@@ -150,7 +149,7 @@ static gboolean
 gnt_combo_box_key_pressed(GntWidget *widget, const char *text)
 {
 	GntComboBox *box = GNT_COMBO_BOX(widget);
-	gboolean showing = !!GNT_WIDGET_IS_FLAG_SET(box->dropdown->parent, GNT_WIDGET_MAPPED);
+	gboolean showing = gnt_widget_get_mapped(box->dropdown->parent);
 
 	if (showing) {
 		if (text[1] == 0) {
@@ -216,7 +215,7 @@ static void
 gnt_combo_box_lost_focus(GntWidget *widget)
 {
 	GntComboBox *combo = GNT_COMBO_BOX(widget);
-	if (GNT_WIDGET_IS_FLAG_SET(combo->dropdown->parent, GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(combo->dropdown->parent))
 		hide_popup(combo, FALSE);
 	widget_lost_focus(widget);
 }
@@ -225,7 +224,7 @@ static gboolean
 gnt_combo_box_clicked(GntWidget *widget, GntMouseEvent event, int x, int y)
 {
 	GntComboBox *box = GNT_COMBO_BOX(widget);
-	gboolean dshowing = GNT_WIDGET_IS_FLAG_SET(box->dropdown->parent, GNT_WIDGET_MAPPED);
+	gboolean dshowing = gnt_widget_get_mapped(box->dropdown->parent);
 
 	if (event == GNT_MOUSE_SCROLL_UP) {
 		if (dshowing)
@@ -254,7 +253,7 @@ gnt_combo_box_size_changed(GntWidget *widget, int oldw, int oldh)
 static gboolean
 dropdown_menu(GntBindable *b, GList *null)
 {
-	if (GNT_WIDGET_IS_FLAG_SET(GNT_COMBO_BOX(b)->dropdown->parent, GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(GNT_COMBO_BOX(b)->dropdown->parent))
 		return FALSE;
 	popup_dropdown(GNT_COMBO_BOX(b));
 	return TRUE;
@@ -303,12 +302,15 @@ gnt_combo_box_init(GTypeInstance *instance, gpointer class)
 	GntWidget *widget = GNT_WIDGET(instance);
 	GntComboBox *combo = GNT_COMBO_BOX(instance);
 
-	GNT_WIDGET_SET_FLAGS(GNT_WIDGET(instance),
-			GNT_WIDGET_GROW_X | GNT_WIDGET_CAN_TAKE_FOCUS | GNT_WIDGET_NO_SHADOW);
+	gnt_widget_set_grow_x(widget, TRUE);
+	gnt_widget_set_take_focus(widget, TRUE);
+	gnt_widget_set_has_shadow(widget, FALSE);
 	combo->dropdown = gnt_tree_new();
 
 	box = gnt_box_new(FALSE, FALSE);
-	GNT_WIDGET_SET_FLAGS(box, GNT_WIDGET_NO_SHADOW | GNT_WIDGET_NO_BORDER | GNT_WIDGET_TRANSIENT);
+	gnt_widget_set_has_shadow(box, FALSE);
+	gnt_widget_set_has_border(box, FALSE);
+	gnt_widget_set_transient(box, TRUE);
 	gnt_box_set_pad(GNT_BOX(box), 0);
 	gnt_box_add_widget(GNT_BOX(box), combo->dropdown);
 
@@ -355,6 +357,14 @@ GntWidget *gnt_combo_box_new()
 	return widget;
 }
 
+GntWidget *
+gnt_combo_box_get_dropdown(GntComboBox *box)
+{
+	g_return_val_if_fail(GNT_IS_BOX(box), NULL);
+
+	return box->dropdown;
+}
+
 void gnt_combo_box_add_data(GntComboBox *box, gpointer key, const char *text)
 {
 	gnt_tree_add_row_last(GNT_TREE(box->dropdown), key,
@@ -385,4 +395,3 @@ void gnt_combo_box_remove_all(GntComboBox *box)
 	gnt_tree_remove_all(GNT_TREE(box->dropdown));
 	set_selection(box, NULL);
 }
-

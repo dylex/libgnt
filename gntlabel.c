@@ -1,4 +1,4 @@
-/**
+/*
  * GNT - The GLib Ncurses Toolkit
  *
  * GNT is the legal property of its developers, whose names are too numerous
@@ -146,8 +146,9 @@ gnt_label_init(GTypeInstance *instance, gpointer class)
 {
 	GntWidget *widget = GNT_WIDGET(instance);
 	gnt_widget_set_take_focus(widget, FALSE);
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_BORDER | GNT_WIDGET_NO_SHADOW);
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_GROW_X);
+	gnt_widget_set_has_border(widget, FALSE);
+	gnt_widget_set_has_shadow(widget, FALSE);
+	gnt_widget_set_grow_x(widget, TRUE);
 	widget->priv.minw = 3;
 	widget->priv.minh = 1;
 	GNTDEBUG;

@@ -1,7 +1,3 @@
-/**
- * @file gnt-skel.h -skel API
- * @ingroup gnt
- */
 /*
  * GNT - The GLib Ncurses Toolkit
  *
@@ -26,6 +22,12 @@
 
 #ifndef GNT_SKEL_H
 #define GNT_SKEL_H
+/*
+ * SECTION:gnt-skel
+ * @section_id: libgnt-gnt-skel
+ * @title: GntSkel
+ * @short_description: A skeleton of an example widget
+ */
 
 #include "gntwidget.h"
 #include "gnt.h"
@@ -40,8 +42,15 @@
 #define GNT_SKEL_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), GNT_TYPE_SKEL, GntSkelClass))
 
 typedef struct _GntSkel			GntSkel;
-typedef struct _GntSkelPriv		GntSkelPriv;
 typedef struct _GntSkelClass		GntSkelClass;
+#ifndef GNT_DISABLE_DEPRECATED
+/**
+ * GntSkelPriv:
+ *
+ * Deprecated: 2.14.0: This is an internal implementation detail.
+ */
+typedef struct _GntSkelPriv GntSkelPriv;
+#endif
 
 struct _GntSkel
 {
@@ -52,6 +61,7 @@ struct _GntSkelClass
 {
 	GntWidgetClass parent;
 
+	/*< private >*/
 	void (*gnt_reserved1)(void);
 	void (*gnt_reserved2)(void);
 	void (*gnt_reserved3)(void);
@@ -60,18 +70,8 @@ struct _GntSkelClass
 
 G_BEGIN_DECLS
 
-/**
- *
- *
- * @return
- */
 GType gnt_skel_get_gtype(void);
 
-/**
- *
- *
- * @return
- */
 GntWidget * gnt_skel_new();
 
 G_END_DECLS

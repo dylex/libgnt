@@ -1,4 +1,4 @@
-/**
+/*
  * GNT - The GLib Ncurses Toolkit
  *
  * GNT is the legal property of its developers, whose names are too numerous
@@ -53,7 +53,7 @@ static void
 redraw_slider(GntSlider *slider)
 {
 	GntWidget *widget = GNT_WIDGET(slider);
-	if (GNT_WIDGET_IS_FLAG_SET(widget, GNT_WIDGET_MAPPED))
+	if (gnt_widget_get_mapped(widget))
 		gnt_widget_draw(widget);
 }
 
@@ -226,7 +226,9 @@ static void
 gnt_slider_init(GTypeInstance *instance, gpointer class)
 {
 	GntWidget *widget = GNT_WIDGET(instance);
-	GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_NO_SHADOW | GNT_WIDGET_NO_BORDER | GNT_WIDGET_CAN_TAKE_FOCUS);
+	gnt_widget_set_has_shadow(widget, FALSE);
+	gnt_widget_set_has_border(widget, FALSE);
+	gnt_widget_set_take_focus(widget, TRUE);
 	widget->priv.minw = 1;
 	widget->priv.minh = 1;
 	GNTDEBUG;
@@ -271,15 +273,23 @@ GntWidget *gnt_slider_new(gboolean vertical, int max, int min)
 	slider->vertical = vertical;
 
 	if (vertical) {
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_GROW_Y);
+		gnt_widget_set_grow_y(widget, TRUE);
 	} else {
-		GNT_WIDGET_SET_FLAGS(widget, GNT_WIDGET_GROW_X);
+		gnt_widget_set_grow_x(widget, TRUE);
 	}
 
 	gnt_slider_set_range(slider, max, min);
 	slider->step = 1;
 
 	return widget;
+}
+
+gboolean
+gnt_slider_get_vertical(GntSlider *slider)
+{
+	g_return_val_if_fail(GNT_IS_SLIDER(slider), FALSE);
+
+	return slider->vertical;
 }
 
 void gnt_slider_set_value(GntSlider *slider, int value)
@@ -312,9 +322,25 @@ void gnt_slider_set_step(GntSlider *slider, int step)
 	slider->step = step;
 }
 
+int
+gnt_slider_get_step(GntSlider *slider)
+{
+	g_return_val_if_fail(GNT_IS_SLIDER(slider), 0);
+
+	return slider->step;
+}
+
 void gnt_slider_set_small_step(GntSlider *slider, int step)
 {
 	slider->smallstep = step;
+}
+
+int
+gnt_slider_get_small_step(GntSlider *slider)
+{
+	g_return_val_if_fail(GNT_IS_SLIDER(slider), 0);
+
+	return slider->smallstep;
 }
 
 void gnt_slider_set_large_step(GntSlider *slider, int step)
@@ -322,11 +348,28 @@ void gnt_slider_set_large_step(GntSlider *slider, int step)
 	slider->largestep = step;
 }
 
+int
+gnt_slider_get_large_step(GntSlider *slider)
+{
+	g_return_val_if_fail(GNT_IS_SLIDER(slider), 0);
+
+	return slider->largestep;
+}
+
 void gnt_slider_set_range(GntSlider *slider, int max, int min)
 {
 	slider->max = MAX(max, min);
 	slider->min = MIN(max, min);
 	sanitize_value(slider);
+}
+
+void
+gnt_slider_get_range(GntSlider *slider, int *max, int *min)
+{
+	g_return_if_fail(GNT_IS_SLIDER(slider));
+
+	*max = slider->max;
+	*min = slider->min;
 }
 
 static void
