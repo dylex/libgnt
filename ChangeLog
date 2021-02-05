@@ -3,7 +3,7 @@ GNT: The GLib Ncurses Toolkit
 
 Please see notes about versioning in README.md.
 
-version 2.14.1 (????/??/??):
+version 2.14.1 (2021/02/04):
 	* Bump the minimum meson version from 0.37.0 to 0.41.0 (Richard Laager)
 	* Fix a buffer size in gntwm.c.  (Richard Laager)
 
