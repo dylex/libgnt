@@ -27,7 +27,7 @@
 
 project('libgnt', 'c',
     version : '2.14.0',
-    meson_version : '>=0.37.0')
+    meson_version : '>=0.41.0')
 gnt_soversion = 0
 
 parts = meson.project_version().split('-')
