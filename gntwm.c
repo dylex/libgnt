@@ -746,7 +746,7 @@ dump_file_save(GntFileSel *fs, const char *path, const char *f, gpointer n)
 			now ^= ch[0];
 #else
 			cchar_t wch;
-			char unicode[12];
+			char unicode[13];
 			mvwin_wch(curscr, y, x, &wch);
 			now = wch.attr;
 			ch[0] = (char)(wch.chars[0] & 0xff);
