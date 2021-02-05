@@ -5,6 +5,7 @@ Please see notes about versioning in README.md.
 
 version 2.14.1 (????/??/??):
 	* Bump the minimum meson version from 0.37.0 to 0.41.0 (Richard Laager)
+	* Fix a buffer size in gntwm.c.  (Richard Laager)
 
 version 2.14.0 (2020/06/10):
 	* Split libgnt out of the Pidgin repository. (Elliott Sales de Andrade)
