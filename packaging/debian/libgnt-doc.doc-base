@@ -1,0 +1,9 @@
+Document: libgnt
+Title: libgnt Reference Manual
+Author: The Pidgin Developers
+Abstract: API Reference Manual for libgnt.
+Section: Programming
+
+Format: HTML
+Index: /usr/share/doc/libgnt-doc/libgnt/index.html
+Files: /usr/share/doc/libgnt-doc/libgnt/*html

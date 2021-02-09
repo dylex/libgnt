@@ -1,0 +1,54 @@
+Source: libgnt
+Section: libs
+Priority: optional
+Maintainer: Gary Kramlich <grim@reaperworld.com>
+Build-Depends: debhelper-compat (= 13),
+               gtk-doc-tools,
+               libglib2.0-dev,
+               libncurses-dev,
+               meson (>= 0.37.0)
+Homepage: https://keep.imfreedom.org/libgnt/libgnt
+Vcs-Browser: https://keep.imfreedom.org/libgnt/libgnt
+Vcs-Hg: https://keep.imfreedom.org/libgnt/libgnt
+Rules-Requires-Root: no
+Standards-Version: 4.5.0
+
+Package: libgnt0
+Architecture: any
+Depends: libglib2.0-0 (>= 2.16.0),
+         libncursesw6,
+         libxml2,
+         ${misc:Depends},
+         ${shlibs:Depends}
+Description: ncurses toolkit for creating text-mode graphical user interfaces
+ GNT is an ncurses toolkit for creating text-mode graphical user interfaces in
+ a fast and easy way. It is based on GLib and ncurses.
+ .
+ It was born out of the console-based UI, **Finch**, for the libpurple project.
+ .
+ This package contains the main library.
+
+Package: libgnt-dev
+Architecture: any
+Section: libdevel
+Depends: libglib2.0-dev, libgnt0 (= ${binary:Version}), ${misc:Depends}
+Suggests: libgnt-doc
+Description: development files for the gnt library
+ GNT is an ncurses toolkit for creating text-mode graphical user interfaces in
+ a fast and easy way. It is based on GLib and ncurses.
+ .
+ It was born out of the console-based UI, **Finch**, for the libpurple project.
+ .
+ This package contains the include files used for development against libgnt.
+
+Package: libgnt-doc
+Architecture: all
+Section: doc
+Depends: ${misc:Depends}
+Description: documentation for the gnt library
+ GNT is an ncurses toolkit for creating text-mode graphical user interfaces in
+ a fast and easy way. It is based on GLib and ncurses.
+ .
+ It was born out of the console-based UI, **Finch**, for the libpurple project.
+ .
+ This package contains the HTML documentation.

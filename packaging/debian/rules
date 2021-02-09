@@ -1,0 +1,7 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export DPKG_GENSYMBOLS_CHECK_LEVEL = 4
+
+%:
+	dh $@
