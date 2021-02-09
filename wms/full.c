@@ -118,6 +118,15 @@ static gboolean
 focus_blist(GntBindable *bindable, GList *null)
 {
 	// purple_blist_show();
+	GntWM *wm = GNT_WM(bindable);
+	GList *iter;
+	for (iter = wm->acts; iter; iter = iter->next) {
+		GntAction *action = iter->data;
+		if (!strcmp(action->label, "Buddy List")) {
+			action->callback();
+			break;
+		}
+	}
 	return TRUE;
 }
 
