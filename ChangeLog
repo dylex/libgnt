@@ -5,6 +5,7 @@ Please see notes about versioning in README.md.
 
 version 2.14.2 (????/??/??):
 	* Fix a SEGFAULT in gnt_combo_box_get_dropdown. (RR #793) (ivanhoe)
+	* Fix an invalid read/write when hiding widgets. (RR #810) (ivanhoe)
 
 version 2.14.1 (2021/02/04):
 	* Bump the minimum meson version from 0.37.0 to 0.41.0 (Richard Laager)
