@@ -192,6 +192,9 @@ libgnt_headers = [
 
 # Check for Python headers
 python_dep = dependency('python2', required : false)
+if not python_dep.found()
+	python_dep = dependency('python-2.7', required : false)
+endif
 gnt_config.set('USE_PYTHON', python_dep.found())
 
 configure_file(output : 'gntconfig.h',
