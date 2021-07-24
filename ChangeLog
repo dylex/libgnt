@@ -3,6 +3,9 @@ GNT: The GLib Ncurses Toolkit
 
 Please see notes about versioning in README.md.
 
+version 2.14.3 (????/??/??):
+	* Nothing yet, be the first!!
+
 version 2.14.2 (2021/07/23):
 	* Fix a SEGFAULT in gnt_combo_box_get_dropdown. (RR #793) (ivanhoe)
 	* Fix an invalid read/write when hiding widgets. (RR #810) (ivanhoe)

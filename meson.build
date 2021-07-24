@@ -22,11 +22,11 @@
 #   For production releases:    ''
 #
 
-# the last version for Finch 2 was 2.14.1,
+# the last version for Finch 2 was 2.14.2,
 # the first version for Finch 3 was 3.0.0
 
 project('libgnt', 'c',
-    version : '2.14.2',
+    version : '2.14.3-dev',
     meson_version : '>=0.41.0')
 gnt_soversion = 0
 
