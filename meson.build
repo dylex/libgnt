@@ -225,6 +225,10 @@ libgnt_dep = declare_dependency(
     link_with : libgnt,
     dependencies : [ncurses, glib])
 
+if meson.version().version_compare('>=0.54.0')
+	meson.override_dependency('gnt', libgnt_dep)
+endif
+
 pkgconfig.generate(
     name : 'LibGNT',
     description : 'Glib Ncurses Toolkit is a collection of curses-widgets.',
