@@ -1,0 +1,6 @@
+option(
+	'python2',
+	type: 'boolean', value: true,
+	description: 'Whether or not to include python support.',
+)
+

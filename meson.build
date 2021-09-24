@@ -27,7 +27,7 @@
 
 project('libgnt', 'c',
     version : '2.14.3-dev',
-    meson_version : '>=0.41.0')
+    meson_version : '>=0.44.0')
 gnt_soversion = 0
 
 parts = meson.project_version().split('-')
@@ -191,11 +191,18 @@ libgnt_headers = [
 ]
 
 # Check for Python headers
-python_dep = dependency('python2', required : false)
-if not python_dep.found()
-	python_dep = dependency('python-2.7', required : false)
+python_dep = disabler()
+if get_option('python2')
+	python_dep = dependency('python2', required : false)
+	if not python_dep.found()
+		python_dep = dependency('python-2.7', required : false)
+	endif
+
+	if not python_dep.found()
+		error('failed to find python')
+	endif
 endif
-gnt_config.set('USE_PYTHON', python_dep.found())
+gnt_config.set('USE_PYTHON', get_option('python2'))
 
 configure_file(output : 'gntconfig.h',
     configuration : gnt_config)
@@ -213,13 +220,17 @@ gntmarshal = gnome.genmarshal('gntmarshal',
                               install_dir : join_paths(get_option('includedir'), 'gnt'))
 
 libgnt_inc = include_directories('.')
+libgnt_dependencies= [ncurses, libxml, glib, gobject, gmodule]
+if get_option('python2')
+	libgnt_dependencies += python_dep
+endif
 libgnt = library('gnt',
                  libgnt_SOURCES + gntmarshal,
                  install : true,
                  version : '@0@.@1@.@2@'.format(gnt_soversion,
                                                 gnt_minor_version,
                                                 gnt_micro_version),
-                 dependencies : [ncurses, libxml, glib, gobject, gmodule, python_dep])
+                 dependencies : libgnt_dependencies)
 libgnt_dep = declare_dependency(
     include_directories : libgnt_inc,
     link_with : libgnt,
