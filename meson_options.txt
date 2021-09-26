@@ -4,3 +4,9 @@ option(
 	description: 'Whether or not to include python support.',
 )
 
+option(
+	'doc',
+	type: 'boolean', value: true,
+	description: 'Whether or not to build the documentation.',
+)
+
