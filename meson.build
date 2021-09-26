@@ -26,7 +26,7 @@
 # the first version for Finch 3 was 3.0.0
 
 project('libgnt', 'c',
-    version : '2.14.3-dev',
+    version : '2.14.3',
     meson_version : '>=0.44.0')
 gnt_soversion = 0
 

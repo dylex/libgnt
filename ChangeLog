@@ -3,8 +3,11 @@ GNT: The GLib Ncurses Toolkit
 
 Please see notes about versioning in README.md.
 
-version 2.14.3 (????/??/??):
-	* Nothing yet, be the first!!
+version 2.14.3 (2021/09/25):
+	* Added an option to disable python2 support. (LIBGNT-16) (RR 930) (Gary
+	  Kramlich)
+	* Add an option to disable building the docs. (LIBGNT-17) (RR 945) (Helmut
+	  Grohne, Gary Kramlich)
 
 version 2.14.2 (2021/07/23):
 	* Fix a SEGFAULT in gnt_combo_box_get_dropdown. (RR #793) (ivanhoe)
