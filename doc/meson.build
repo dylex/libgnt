@@ -1,3 +1,5 @@
+if get_option('doc')
+
 DOC_MODULE = 'libgnt'
 
 # Header files or dirs to ignore when scanning. Use base file/dir names
@@ -35,3 +37,6 @@ gnome.gtkdoc(DOC_MODULE,
     scan_args : scan_args,
     mkdb_args : mkdb_args,
     gobject_typesfile : DOC_MODULE + '.types')
+
+endif # get_option('doc')
+

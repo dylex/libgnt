@@ -360,7 +360,7 @@ GntWidget *gnt_combo_box_new()
 GntWidget *
 gnt_combo_box_get_dropdown(GntComboBox *box)
 {
-	g_return_val_if_fail(GNT_IS_BOX(box), NULL);
+	g_return_val_if_fail(GNT_IS_COMBO_BOX(box), NULL);
 
 	return box->dropdown;
 }

@@ -328,7 +328,7 @@ gnt_widget_destroy(GntWidget *obj)
 	if (!gnt_widget_in_destruction(obj)) {
 		GNT_WIDGET_SET_FLAGS(obj, GNT_WIDGET_DESTROYING);
 		gnt_widget_hide(obj);
-		delwin(obj->window);
+		g_clear_pointer(&obj->window, delwin);
 		g_object_run_dispose(G_OBJECT(obj));
 	}
 	GNTDEBUG;
@@ -442,7 +442,9 @@ void
 gnt_widget_hide(GntWidget *widget)
 {
 	g_signal_emit(widget, signals[SIG_HIDE], 0);
-	wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_NORMAL));
+	if (widget->window) {
+		wbkgdset(widget->window, '\0' | gnt_color_pair(GNT_COLOR_NORMAL));
+	}
 #if 0
 	/* XXX: I have no clue why, but this seemed to be necessary. */
 	if (gnt_widget_has_shadow(widget))

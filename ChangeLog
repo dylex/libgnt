@@ -3,7 +3,18 @@ GNT: The GLib Ncurses Toolkit
 
 Please see notes about versioning in README.md.
 
-version 2.14.1 (????/??/??):
+version 2.14.3 (2021/09/25):
+	* Added an option to disable python2 support. (LIBGNT-16) (RR 930) (Gary
+	  Kramlich)
+	* Add an option to disable building the docs. (LIBGNT-17) (RR 945) (Helmut
+	  Grohne, Gary Kramlich)
+
+version 2.14.2 (2021/07/23):
+	* Fix a SEGFAULT in gnt_combo_box_get_dropdown. (RR #793) (ivanhoe)
+	* Fix an invalid read/write when hiding widgets. (RR #810) (ivanhoe)
+	* Look for python-2.7.pc as well as python2.pc. (RR #822) (Gary Kramlich)
+
+version 2.14.1 (2021/02/04):
 	* Bump the minimum meson version from 0.37.0 to 0.41.0 (Richard Laager)
 	* Fix a buffer size in gntwm.c.  (Richard Laager)
 
